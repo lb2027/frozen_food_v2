@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function fetchProduk() {
     try {
       const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDUyNTUzNjYsInVzZXJuYW1lIjoiZHdpa2kifQ.nn5GFSoKEfXQRTpaPuTvU4ZcAq1IfGx382RWXTFcvxg";
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDUyNTc3ODMsInVzZXJuYW1lIjoiZHdpa2kifQ.enMj3cZafCKpR5CD4HlCJ9gmQ7h6tYODPkQnmWLF9XU";
       const response = await fetch("http://localhost:5050/selectproduk", {
         headers: {
           "Content-Type": "application/json",
@@ -14,12 +14,16 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Produk data:", produkData);
 
       // Update stats cards
-      document.getElementById("daily-sales").innerText = "Rp 2.5M"; // Replace with actual data
-      document.getElementById("monthly-revenue").innerText = "Rp 75M"; // Replace with actual data
-      document.getElementById("inventory-status").innerText =
-        produkData.length + " Products";
+      //   document.getElementById("daily-sales").innerText = "Rp 2.5M"; // Replace with actual data
+      //   document.getElementById("monthly-revenue").innerText = "Rp 75M"; // Replace with actual data
+      //   document.getElementById("inventory-status").innerText =
+      //     produkData.length + " Products";
 
       const productList = document.getElementById("product-list");
+      if (!productList) {
+        console.error("Product list element not found!");
+        return;
+      }
       productList.innerHTML = "";
 
       produkData.forEach((produk) => {
@@ -64,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   >
                     <polyline points="3 6 5 6 21 6" />
                     <path
-                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1-2 2v2"
                     />
                   </svg>
                   Hapus
@@ -77,7 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
       console.error("Error fetching produk:", error);
       const productList = document.getElementById("product-list");
-      productList.innerHTML = `<div class="error-message">Failed to load products. Please check the API.</div>`;
+      if (productList) {
+        productList.innerHTML = `<div class="error-message">Failed to load products. Please check the API.</div>`;
+      } else {
+        console.error("Product list element not found in catch block!");
+      }
     }
   }
 
