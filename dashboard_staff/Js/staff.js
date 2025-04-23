@@ -1,36 +1,49 @@
-// Toggle active sidebar item
+// Toggle sidebar 
 const sidebarItems = document.querySelectorAll('.sidebar-item');
+
 sidebarItems.forEach(item => {
   item.addEventListener('click', () => {
-    sidebarItems.forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
+    const icon = item.querySelector('.icon-circle');
+    
+    if (icon) {
+      icon.classList.add('scale-up');
+
+      setTimeout(() => {
+        icon.classList.remove('scale-up');
+      }, 200); 
+    }
   });
 });
 
-// Toggle time filter active state
-const timeOptions = document.querySelectorAll('.time-option');
-timeOptions.forEach(option => {
-  option.addEventListener('click', () => {
-    timeOptions.forEach(o => o.classList.remove('active'));
-    option.classList.add('active');
-    console.log(`Filter waktu: ${option.textContent}`);
-    // Bisa tambahkan fungsi untuk fetch data baru sesuai filter
+// Bagian Modal Fitur
+
+//MASUK
+function bukaModal() {
+  document.getElementById('modalBarangMasuk').style.display = 'flex';
+}
+
+function tutupModal() {
+  document.getElementById('modalBarangMasuk').style.display = 'none';
+}
+
+document.querySelector('.sidebar-item.active').addEventListener('click', bukaModal);
+
+// TERJUAL
+function bukaModalTerjual() {
+  document.getElementById('modalBarangTerjual').style.display = 'flex';
+}
+
+function tutupModalTerjual() {
+  document.getElementById('modalBarangTerjual').style.display = 'none';
+}
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const spanText = item.querySelector('span').textContent.trim();
+    if (spanText === "Barang Terjual") {
+      bukaModalTerjual();
+    }
   });
 });
 
-// Export button handler
-const exportBtn = document.querySelector('.export-btn');
-if (exportBtn) {
-  exportBtn.addEventListener('click', () => {
-    alert('Fitur export belum tersedia 😅');
-    // Di sini bisa integrasi ke fungsi export PDF, CSV, dll
-  });
-}
 
-// Simulasi notifikasi
-const notifIcon = document.querySelector('.notification-icon');
-if (notifIcon) {
-  notifIcon.addEventListener('click', () => {
-    alert('Belum ada notifikasi baru 🔔');
-  });
-}
