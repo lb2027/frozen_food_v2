@@ -365,7 +365,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #1e1e1e; /* latar tabel */
+  background-color: #1e1e1e; /* latar tabel  */
 }
 
 .product-table th, .product-table td {
@@ -383,8 +383,9 @@
   border-bottom: 1px solid #333;  /* Garis pemisah antar produk */
 }
 
+/*Bagian untuk efek ketika di sentuh*/
 .product-table tr:hover {
-  background-color: #666; 
+  background-color: #333; 
 }
 
 .product-table img {
