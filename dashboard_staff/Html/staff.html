@@ -62,77 +62,68 @@
       </div>
 
       <!--Bagian Daftar Produk-->
-      <div class="content-section">
-        <div class="section-container">
-          <div class="section-header">
-            <div class="section-title">Daftar Produk</div>
-          </div>
-          <div class="dish-list">
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
+      <body>
+        <div class="content-section">
+          <div class="section-container">
+            <div class="section-header">
+              <div class="section-title">Daftar Produk</div>
             </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status out-of-stock">Out of stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
+            <table class="product-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Foto</th>
+                  <th>Stok</th>
+                  <th>Harga</th>
+                  <th>Supplier</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data produk akan ditampilkan di sini -->
+                <tr>
+                  <td>1</td>
+                  <td>Chicken Parmesan</td>
+                  <td><img src="/api/placeholder/60/50" alt="Chicken Parmesan"></td>
+                  <td>In Stock</td>
+                  <td>$55.00</td>
+                  <td>Supplier A</td>
+                  <td>
+                    <button class="edit">Edit</button>
+                    <button class="delete">Delete</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Spaghetti Bolognese</td>
+                  <td><img src="/api/placeholder/60/50" alt="Spaghetti Bolognese"></td>
+                  <td>Out of Stock</td>
+                  <td>$45.00</td>
+                  <td>Supplier B</td>
+                  <td>
+                    <button class="edit">Edit</button>
+                    <button class="delete">Delete</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Caesar Salad</td>
+                  <td><img src="/api/placeholder/60/50" alt="Caesar Salad"></td>
+                  <td>In Stock</td>
+                  <td>$35.00</td>
+                  <td>Supplier C</td>
+                  <td>
+                    <button class="edit">Edit</button>
+                    <button class="delete">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </body>
+
 
         <!--Bagian Modal Fitur-->
 
