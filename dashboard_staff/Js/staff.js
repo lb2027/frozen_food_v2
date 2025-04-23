@@ -46,4 +46,19 @@ document.querySelectorAll('.sidebar-item').forEach(item => {
   });
 });
 
+//CLOSE MODAL DI LAYAR
+window.addEventListener('click', function (event) {
+  const modalMasuk = document.getElementById('modalBarangMasuk');
+  const modalTerjual = document.getElementById('modalBarangTerjual');
+
+  if (event.target === modalMasuk) {
+    modalMasuk.style.display = 'none';
+  }
+
+  if (event.target === modalTerjual) {
+    modalTerjual.style.display = 'none';
+  }
+});
+
+
 

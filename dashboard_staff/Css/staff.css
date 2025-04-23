@@ -352,4 +352,21 @@
     to { opacity: 1; transform: scale(1); }
   }
   
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 70px;
+    }
+  
+    .sidebar-item span {
+      display: none; /* sembunyikan teks */
+    }
+  
+    .main-content {
+      padding: 10px;
+    }
+  
+    .modal-content {
+      width: 95%;
+    }
+  }
   
