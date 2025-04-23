@@ -3,13 +3,46 @@ document.addEventListener("DOMContentLoaded", function () {
   loginForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
+    let apiUrl = "";
+
+    async function readJsonFile(filePath) {
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const jsonData = await response.json();
+        return jsonData;
+      } catch (error) {
+        console.error("Error reading JSON file:", error);
+        return null;
+      }
+    }
+
+    async function initializeApiUrl() {
+      const envData = await readJsonFile("/json/env.json");
+      if (envData && envData.api_url) {
+        apiUrl = envData.api_url;
+      } else {
+        console.log("failed login"); // Default URL if reading fails
+        console.warn(
+          "Failed to read API URL from JSON, using default:",
+          apiUrl
+        );
+      }
+    }
+
+    await initializeApiUrl();
+
+    console.log("API URL:", apiUrl);
+
     const usernameInput = document.querySelector('input[type="text"]');
     const passwordInput = document.querySelector('input[type="password"]');
     const username = usernameInput.value;
     const password = passwordInput.value;
 
     try {
-      const response = await fetch("http://localhost:5050/login", {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
