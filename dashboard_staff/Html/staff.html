@@ -19,7 +19,7 @@
         <span>Barang Masuk</span>
       </div>
       <div class="sidebar-item">
-        <div class="icon-circle">📊</div>
+        <div class="icon-circle">🛒</div>
         <span>Barang Terjual</span>
       </div>
       <div class="sidebar-item logout-container">
@@ -62,77 +62,180 @@
       </div>
 
       <!--Bagian Daftar Produk-->
-      <div class="content-section">
-        <div class="section-container">
-          <div class="section-header">
-            <div class="section-title">Daftar Produk</div>
-          </div>
-          <div class="dish-list">
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
+      <body>
+        <div class="content-section">
+          <div class="section-container">
+            <div class="section-header">
+              <div class="section-title">Daftar Produk</div>
             </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status out-of-stock">Out of stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
-
-            <div class="dish-item">
-              <div class="dish-info">
-                <div class="dish-img">
-                  <img src="/api/placeholder/60/50" alt="Chicken Parmesan" />
-                </div>
-                <div class="dish-details">
-                  <div class="dish-name">Chicken Parmesan</div>
-                  <div class="dish-serving">Serving : 01 person</div>
-                </div>
-              </div>
-              <div class="dish-status">
-                <div class="stock-status in-stock">In Stock</div>
-                <div class="dish-price">$55.00</div>
-              </div>
-            </div>
+            <table class="product-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Foto</th>
+                  <th>Stok</th>
+                  <th>Harga</th>
+                  <th>Supplier</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data produk akan ditampilkan di sini -->
+                <tr>
+                  <td>1</td>
+                  <td>Chicken Parmesan</td>
+                  <td><img src="../Foto/1.jpg" alt="Chicken Parmesan"></td>
+                  <td>10</td>
+                  <td>12.000</td>
+                  <td>Murtiasih Frozen Food</td>
+                  <td>
+                    <button class="edit">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
+                      Edit
+                    </button>
+                    
+                    <button class="delete">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Spaghetti Bolognese</td>
+                  <td><img src="../Foto/2.jpg" alt="Spaghetti Bolognese"></td>
+                  <td>20</td>
+                  <td>20.000</td>
+                  <td>Murtiasih Frozen Food</td>
+                  <td>
+                    <button class="edit">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
+                      Edit
+                    </button>
+                    
+                    <button class="delete">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Caesar Salad</td>
+                  <td><img src="../Foto/3.jpg" alt="Caesar Salad"></td>
+                  <td>17</td>
+                  <td>19.500</td>
+                  <td>Murtiasih Frozen Food</td>
+                  <td>
+                    <button class="edit">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
+                      Edit
+                    </button>
+                    
+                    <button class="delete">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        viewBox="0 0 24 24"
+                        style="margin-right: 5px"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                
+              </tbody>
+            </table>
           </div>
         </div>
+      </body>
+
 
         <!--Bagian Modal Fitur-->
 
