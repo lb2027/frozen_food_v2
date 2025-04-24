@@ -85,6 +85,104 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.style.display = "none";
   });
 
+  // Get references to the modal and button elements for adding stock
+  const addStockModal = document.getElementById("add-stock-modal");
+  const openAddStockModalBtn = document.getElementById("open-add-stock-modal");
+  const closeAddStockModalBtn = document.getElementById(
+    "close-add-stock-modal"
+  );
+  const addStockForm = document.getElementById("add-stock-form");
+
+  // Function to open the add stock modal
+  openAddStockModalBtn.addEventListener("click", () => {
+    addStockModal.style.display = "block";
+  });
+
+  // Function to close the add stock modal
+  closeAddStockModalBtn.addEventListener("click", () => {
+    addStockModal.style.display = "none";
+  });
+
+  // Function to handle add stock form submission
+  addStockForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    // Get form values
+    const produkId = document.getElementById("produk").value;
+    const stokMasuk = document.getElementById("stok_masuk").value;
+
+    // Validate form values
+    if (!produkId || !stokMasuk) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      // Fetch the existing product data
+      const productResponse = await fetch(
+        `${apiUrl}/selectprodukbyid/${produkId}`, // You'll need to create this endpoint
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+
+      if (!productResponse.ok) {
+        alert("Failed to fetch product data.");
+        return;
+      }
+
+      const existingProduct = await productResponse.json();
+
+      // Update the stock
+      const newStock = existingProduct[0].stok + parseInt(stokMasuk); // Assuming the API returns an array
+
+      // Send the updated product data
+      const response = await fetch(`${apiUrl}/updateproduk`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify({
+          produk_id: existingProduct[0].produk_id,
+          nama: existingProduct[0].nama,
+          stok: newStock,
+          harga: existingProduct[0].harga,
+          harga_beli: existingProduct[0].harga_beli,
+          foto: existingProduct[0].foto,
+          supplier: existingProduct[0].supplier,
+        }),
+      });
+
+      if (response.ok) {
+        // Close the modal
+        addStockModal.style.display = "none";
+
+        // Refresh the product list
+        fetchProduk();
+      } else {
+        // Display an error message
+        const errorData = await response.json();
+        alert(`Failed to add stock: ${errorData.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      // Display an error message
+      console.error("Error adding stock:", error);
+      alert("An error occurred while adding the stock.");
+    }
+  });
+
+  // close button for add stock modal
+  const closeButtonStock = document.getElementById("closeBtnStock");
+
+  closeButtonStock.addEventListener("click", function () {
+    // Close the modal
+    addStockModal.style.display = "none";
+  });
+
   let produkData = []; // Store the product data
 
   // Function to read the JSON file
@@ -126,13 +224,10 @@ document.addEventListener("DOMContentLoaded", function () {
       produkData = await response.json(); // Store the product data
       console.log("Produk data:", produkData);
 
-      // Update stats cards
-      //   document.getElementById("daily-sales").innerText = "Rp 2.5M"; // Replace with actual data
-      //   document.getElementById("monthly-revenue").innerText = "Rp 75M"; // Replace with actual data
-      //   document.getElementById("inventory-status").innerText =
-      //     produkData.length + " Products";
-
       renderProductList(produkData); // Render the product list
+
+      // Populate the product dropdown in the add stock modal
+      populateProductDropdown(produkData);
     } catch (error) {
       console.error("Error fetching produk:", error);
       const productList = document.getElementById("product-list");
@@ -203,6 +298,25 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
       `;
       productList.appendChild(row);
+    });
+  }
+
+  function populateProductDropdown(products) {
+    const productDropdown = document.getElementById("produk");
+    if (!productDropdown) {
+      console.error("Product dropdown element not found!");
+      return;
+    }
+
+    // Clear existing options
+    productDropdown.innerHTML = "";
+
+    // Add options for each product
+    products.forEach((produk) => {
+      const option = document.createElement("option");
+      option.value = produk.produk_id;
+      option.text = produk.nama;
+      productDropdown.appendChild(option);
     });
   }
 
