@@ -1,8 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Check if the user is logged in
   const token = localStorage.getItem("authToken");
-  if (!token) {
-    // Redirect to the login page if not logged in
+
+  // Function to check if the token is expired
+  function isTokenExpired(token) {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payload = JSON.parse(atob(payloadBase64));
+
+      // Check if the token has an expiration time
+      if (payload && payload.exp) {
+        const expiryTime = payload.exp * 1000; // Convert to milliseconds
+        const currentTime = Date.now();
+
+        // Check if the token is expired
+        return currentTime > expiryTime;
+      } else {
+        // If the token doesn't have an expiration time, consider it invalid
+        return true;
+      }
+    } catch (error) {
+      // If there's an error decoding the token, consider it invalid
+      console.error("Error decoding token:", error);
+      return true;
+    }
+  }
+
+  if (!token || isTokenExpired(token)) {
+    // Redirect to the login page if not logged in or token is expired
     window.location.href = "/login/login.html"; // Replace with login page
     return; // Prevent further execution
   }
@@ -110,7 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Get form values
     const produkId = document.getElementById("produk").value;
     const stokMasuk = document.getElementById("stok_masuk").value;
-
+    console.log(produkId);
+    console.log(stokMasuk);
     // Validate form values
     if (!produkId || !stokMasuk) {
       alert("Please fill in all fields.");
@@ -120,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       // Fetch the existing product data
       const productResponse = await fetch(
-        `${apiUrl}/selectprodukbyid/${produkId}`, // You'll need to create this endpoint
+        `${apiUrl}/selectProdukById?id=${produkId}`, // Corrected URL
         {
           headers: {
             "Content-Type": "application/json",
@@ -135,9 +161,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const existingProduct = await productResponse.json();
+      console.log("existingProduct:", existingProduct); // Add this line
+
+      if (!existingProduct || Object.keys(existingProduct).length === 0) {
+        console.error("No product data found for produkId:", produkId);
+        alert("No product data found.");
+        return;
+      }
 
       // Update the stock
-      const newStock = existingProduct[0].stok + parseInt(stokMasuk); // Assuming the API returns an array
+      const newStock = existingProduct.stok + parseInt(stokMasuk);
 
       // Send the updated product data
       const response = await fetch(`${apiUrl}/updateproduk`, {
@@ -147,13 +180,13 @@ document.addEventListener("DOMContentLoaded", function () {
           token: token,
         },
         body: JSON.stringify({
-          produk_id: existingProduct[0].produk_id,
-          nama: existingProduct[0].nama,
+          produk_id: existingProduct.produk_id,
+          nama: existingProduct.nama,
           stok: newStock,
-          harga: existingProduct[0].harga,
-          harga_beli: existingProduct[0].harga_beli,
-          foto: existingProduct[0].foto,
-          supplier: existingProduct[0].supplier,
+          harga: existingProduct.harga,
+          harga_beli: existingProduct.harga_beli,
+          foto: existingProduct.foto,
+          supplier: existingProduct.supplier,
         }),
       });
 
