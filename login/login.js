@@ -71,9 +71,18 @@ document.addEventListener("DOMContentLoaded", function () {
           alert("Unknown role. Redirecting to a default page.");
         }
       } else {
-        // Handle login error
+        const errorData = await response.json();
+        console.error("Login failed:", errorData.message);
+        alert("Login failed: " + errorData.message);
       }
     } catch (error) {
+      // display error message with timeout
+      const errorMessage = document.querySelector(".error-message");
+      errorMessage.style.display = "block";
+      setTimeout(() => {
+        errorMessage.style.display = "none";
+      }, 3000); // Hide after 3 seconds
+
       // Handle network error
     }
   });

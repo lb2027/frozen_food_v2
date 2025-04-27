@@ -110,3 +110,11 @@ body {
 .login-button:hover {
   background-color: #ff9aa2;
 }
+
+.error-message {
+  color: #c0c0c0;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  display: none;
+}
