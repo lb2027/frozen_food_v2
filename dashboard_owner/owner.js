@@ -282,16 +282,23 @@ document.addEventListener("DOMContentLoaded", function () {
     soldItems.forEach((item) => {
       const produkId = item.querySelector(".produk").value;
       const stokTerjual = item.querySelector(".stok_terjual").value;
+      const selectedOption = item.querySelector(".produk").selectedOptions[0];
+      const namaProduk = selectedOption.text; // Get the product name from the dropdown text
+      // You might need to fetch the price from the database or store it in the dropdown
+      // For simplicity, let's assume you have a way to get the price based on the product ID
+      const harga = produkData.find((p) => p.produk_id == produkId).harga;
 
       items.push({
-        produk_id: parseInt(produkId, 10), // Parse as integer with radix 10
-        stok_keluar: parseInt(stokTerjual, 10), // Parse as integer with radix 10
+        produk_id: parseInt(produkId, 10),
+        nama_produk: namaProduk,
+        harga: harga,
+        stok_keluar: parseInt(stokTerjual, 10),
       });
     });
 
-    console.log("Items to send:", items); // Add this line
+    console.log("Items to send:", items);
     const jsonPayload = JSON.stringify(items);
-    console.log("JSON Payload:", jsonPayload); // Add this line
+    console.log("JSON Payload:", jsonPayload);
 
     if (items.length === 0) {
       alert("Please add at least one product to the sold items list.");
