@@ -121,6 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to open the add stock modal
   openAddStockModalBtn.addEventListener("click", () => {
     addStockModal.style.display = "block";
+    const addStockDropdown = document.querySelector("#add-stock-modal .produk");
+    populateProductDropdown(produkData, addStockDropdown);
   });
 
   // Function to close the add stock modal
@@ -216,6 +218,125 @@ document.addEventListener("DOMContentLoaded", function () {
     addStockModal.style.display = "none";
   });
 
+  // Get references to the modal and button elements for stok sold
+  const stokSoldModal = document.getElementById("stok-sold-modal");
+  const openStokSoldModalBtn = document.querySelector(".btn-outgoing"); // Assuming you have a class for the "Barang Terjual" button
+  const closeStokSoldModalBtn = document.getElementById(
+    "close-stok-sold-modal"
+  );
+  const stokSoldForm = document.getElementById("stok-sold-form");
+  const soldItemsList = document.getElementById("sold-items-list");
+  const addItemBtn = document.getElementById("add-item-btn");
+
+  // Function to open the stok sold modal
+  openStokSoldModalBtn.addEventListener("click", () => {
+    stokSoldModal.style.display = "block";
+    // Populate the product dropdown when the modal is opened
+    populateProductDropdown(
+      produkData,
+      document.querySelector("#stok-sold-modal .produk")
+    );
+  });
+
+  // Function to close the stok sold modal
+  closeStokSoldModalBtn.addEventListener("click", () => {
+    stokSoldModal.style.display = "none";
+  });
+
+  // Function to add a new product item to the sold items list
+  addItemBtn.addEventListener("click", () => {
+    const newItem = document.createElement("div");
+    newItem.classList.add("sold-item");
+    newItem.innerHTML = `
+      <div class="form-group">
+        <label for="produk">Pilih Produk:</label>
+        <select class="produk" name="produk" required>
+          <!-- Options will be dynamically added here -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="stok_terjual">Stok Terjual:</label>
+        <input type="number" class="stok_terjual" name="stok_terjual" required />
+      </div>
+      <button type="button" class="remove-item-btn">Hapus</button>
+    `;
+    soldItemsList.appendChild(newItem);
+
+    // Populate the product dropdown in the new item
+    populateProductDropdown(produkData, newItem.querySelector(".produk"));
+
+    // Add event listener to the remove button
+    newItem.querySelector(".remove-item-btn").addEventListener("click", () => {
+      newItem.remove();
+    });
+  });
+
+  // Function to handle stok sold form submission
+  stokSoldForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    // Get all sold items
+    const soldItems = soldItemsList.querySelectorAll(".sold-item");
+    const items = [];
+
+    soldItems.forEach((item) => {
+      const produkId = item.querySelector(".produk").value;
+      const stokTerjual = item.querySelector(".stok_terjual").value;
+
+      items.push({
+        produk_id: parseInt(produkId, 10), // Parse as integer with radix 10
+        stok_keluar: parseInt(stokTerjual, 10), // Parse as integer with radix 10
+      });
+    });
+
+    console.log("Items to send:", items); // Add this line
+    const jsonPayload = JSON.stringify(items);
+    console.log("JSON Payload:", jsonPayload); // Add this line
+
+    if (items.length === 0) {
+      alert("Please add at least one product to the sold items list.");
+      return;
+    }
+
+    try {
+      // Send a POST request to the sold items API
+      const response = await fetch(`${apiUrl}/soldproduk`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: jsonPayload,
+      });
+
+      if (response.ok) {
+        // Close the modal
+        stokSoldModal.style.display = "none";
+
+        // Refresh the product list
+        fetchProduk();
+      } else {
+        // Display an error message
+        const errorData = await response.json();
+        alert(
+          `Failed to add sold items: ${errorData.message || "Unknown error"}`
+        );
+      }
+    } catch (error) {
+      // Display an error message
+      console.error("Error adding sold items:", error);
+      alert("An error occurred while adding the sold items.");
+    }
+  });
+
+  // close button for stok sold modal
+  const closeButtonStokSold = document.getElementById("closeBtnStokSold");
+
+  closeButtonStokSold.addEventListener("click", function () {
+    // Close the modal
+    stokSoldModal.style.display = "none";
+  });
+
   let produkData = []; // Store the product data
 
   // Function to read the JSON file
@@ -254,13 +375,12 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
       console.log("Response status:", response.status);
-      produkData = await response.json(); // Store the product data
-      console.log("Produk data:", produkData);
+      const data = await response.json(); // Store the product data
+      console.log("Produk data from API:", data);
+      produkData = data;
+      console.log("produkData after fetch:", produkData);
 
       renderProductList(produkData); // Render the product list
-
-      // Populate the product dropdown in the add stock modal
-      populateProductDropdown(produkData);
     } catch (error) {
       console.error("Error fetching produk:", error);
       const productList = document.getElementById("product-list");
@@ -285,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
       row.innerHTML = `
         <td>${produk.produk_id}</td>
         <td>${produk.nama}</td>
-        <td><div class="product-image"><img src="${produk.foto}" alt="${
+        <td><div class="product-image"><img src="/images/${produk.foto}" alt="${
         produk.nama
       }" width="50"></div></td>
         <td>${produk.stok}</td>
@@ -334,22 +454,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function populateProductDropdown(products) {
-    const productDropdown = document.getElementById("produk");
-    if (!productDropdown) {
+  function populateProductDropdown(products, dropdown) {
+    if (!dropdown) {
       console.error("Product dropdown element not found!");
       return;
     }
 
     // Clear existing options
-    productDropdown.innerHTML = "";
+    dropdown.innerHTML = "";
 
     // Add options for each product
     products.forEach((produk) => {
       const option = document.createElement("option");
       option.value = produk.produk_id;
       option.text = produk.nama;
-      productDropdown.appendChild(option);
+      dropdown.appendChild(option);
     });
   }
 

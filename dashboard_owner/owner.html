@@ -481,7 +481,7 @@
         <form id="add-stock-form">
           <div class="form-group">
             <label for="produk">Pilih Produk:</label>
-            <select id="produk" name="produk" required>
+            <select class="produk" id="produk" name="produk" required>
               <!-- Options will be dynamically added here -->
             </select>
           </div>
@@ -491,6 +491,46 @@
           </div>
           <button type="submit" class="submit-btn">Simpan</button>
           <button type="button" id="closeBtnStock" id="close-add-stock-modal">
+            Batal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Stok sold Modal -->
+    <div class="modal" id="stok-sold-modal">
+      <div class="modal-content">
+        <span class="close-button" id="close-stok-sold-modal">&times;</span>
+        <h2>Stok Terjual</h2>
+        <form id="stok-sold-form">
+          <div id="sold-items-list">
+            <!-- Initial sold item -->
+            <div class="sold-item">
+              <div class="form-group">
+                <label for="produk">Pilih Produk:</label>
+                <select class="produk" name="produk" required>
+                  <!-- Options will be dynamically added here -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="stok_terjual">Stok Terjual:</label>
+                <input
+                  type="number"
+                  class="stok_terjual"
+                  name="stok_terjual"
+                  required
+                />
+              </div>
+              <button type="button" class="remove-item-btn">Hapus</button>
+            </div>
+          </div>
+          <button type="button" id="add-item-btn">Tambah Produk</button>
+          <button type="submit" class="submit-btn">Simpan</button>
+          <button
+            type="button"
+            id="closeBtnStokSold"
+            id="close-stok-sold-modal"
+          >
             Batal
           </button>
         </form>
