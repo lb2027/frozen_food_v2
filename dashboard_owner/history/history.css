@@ -17,7 +17,11 @@
 body {
   background-color: #131320;
   color: var(--dark);
-  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Dark mode scrollbar */
@@ -88,7 +92,7 @@ body {
 }
 
 .content {
-  margin-left: 240px;
+  margin-left: 3em;
   width: calc(100% - 240px);
   padding: 1.5rem;
 }
