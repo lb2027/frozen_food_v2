@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  await initializeApiUrl(); // Ensure the API URL is initialized before proceeding
   // Initialize the transaction history functionality
   initTransactionHistory();
 });
@@ -20,22 +21,24 @@ async function readJsonFile(filePath) {
 // Read the JSON file and set the API URL
 let apiUrl = "";
 async function initializeApiUrl() {
-  const envData = await readJsonFile("/json/env.json");
-  if (envData && envData.api_url) {
-    apiUrl = envData.api_url;
-  } else {
-    apiUrl = "http://localhost:5050"; // Default URL if reading fails
-    console.warn("Failed to read API URL from JSON, using default:", apiUrl);
+  try {
+    const envData = await readJsonFile("/json/env.json");
+    if (envData && envData.api_url) {
+      apiUrl = envData.api_url;
+    } else {
+      apiUrl = "http://localhost:5050"; // Default URL if reading fails
+      console.warn("Failed to read API URL from JSON, using default:", apiUrl);
+    }
+    console.log("API URL initialized:", apiUrl);
+  } catch (error) {
+    console.error("Error initializing API URL:", error);
+    apiUrl = "http://localhost:5050"; // Default URL on error
   }
 }
 
-initializeApiUrl().then(() => {
-  console.log("API URL initialized:", apiUrl);
-  loadTransactionData(); // Call loadTransactionData here
-});
-
 function initTransactionHistory() {
   // Load transaction data from the server
+  loadTransactionData(); // Load the first page with no filters
 
   // Initialize search functionality
   initSearchFilter();
@@ -111,14 +114,23 @@ function loadTransactionData(page = 1, filters = {}) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      token: token,
     },
   }) // Replace with your actual API endpoint
-    .then((response) => response.json()) // Parse the JSON response
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
-      displayTransactionData(data.transactions);
-      updatePagination(data.pagination);
-      updateStatCards(data.stats);
+      console.log("API Response:", data); // Add this line
+      if (data && Array.isArray(data)) {
+        displayTransactionData(data);
+      } else {
+        console.warn("No transaction data received from the server.");
+        displayTransactionData([]); // Display an empty table
+      }
       hideLoading();
     })
     .catch((error) => {
@@ -142,8 +154,8 @@ function displayTransactionData(transactions) {
 
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td class="transaction-id">${transaction.transaction_id}</td>
-            <td>${transaction.transaction_date}</td>
+            <td class="transaction-id">${transaction.transaksi_id}</td>
+            <td>${transaction.tanggal_transaksi}</td>
             <td>${transaction.nama_produk}</td>
             <td>${formattedSellPrice}</td>
             <td>${formattedBuyPrice}</td>

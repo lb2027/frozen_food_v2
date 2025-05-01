@@ -11,6 +11,11 @@ body {
   display: flex;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .sidebar {
   width: 110px;
   height: 100vh;
