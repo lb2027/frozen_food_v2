@@ -126,9 +126,11 @@ function loadTransactionData(page = 1, filters = {}) {
     .then((data) => {
       console.log("API Response:", data); // Add this line
       if (data && Array.isArray(data)) {
+        transactionData = data; // Store the transaction data globally
         displayTransactionData(data);
       } else {
         console.warn("No transaction data received from the server.");
+        transactionData = []; // Store an empty array globally
         displayTransactionData([]); // Display an empty table
       }
       hideLoading();
@@ -159,19 +161,30 @@ function displayTransactionData(transactions) {
             <td>${transaction.nama_produk}</td>
             <td>${formattedSellPrice}</td>
             <td>${formattedBuyPrice}</td>
+            <td>${formatCurrency(
+              transaction.harga_jual * transaction.jumlah_terjual -
+                transaction.harga_beli * transaction.jumlah_terjual
+            )}</td>
             <td>${transaction.jumlah_terjual}</td>
+
             <td>
                 
             </td>
             <td>
                 <div class="actions">
-                    <button class="action-btn view-btn" data-id="${transaction.transaction_id}">
+                    <button class="action-btn view-btn" data-id="${
+                      transaction.transaction_id
+                    }">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn edit-btn" data-id="${transaction.transaction_id}">
+                    <button class="action-btn edit-btn" data-id="${
+                      transaction.transaction_id
+                    }">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="action-btn delete-btn" data-id="${transaction.transaction_id}">
+                    <button class="action-btn delete-btn" data-id="${
+                      transaction.transaction_id
+                    }">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -261,15 +274,15 @@ function updateStatCards(stats) {
 // Initialize search functionality
 function initSearchFilter() {
   const searchInput = document.querySelector(".search-input input");
-  let debounceTimer;
 
   searchInput.addEventListener("input", function () {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      const currentFilters = getActiveFilters();
-      currentFilters.search = this.value.trim();
-      loadTransactionData(1, currentFilters);
-    }, 500); // 500ms debounce
+    const searchTerm = this.value.toLowerCase();
+    // Assuming 'transactionData' holds your transaction data
+    // and 'nama_produk' is the property to search
+    const filteredTransactions = transactionData.filter((transaction) =>
+      transaction.nama_produk.toLowerCase().includes(searchTerm)
+    );
+    displayTransactionData(filteredTransactions);
   });
 }
 
@@ -423,3 +436,5 @@ function displayError(message) {
   // In a real application, you would show a toast or an error message
   // in a designated area of the page
 }
+
+let transactionData = []; // Global variable to store transaction data

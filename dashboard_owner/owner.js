@@ -546,6 +546,12 @@ document.addEventListener("DOMContentLoaded", function () {
     renderProductList(filteredProducts);
   });
 
+  btnHistory = document.querySelector(".btn-history");
+  btnHistory.addEventListener("click", function () {
+    // Redirect to the history page
+    window.location.href = "/dashboard_owner/history/history.html"; // Replace with the actual path to your history page
+  });
+
   // Call initializeApiUrl before fetching products
   initializeApiUrl().then(() => {
     fetchProduk();
