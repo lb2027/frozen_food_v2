@@ -26,13 +26,13 @@ async function initializeApiUrl() {
     if (envData && envData.api_url) {
       apiUrl = envData.api_url;
     } else {
-      apiUrl = "http://localhost:5050"; // Default URL if reading fails
+      apiUrl = "http://localhost:5050";
       console.warn("Failed to read API URL from JSON, using default:", apiUrl);
     }
     console.log("API URL initialized:", apiUrl);
   } catch (error) {
     console.error("Error initializing API URL:", error);
-    apiUrl = "http://localhost:5050"; // Default URL on error
+    apiUrl = "http://localhost:5050";
   }
 }
 
@@ -58,6 +58,11 @@ function initTransactionHistory() {
   document
     .querySelector(".btn-primary")
     .addEventListener("click", openNewTransactionForm);
+
+  // Initialize back to dashboard button
+  document.getElementById("back-to-dashboard").addEventListener("click", () => {
+    window.location.href = "/dashboard_owner/owner.html";
+  });
 }
 
 // Function to load transaction data from the server
@@ -71,13 +76,13 @@ function loadTransactionData(page = 1, filters = {}) {
 
   // Add any filters
   if (filters.search) queryParams.append("search", filters.search);
-  if (filters.type) queryParams.append("type", filters.type);
-  if (filters.status) queryParams.append("status", filters.status);
-  if (filters.dateRange) queryParams.append("dateRange", filters.dateRange);
+  if (filters.productFilter)
+    queryParams.append("product", filters.productFilter);
+  if (filters.dateFilter) queryParams.append("dateRange", filters.dateFilter);
 
   const token = localStorage.getItem("authToken");
 
-  console.log("JWT Token:", token); // Add this line
+  console.log("JWT Token:", token);
 
   // Function to check if the token is expired
   function isTokenExpired(token) {
@@ -106,11 +111,10 @@ function loadTransactionData(page = 1, filters = {}) {
   if (!token || isTokenExpired(token)) {
     // Redirect to the login page if not logged in or token is expired
     window.location.href = "/login/login.html"; // Replace with login page
-    return; // Prevent further execution
+    return;
   }
 
-  // Fetch data from server - this would be replaced with your actual API endpoint
-  fetch(`${apiUrl}/displayhistory`, {
+  fetch(`${apiUrl}/displayhistory?${queryParams.toString()}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -124,14 +128,15 @@ function loadTransactionData(page = 1, filters = {}) {
       return response.json();
     })
     .then((data) => {
-      console.log("API Response:", data); // Add this line
+      console.log("API Response:", data);
       if (data && Array.isArray(data)) {
         transactionData = data; // Store the transaction data globally
-        displayTransactionData(data);
+        displayTransactionGroups(data);
+        updateStatistics(data);
       } else {
         console.warn("No transaction data received from the server.");
         transactionData = []; // Store an empty array globally
-        displayTransactionData([]); // Display an empty table
+        displayTransactionGroups([]); // Display empty transaction groups
       }
       hideLoading();
     })
@@ -142,62 +147,204 @@ function loadTransactionData(page = 1, filters = {}) {
     });
 }
 
-// Mock function to generate sample data (replace with actual API call in production)
-
-// Function to display transaction data in the table
-function displayTransactionData(transactions) {
-  const tableBody = document.querySelector(".transaction-table tbody");
-  tableBody.innerHTML = ""; // Clear existing rows
+// Function to group transactions by transaction_id
+function groupTransactionsByID(transactions) {
+  const groups = {};
 
   transactions.forEach((transaction) => {
-    // Format currency values
-    const formattedSellPrice = formatCurrency(transaction.harga_jual);
-    const formattedBuyPrice = formatCurrency(transaction.harga_beli);
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-            <td class="transaction-id">${transaction.transaksi_id}</td>
-            <td>${transaction.tanggal_transaksi}</td>
-            <td>${transaction.nama_produk}</td>
-            <td>${formattedSellPrice}</td>
-            <td>${formattedBuyPrice}</td>
-            <td>${formatCurrency(
-              transaction.harga_jual * transaction.jumlah_terjual -
-                transaction.harga_beli * transaction.jumlah_terjual
-            )}</td>
-            <td>${transaction.jumlah_terjual}</td>
-
-            <td>
-                
-            </td>
-            <td>
-                <div class="actions">
-                    <button class="action-btn view-btn" data-id="${
-                      transaction.transaction_id
-                    }">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="action-btn edit-btn" data-id="${
-                      transaction.transaction_id
-                    }">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="action-btn delete-btn" data-id="${
-                      transaction.transaction_id
-                    }">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-    tableBody.appendChild(row);
+    const id = transaction.transaksi_id;
+    if (!groups[id]) {
+      groups[id] = {
+        id: id,
+        date: transaction.tanggal_transaksi,
+        items: [],
+      };
+    }
+    groups[id].items.push(transaction);
   });
+
+  return Object.values(groups);
+}
+
+// Function to display transaction groups
+function displayTransactionGroups(transactions) {
+  const transactionGroups = document.querySelector(".transaction-groups");
+  transactionGroups.innerHTML = ""; // Clear existing transaction groups
+
+  // Group transactions by transaction_id
+  const groups = groupTransactionsByID(transactions);
+
+  if (groups.length === 0) {
+    transactionGroups.innerHTML =
+      '<div class="no-data">No transaction data available</div>';
+    return;
+  }
+
+  // Calculate totals for all transactions
+  let totalRevenue = 0;
+  let totalProfit = 0;
+
+  groups.forEach((group) => {
+    const transactionGroup = document.createElement("div");
+    transactionGroup.className = "transaction-group";
+
+    // Calculate totals for this group
+    let groupTotalAmount = 0;
+    let groupTotalProfit = 0;
+
+    group.items.forEach((item) => {
+      const totalPrice = item.harga_jual * item.jumlah_terjual;
+      const profit = totalPrice - item.harga_beli * item.jumlah_terjual;
+
+      groupTotalAmount += totalPrice;
+      groupTotalProfit += profit;
+
+      totalRevenue += totalPrice;
+      totalProfit += profit;
+    });
+
+    // Create the transaction group header
+    transactionGroup.innerHTML = `
+      <div class="transaction-group-header">
+        <div class="transaction-id">ID Transaksi: ${group.id}</div>
+        <div class="transaction-date">Tanggal: ${group.date}</div>
+        <div class="transaction-actions">
+          <button class="action-btn view-btn" data-id="${group.id}">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="action-btn edit-btn" data-id="${group.id}">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button class="action-btn delete-btn" data-id="${group.id}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <table class="transaction-table">
+        <thead>
+          <tr>
+            <th>Nama Produk</th>
+            <th>Harga Jual</th>
+            <th>Harga Beli</th>
+            <th>Jumlah Terjual</th>
+            <th>Total Harga</th>
+            <th>Keuntungan</th>
+            <th>Waktu</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${group.items
+            .map((item) => {
+              const totalPrice = item.harga_jual * item.jumlah_terjual;
+              const profit = totalPrice - item.harga_beli * item.jumlah_terjual;
+
+              return `
+              <tr>
+                <td>${item.nama_produk}</td>
+                <td>${formatCurrency(item.harga_jual)}</td>
+                <td>${formatCurrency(item.harga_beli)}</td>
+                <td>${item.jumlah_terjual}</td>
+                <td>${formatCurrency(totalPrice)}</td>
+                <td>${formatCurrency(profit)}</td>
+                <td>${item.waktu || "N/A"}</td>
+              </tr>
+            `;
+            })
+            .join("")}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" class="total-label">Total Transaksi ID ${
+              group.id
+            }</td>
+            <td>${formatCurrency(groupTotalAmount)}</td>
+            <td>${formatCurrency(groupTotalProfit)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    transactionGroups.appendChild(transactionGroup);
+  });
+
+  // Update the transaction summary
+  updateTransactionSummary(totalRevenue, totalProfit);
 
   // Reinitialize action buttons for the new rows
   initActionButtons();
+
+  // Update pagination
+  updatePagination({
+    currentPage: 1,
+    perPage: groups.length,
+    total: transactions.length,
+    totalPages: Math.ceil(transactions.length / groups.length),
+  });
 }
 
-// Function to update pagination based on data
+// Function to update transaction summary
+function updateTransactionSummary(totalRevenue, totalProfit) {
+  const summaryContainer = document.querySelector(".transaction-summary");
+
+  if (summaryContainer) {
+    summaryContainer.innerHTML = `
+      <div class="summary-item">
+        <div class="summary-label">Total Pendapatan:</div>
+        <div class="summary-value">${formatCurrency(totalRevenue)}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Total Keuntungan:</div>
+        <div class="summary-value">${formatCurrency(totalProfit)}</div>
+      </div>
+    `;
+  }
+}
+
+// Function to update statistics based on transaction data
+function updateStatistics(transactions) {
+  // Calculate total transactions
+  const totalTransactions = new Set(transactions.map((t) => t.transaksi_id))
+    .size;
+
+  // Calculate today's revenue
+  const today = new Date().toISOString().split("T")[0];
+  const todayTransactions = transactions.filter(
+    (t) => t.tanggal_transaksi === today
+  );
+  const todayRevenue = todayTransactions.reduce(
+    (sum, t) => sum + t.harga_jual * t.jumlah_terjual,
+    0
+  );
+
+  // Calculate average transaction amount
+  const transactionGroups = groupTransactionsByID(transactions);
+  const totalRevenue = transactions.reduce(
+    (sum, t) => sum + t.harga_jual * t.jumlah_terjual,
+    0
+  );
+  const avgTransactionAmount =
+    transactionGroups.length > 0 ? totalRevenue / transactionGroups.length : 0;
+
+  // Calculate total profit
+  const totalProfit = transactions.reduce((sum, t) => {
+    const profit =
+      t.harga_jual * t.jumlah_terjual - t.harga_beli * t.jumlah_terjual;
+    return sum + profit;
+  }, 0);
+
+  // Update the stat cards
+  document.querySelector(".stat-card:nth-child(1) .stat-value").textContent =
+    totalTransactions.toLocaleString();
+  document.querySelector(".stat-card:nth-child(2) .stat-value").textContent =
+    formatCurrency(todayRevenue);
+  document.querySelector(".stat-card:nth-child(3) .stat-value").textContent =
+    formatCurrency(avgTransactionAmount);
+  document.querySelector(".stat-card:nth-child(4) .stat-value").textContent =
+    formatCurrency(totalProfit);
+}
+
+// Update pagination based on data
 function updatePagination(pagination) {
   const paginationInfo = document.querySelector(".pagination-info");
   const paginationControls = document.querySelector(".pagination-controls");
@@ -208,7 +355,7 @@ function updatePagination(pagination) {
     startItem + pagination.perPage - 1,
     pagination.total
   );
-  paginationInfo.textContent = `Showing ${startItem} to ${endItem} of ${pagination.total} entries`;
+  paginationInfo.textContent = `Menampilkan ${startItem} sampai ${endItem} dari ${pagination.total} transaksi`;
 
   // Update pagination controls
   paginationControls.innerHTML = "";
@@ -256,33 +403,25 @@ function updatePagination(pagination) {
   paginationControls.appendChild(nextButton);
 }
 
-// Function to update stat cards
-function updateStatCards(stats) {
-  document.querySelector(".stat-card:nth-child(1) .stat-value").textContent =
-    stats.totalTransactions.toLocaleString();
-  document.querySelector(
-    ".stat-card:nth-child(2) .stat-value"
-  ).textContent = `$${stats.todayRevenue.toLocaleString()}`;
-  document.querySelector(
-    ".stat-card:nth-child(3) .stat-value"
-  ).textContent = `$${stats.averageTransaction.toLocaleString()}`;
-  document.querySelector(
-    ".stat-card:nth-child(4) .stat-value"
-  ).textContent = `$${stats.refunds.toLocaleString()}`;
-}
-
 // Initialize search functionality
 function initSearchFilter() {
-  const searchInput = document.querySelector(".search-input input");
+  const searchInput = document.getElementById("search-input");
 
   searchInput.addEventListener("input", function () {
     const searchTerm = this.value.toLowerCase();
-    // Assuming 'transactionData' holds your transaction data
-    // and 'nama_produk' is the property to search
+
+    if (searchTerm === "") {
+      // If search term is empty, show all data
+      displayTransactionGroups(transactionData);
+      return;
+    }
+
+    // Filter transactions based on product name
     const filteredTransactions = transactionData.filter((transaction) =>
       transaction.nama_produk.toLowerCase().includes(searchTerm)
     );
-    displayTransactionData(filteredTransactions);
+
+    displayTransactionGroups(filteredTransactions);
   });
 }
 
@@ -290,7 +429,7 @@ function initSearchFilter() {
 function initFilterDropdowns() {
   const filterSelects = document.querySelectorAll(".filter-select");
 
-  filterSelects.forEach((select) => {
+  filterSelects.forEach((select, index) => {
     select.addEventListener("change", function () {
       const filters = getActiveFilters();
       loadTransactionData(1, filters);
@@ -303,25 +442,21 @@ function getActiveFilters() {
   const filters = {};
 
   // Get search input value
-  const searchInput = document.querySelector(".search-input input");
+  const searchInput = document.getElementById("search-input");
   if (searchInput.value.trim()) {
     filters.search = searchInput.value.trim();
   }
 
-  // Get filter select values
-  const typeSelect = document.querySelector(".filter-select:nth-child(1)");
-  if (typeSelect.selectedIndex > 0) {
-    filters.type = typeSelect.value;
+  // Get product filter value (first dropdown)
+  const productFilter = document.querySelectorAll(".filter-select")[0];
+  if (productFilter && productFilter.selectedIndex > 0) {
+    filters.productFilter = productFilter.value;
   }
 
-  const statusSelect = document.querySelector(".filter-select:nth-child(2)");
-  if (statusSelect.selectedIndex > 0) {
-    filters.status = statusSelect.value;
-  }
-
-  const dateSelect = document.querySelector(".filter-select:nth-child(3)");
-  if (dateSelect.selectedIndex > 0) {
-    filters.dateRange = dateSelect.value;
+  // Get date filter value (second dropdown)
+  const dateFilter = document.querySelectorAll(".filter-select")[1];
+  if (dateFilter && dateFilter.selectedIndex > 0) {
+    filters.dateFilter = dateFilter.value;
   }
 
   return filters;
@@ -384,29 +519,87 @@ function deleteTransaction(transactionId) {
   if (
     confirm(`Are you sure you want to delete transaction ${transactionId}?`)
   ) {
-    // In a real application, you would send a delete request to the server
-    alert(`Transaction ${transactionId} has been deleted.`);
+    const token = localStorage.getItem("authToken");
 
-    // Reload transaction data after deletion
-    loadTransactionData();
+    fetch(`${apiUrl}/deletetransaction/${transactionId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Delete response:", data);
+        alert(`Transaction ${transactionId} has been deleted.`);
+        // Reload transaction data after deletion
+        loadTransactionData();
+      })
+      .catch((error) => {
+        console.error("Error deleting transaction:", error);
+        alert("Failed to delete transaction. Please try again later.");
+      });
   }
 }
 
 // Function to handle exporting transactions
 function exportTransactions() {
   console.log("Exporting transactions");
-  alert("Exporting transactions...");
+
+  // Get current filters to export filtered data
+  const filters = getActiveFilters();
+  const token = localStorage.getItem("authToken");
+
+  // Prepare query parameters
+  const queryParams = new URLSearchParams();
+  if (filters.search) queryParams.append("search", filters.search);
+  if (filters.productFilter)
+    queryParams.append("product", filters.productFilter);
+  if (filters.dateFilter) queryParams.append("dateRange", filters.dateFilter);
 
   // In a real application, you would send a request to the server to generate
   // and download a CSV/Excel file with transaction data
+  fetch(`${apiUrl}/exporttransactions?${queryParams.toString()}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token: token,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.blob();
+    })
+    .then((blob) => {
+      // Create a download link and click it
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "transaction_history.csv";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      alert("Export successful!");
+    })
+    .catch((error) => {
+      console.error("Error exporting transactions:", error);
+      alert("Failed to export transactions. Please try again later.");
+    });
 }
 
 // Function to handle opening a new transaction form
 function openNewTransactionForm() {
   console.log("Opening new transaction form");
-  alert("New transaction form");
-
-  // In a real application, you would show a form for creating a new transaction
+  // Redirect to transaction form page
+  window.location.href = "/dashboard_owner/transactions/new_transaction.html";
 }
 
 // Utility functions
@@ -422,19 +615,59 @@ function formatCurrency(amount) {
 function showLoading() {
   // In a real application, you would show a loading spinner
   console.log("Loading...");
+
+  // Add a loading overlay to the content
+  const loadingOverlay = document.createElement("div");
+  loadingOverlay.id = "loading-overlay";
+  loadingOverlay.innerHTML = '<div class="spinner"></div>';
+  loadingOverlay.style.position = "fixed";
+  loadingOverlay.style.top = "0";
+  loadingOverlay.style.left = "0";
+  loadingOverlay.style.width = "100%";
+  loadingOverlay.style.height = "100%";
+  loadingOverlay.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+  loadingOverlay.style.display = "flex";
+  loadingOverlay.style.justifyContent = "center";
+  loadingOverlay.style.alignItems = "center";
+  loadingOverlay.style.zIndex = "9999";
+
+  document.body.appendChild(loadingOverlay);
 }
 
 function hideLoading() {
   // In a real application, you would hide the loading spinner
   console.log("Loading complete.");
+
+  // Remove the loading overlay
+  const loadingOverlay = document.getElementById("loading-overlay");
+  if (loadingOverlay) {
+    loadingOverlay.remove();
+  }
 }
 
 function displayError(message) {
   console.error(message);
-  alert(message);
 
-  // In a real application, you would show a toast or an error message
-  // in a designated area of the page
+  // Create and show error toast
+  const errorToast = document.createElement("div");
+  errorToast.className = "error-toast";
+  errorToast.textContent = message;
+  errorToast.style.position = "fixed";
+  errorToast.style.bottom = "20px";
+  errorToast.style.right = "20px";
+  errorToast.style.backgroundColor = "#f44336";
+  errorToast.style.color = "white";
+  errorToast.style.padding = "15px";
+  errorToast.style.borderRadius = "4px";
+  errorToast.style.zIndex = "9999";
+
+  document.body.appendChild(errorToast);
+
+  // Remove the toast after 3 seconds
+  setTimeout(() => {
+    errorToast.remove();
+  }, 3000);
 }
 
-let transactionData = []; // Global variable to store transaction data
+// Global variable to store transaction data
+let transactionData = [];
