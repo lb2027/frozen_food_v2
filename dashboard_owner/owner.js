@@ -556,4 +556,22 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeApiUrl().then(() => {
     fetchProduk();
   });
+
+  closeModalBtn.addEventListener("click", () => {
+    modal.classList.remove("show");
+    modal.querySelector(".modal-content").style.opacity = "0";
+    modal.querySelector(".modal-content").style.transform = "translateY(-20px)";
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 300); // Match this with your transition speed
+  });
+
+  openModalBtn.addEventListener("click", () => {
+    modal.style.display = "block";
+    modal.classList.add("show");
+    setTimeout(() => {
+      modal.querySelector(".modal-content").style.opacity = "1";
+      modal.querySelector(".modal-content").style.transform = "translateY(0)";
+    }, 10);
+  });
 });

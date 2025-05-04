@@ -21,12 +21,6 @@
   --info: #3b82f6;
   --info-transparent: rgba(59, 130, 246, 0.1);
   --body-bg: #131320;
-  --sidebar-width: 240px;
-  --border-radius-sm: 0.375rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 0.75rem;
-  --box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  --transition-speed: 0.3s;
 }
 
 /* Base Styles */
@@ -49,6 +43,10 @@ a {
   text-decoration: none;
   color: inherit;
   transition: color var(--transition-speed) ease;
+}
+
+.sidebar {
+  height: 100vh;
 }
 
 /* Custom Scrollbar */
@@ -74,7 +72,7 @@ a {
 
 /* Content Area */
 .content {
-  margin-left: 2em;
+  margin-left: 1.5em;
   padding: 2rem;
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
