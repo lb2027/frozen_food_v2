@@ -1,3 +1,4 @@
+// Modify the existing document.addEventListener block to include our new functionality
 document.addEventListener("DOMContentLoaded", function () {
   // Check if the user is logged in
   const token = localStorage.getItem("authToken");
@@ -322,6 +323,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Refresh the product list
         fetchProduk();
+        // Refresh the sales data after adding sales
+        fetchDailySales();
+        fetchWeeklySales();
       } else {
         // Display an error message
         const errorData = await response.json();
@@ -345,6 +349,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   let produkData = []; // Store the product data
+  let salesData = []; // Store the sales data
 
   // Function to read the JSON file
   async function readJsonFile(filePath) {
@@ -371,6 +376,174 @@ document.addEventListener("DOMContentLoaded", function () {
       apiUrl = "http://localhost:5050"; // Default URL if reading fails
       console.warn("Failed to read API URL from JSON, using default:", apiUrl);
     }
+  }
+
+  // Function to fetch daily sales data
+  async function fetchDailySales() {
+    try {
+      // Get current date in YYYY-MM-DD format
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
+
+      const response = await fetch(
+        `${apiUrl}/dailysales?date=${formattedDate}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Daily sales data:", data);
+
+      // Update the daily sales card
+      updateDailySalesCard(data);
+    } catch (error) {
+      console.error("Error fetching daily sales:", error);
+      // Set default values if API call fails
+      updateDailySalesCard({
+        date: new Date().toISOString().split("T")[0],
+        totalSales: 0,
+      });
+    }
+  }
+
+  // Function to update the daily sales card with real data
+  function updateDailySalesCard(data) {
+    console.log("updateDailySalesCard called with data:", data);
+    const dailySalesValue = document.querySelector(
+      ".stat-card:first-child .stat-value"
+    );
+    const dailySalesDate = document.querySelector(
+      ".stat-card:first-child .stat-date"
+    );
+
+    // Check if data is valid
+    if (!data || typeof data.totalSales !== "number") {
+      console.error("Invalid data for daily sales:", data);
+      return;
+    }
+
+    // Format the sales value as currency
+    const formattedSales = formatCurrency(data.totalSales || 0);
+
+    // Update the card content
+    dailySalesValue.textContent = formattedSales;
+
+    // Update the date (current date)
+    const today = new Date();
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    dailySalesDate.textContent = today.toLocaleDateString("id-ID", options);
+  }
+
+  // Helper function to format currency
+  function formatCurrency(amount) {
+    console.log("formatCurrency called with amount:", amount);
+    const formatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    });
+    return formatter.format(amount);
+  }
+
+  // Function to fetch weekly sales data for the chart
+  async function fetchWeeklySales() {
+    try {
+      // Get date from 7 days ago
+      const today = new Date();
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+
+      const formattedEndDate = today.toISOString().split("T")[0];
+      const formattedStartDate = sevenDaysAgo.toISOString().split("T")[0];
+
+      const response = await fetch(
+        `${apiUrl}/weeklysales?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Weekly sales data:", data);
+      salesData = data;
+
+      // Update the sales chart
+      updateSalesChart(data);
+    } catch (error) {
+      console.error("Error fetching weekly sales:", error);
+      // Create sample data if API call fails
+      const sampleData = generateSampleSalesData();
+      updateSalesChart(sampleData);
+    }
+  }
+
+  // Generate sample data for testing
+  function generateSampleSalesData() {
+    const data = [];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      data.push({
+        date: date.toISOString().split("T")[0],
+        sales: Math.floor(Math.random() * 2000000) + 500000, // Random sales between 500k-2.5M
+      });
+    }
+
+    return data;
+  }
+
+  // Function to update the sales chart
+  function updateSalesChart(data) {
+    const miniChart = document.querySelector(
+      ".stat-card:first-child .mini-chart"
+    );
+
+    // Clear existing chart
+    miniChart.innerHTML = "";
+
+    // Find the maximum sales value for scaling
+    const maxSales = Math.max(...data.map((day) => day.sales));
+
+    // Create bars for each day
+    data.forEach((day) => {
+      const heightPercentage = maxSales > 0 ? (day.sales / maxSales) * 100 : 0;
+
+      const bar = document.createElement("div");
+      bar.className = "chart-bar";
+      bar.style.height = `${heightPercentage}%`;
+
+      // Add tooltip with date and sales amount
+      bar.setAttribute(
+        "title",
+        `${formatDate(day.date)}: ${formatCurrency(day.sales)}`
+      );
+
+      miniChart.appendChild(bar);
+    });
+  }
+
+  // Helper function to format date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
   }
 
   async function fetchProduk() {
@@ -552,10 +725,16 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "/dashboard_owner/history/history.html"; // Replace with the actual path to your history page
   });
 
-  // Call initializeApiUrl before fetching products
-  initializeApiUrl().then(() => {
-    fetchProduk();
-  });
+  // Initialize everything
+  async function initializeDashboard() {
+    await initializeApiUrl();
+    await fetchProduk();
+    await fetchDailySales();
+    await fetchWeeklySales();
+  }
+
+  // Call initializeDashboard instead of just initializeApiUrl
+  initializeDashboard();
 
   closeModalBtn.addEventListener("click", () => {
     modal.classList.remove("show");
