@@ -287,7 +287,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const namaProduk = selectedOption.text; // Get the product name from the dropdown text
       // You might need to fetch the price from the database or store it in the dropdown
       // For simplicity, let's assume you have a way to get the price based on the product ID
-      const harga = produkData.find((p) => p.produk_id == produkId).harga;
+      const product = produkData.find((p) => p.produk_id == produkId);
+      if (!product) {
+        alert(`Product with ID ${produkId} not found.`);
+        return;
+      }
+      const harga = product.harga;
 
       items.push({
         produk_id: parseInt(produkId, 10),
@@ -305,6 +310,10 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Please add at least one product to the sold items list.");
       return;
     }
+
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem("authToken");
+    console.log("Token:", token); // Add this line
 
     try {
       // Send a POST request to the sold items API
@@ -329,6 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         // Display an error message
         const errorData = await response.json();
+        console.error("API Error:", errorData); // Add this line
         alert(
           `Failed to add sold items: ${errorData.message || "Unknown error"}`
         );
@@ -546,6 +556,62 @@ document.addEventListener("DOMContentLoaded", function () {
     return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
   }
 
+  // Function to fetch monthly revenue data
+  async function fetchMonthlyRevenue() {
+    try {
+      const response = await fetch(`${apiUrl}/monthlysales`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Monthly revenue data:", data);
+
+      // Update the monthly revenue card
+      updateMonthlyRevenueCard(data);
+    } catch (error) {
+      console.error("Error fetching monthly revenue:", error);
+      // Set default values if API call fails
+      updateMonthlyRevenueCard({
+        month: new Date().toLocaleString("default", { month: "long" }),
+        year: new Date().getFullYear(),
+        totalRevenue: 0,
+      });
+    }
+  }
+
+  // Function to update the monthly revenue card with real data
+  function updateMonthlyRevenueCard(data) {
+    console.log("updateMonthlyRevenueCard called with data:", data);
+    const monthlyRevenueValue = document.querySelector(
+      ".stat-card:nth-child(2) .stat-value"
+    );
+    const monthlyRevenueDate = document.querySelector(
+      ".stat-card:nth-child(2) .stat-date"
+    );
+
+    // Check if data is valid
+    if (!data || typeof data.totalRevenue !== "number") {
+      console.error("Invalid data for monthly revenue:", data);
+      return;
+    }
+
+    // Format the revenue value as currency
+    const formattedRevenue = formatCurrency(data.totalRevenue || 0);
+
+    // Update the card content
+    monthlyRevenueValue.textContent = formattedRevenue;
+
+    // Update the date (month and year)
+    monthlyRevenueDate.textContent = `${data.month} ${data.year}`;
+  }
+
   async function fetchProduk() {
     try {
       const response = await fetch(`${apiUrl}/selectproduk`, {
@@ -558,7 +624,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await response.json(); // Store the product data
       console.log("Produk data from API:", data);
       produkData = data;
-      console.log("produkData after fetch:", produkData);
+      console.log("produkData after fetch:", produkData); // Add this line
 
       renderProductList(produkData); // Render the product list
     } catch (error) {
@@ -593,7 +659,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${produk.supplier}</td>
         <td>
             <div class="action-btns">
-              <div class="edit-btn">
+              <div class="edit-btn" data-produk-id="${produk.produk_id}">
                 <svg
                   width="16"
                   height="16"
@@ -611,7 +677,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </svg>
                 Edit
               </div>
-              <div class="delete-btn">
+              <div class="delete-btn" data-produk-id="${produk.produk_id}">
                 <svg
                   width="16"
                   height="16"
@@ -631,7 +697,62 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
       `;
       productList.appendChild(row);
+
+      // Add event listeners to the edit and delete buttons
+      const editBtn = row.querySelector(".edit-btn");
+      const deleteBtn = row.querySelector(".delete-btn");
+
+      editBtn.addEventListener("click", () => {
+        const produkId = editBtn.dataset.produkId;
+        openEditModal(produkId);
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        const produkId = deleteBtn.dataset.produkId;
+        deleteProduk(produkId);
+      });
     });
+  }
+
+  async function openEditModal(produkId) {
+    try {
+      // Fetch the product data
+      const response = await fetch(
+        `${apiUrl}/selectProdukById?id=${produkId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        alert("Failed to fetch product data.");
+        return;
+      }
+
+      const produk = await response.json();
+
+      // Get references to the edit modal and form elements
+      const editModal = document.getElementById("edit-product-modal");
+      const editForm = document.getElementById("edit-product-form");
+
+      // Populate the form with the product data
+      editForm.querySelector("#edit_produk_id").value = produk.produk_id;
+      editForm.querySelector("#edit_nama").value = produk.nama;
+      editForm.querySelector("#edit_stok").value = produk.stok;
+      editForm.querySelector("#edit_harga").value = produk.harga;
+      editForm.querySelector("#edit_harga_beli").value = produk.harga_beli;
+      editForm.querySelector("#edit_foto").value = produk.foto;
+      editForm.querySelector("#edit_supplier").value = produk.supplier;
+
+      // Display the edit modal
+      editModal.style.display = "block";
+    } catch (error) {
+      console.error("Error opening edit modal:", error);
+      alert("An error occurred while opening the edit modal.");
+    }
   }
 
   function populateProductDropdown(products, dropdown) {
@@ -653,13 +774,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function deleteProduk(produkId) {
+    // Add confirmation dialog
+    const confirmation = confirm(
+      "Apakah Anda yakin ingin menghapus produk ini?"
+    );
+    if (!confirmation) {
+      return; // Do nothing if the user cancels
+    }
+
     try {
-      const response = await fetch(`${apiUrl}/deleteproduk/${produkId}`, {
+      const response = await fetch(`${apiUrl}/deleteproduk`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           token: token,
         },
+        body: JSON.stringify({
+          produk_id: parseInt(produkId),
+        }),
       });
 
       if (response.ok) {
@@ -725,12 +857,70 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "/dashboard_owner/history/history.html"; // Replace with the actual path to your history page
   });
 
+  // Function to fetch inventory status data
+  async function fetchInventoryStatus() {
+    try {
+      const response = await fetch(`${apiUrl}/inventorystatus`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Inventory status data:", data);
+
+      // Update the inventory status card
+      updateInventoryStatusCard(data);
+    } catch (error) {
+      console.error("Error fetching inventory status:", error);
+      // Set default values if API call fails
+      updateInventoryStatusCard({
+        totalProducts: 0,
+      });
+    }
+  }
+
+  // Function to update the inventory status card with real data
+  function updateInventoryStatusCard(data) {
+    console.log("updateInventoryStatusCard called with data:", data);
+    const inventoryStatusValue = document.querySelector(
+      ".stat-card:nth-child(3) .stat-value"
+    );
+    const inventoryStatusDate = document.querySelector(
+      ".stat-card:nth-child(3) .stat-date"
+    );
+
+    // Check if data is valid
+    if (!data || typeof data.totalProducts !== "number") {
+      console.error("Invalid data for inventory status:", data);
+      return;
+    }
+
+    // Update the card content
+    inventoryStatusValue.textContent = `${data.totalProducts} Products`;
+
+    // Update the date (current date)
+    const today = new Date();
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    inventoryStatusDate.textContent = `Updated ${today.toLocaleDateString(
+      "en-US",
+      options
+    )}`;
+  }
+
   // Initialize everything
   async function initializeDashboard() {
     await initializeApiUrl();
     await fetchProduk();
     await fetchDailySales();
     await fetchWeeklySales();
+    await fetchMonthlyRevenue();
+    await fetchInventoryStatus();
   }
 
   // Call initializeDashboard instead of just initializeApiUrl
@@ -752,5 +942,89 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.querySelector(".modal-content").style.opacity = "1";
       modal.querySelector(".modal-content").style.transform = "translateY(0)";
     }, 10);
+  });
+
+  setInterval(() => {
+    fetchDailySales();
+    fetchWeeklySales();
+    fetchMonthlyRevenue();
+    fetchInventoryStatus();
+  }, 60000); // Refresh every 60 seconds (1 minute)
+
+  // Get references to the edit modal and form elements
+  const editModal = document.getElementById("edit-product-modal");
+  const editForm = document.getElementById("edit-product-form");
+
+  // Function to close the edit modal
+  function closeEditModal() {
+    editModal.style.display = "none";
+  }
+
+  // Add event listener to the close button
+  document
+    .getElementById("close-edit-modal")
+    .addEventListener("click", closeEditModal);
+
+  // Add event listener to the close button
+  document.getElementById("closeEditBtn").addEventListener("click", () => {
+    editModal.style.display = "none";
+  });
+
+  // Function to handle edit product form submission
+  editForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    // Get form values
+    const produkId = document.getElementById("edit_produk_id").value;
+    const nama = document.getElementById("edit_nama").value;
+    const stok = document.getElementById("edit_stok").value;
+    const harga = document.getElementById("edit_harga").value;
+    const harga_beli = document.getElementById("edit_harga_beli").value;
+    const foto = document.getElementById("edit_foto").value;
+    const supplier = document.getElementById("edit_supplier").value;
+
+    // Validate form values
+    if (!nama || !stok || !harga || !harga_beli || !foto || !supplier) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      // Send a PUT request to the update product API
+      const response = await fetch(`${apiUrl}/updateproduk`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify({
+          produk_id: parseInt(produkId),
+          nama: nama,
+          stok: parseInt(stok),
+          harga: parseFloat(harga),
+          harga_beli: parseFloat(harga_beli),
+          foto: foto,
+          supplier: supplier,
+        }),
+      });
+
+      if (response.ok) {
+        // Close the modal
+        editModal.style.display = "none";
+
+        // Refresh the product list
+        fetchProduk();
+      } else {
+        // Display an error message
+        const errorData = await response.json();
+        alert(
+          `Failed to update product: ${errorData.message || "Unknown error"}`
+        );
+      }
+    } catch (error) {
+      // Display an error message
+      console.error("Error updating product:", error);
+      alert("An error occurred while updating the product.");
+    }
   });
 });

@@ -302,20 +302,41 @@ function updateTransactionSummary(totalRevenue, totalProfit) {
 }
 
 // Function to update statistics based on transaction data
-function updateStatistics(transactions) {
+async function updateStatistics(transactions) {
   // Calculate total transactions
   const totalTransactions = new Set(transactions.map((t) => t.transaksi_id))
     .size;
+  console.log("Total Transactions:", totalTransactions);
 
-  // Calculate today's revenue
-  const today = new Date().toISOString().split("T")[0];
-  const todayTransactions = transactions.filter(
-    (t) => t.tanggal_transaksi === today
-  );
-  const todayRevenue = todayTransactions.reduce(
-    (sum, t) => sum + t.harga_jual * t.jumlah_terjual,
-    0
-  );
+  // Calculate today's revenue using the /dailysales endpoint
+  let todayRevenue = 0;
+  try {
+    // Get current date in YYYY-MM-DD format
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch(`${apiUrl}/dailysales?date=${formattedDate}`, {
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Daily sales data:", data);
+
+    todayRevenue = data.totalSales || 0;
+  } catch (error) {
+    console.error("Error fetching daily sales:", error);
+    todayRevenue = 0; // Set default value if API call fails
+  }
+  console.log("Today's Revenue:", todayRevenue);
 
   // Calculate average transaction amount
   const transactionGroups = groupTransactionsByID(transactions);
@@ -323,8 +344,10 @@ function updateStatistics(transactions) {
     (sum, t) => sum + t.harga_jual * t.jumlah_terjual,
     0
   );
+  console.log("Total Revenue:", totalRevenue);
   const avgTransactionAmount =
     transactionGroups.length > 0 ? totalRevenue / transactionGroups.length : 0;
+  console.log("Average Transaction Amount:", avgTransactionAmount);
 
   // Calculate total profit
   const totalProfit = transactions.reduce((sum, t) => {
@@ -332,6 +355,7 @@ function updateStatistics(transactions) {
       t.harga_jual * t.jumlah_terjual - t.harga_beli * t.jumlah_terjual;
     return sum + profit;
   }, 0);
+  console.log("Total Profit:", totalProfit);
 
   // Update the stat cards
   document.querySelector(".stat-card:nth-child(1) .stat-value").textContent =
