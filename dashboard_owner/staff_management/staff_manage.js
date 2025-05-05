@@ -72,10 +72,122 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize view
   init();
 
+  // Modified init() function to include filter initialization
   function init() {
     fetchStaffData();
     fetchStaffStats();
     setupEventListeners();
+    initFilters();
+  }
+
+  // New function to initialize filters
+  function initFilters() {
+    const statusFilter = document.querySelector(
+      '.filter-select[title="Filter by status"]'
+    );
+    const dateFilter = document.querySelector(
+      '.filter-select[title="Filter by date"]'
+    );
+
+    if (statusFilter) {
+      statusFilter.addEventListener("change", applyFilters);
+    }
+
+    if (dateFilter) {
+      dateFilter.addEventListener("change", applyFilters);
+    }
+  }
+
+  // Function to apply filters
+  function applyFilters() {
+    const statusFilter = document.querySelector(
+      '.filter-select[title="Filter by status"]'
+    );
+    const dateFilter = document.querySelector(
+      '.filter-select[title="Filter by date"]'
+    );
+    const searchInput = document.getElementById("staff-search");
+
+    // Start with all staff data
+    let filtered = [...staffData];
+
+    // Apply status filter if selected
+    if (statusFilter && statusFilter.value) {
+      const selectedStatus = statusFilter.value;
+      filtered = filtered.filter(
+        (staff) => staff.status_kerja === selectedStatus
+      );
+    }
+
+    // Apply date filter if selected
+    if (dateFilter && dateFilter.value) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      switch (dateFilter.value) {
+        case "today":
+          filtered = filtered.filter((staff) => {
+            if (!staff.created_at) return false;
+            const staffDate = new Date(staff.created_at);
+            staffDate.setHours(0, 0, 0, 0);
+            return staffDate.getTime() === today.getTime();
+          });
+          break;
+
+        case "yesterday":
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          filtered = filtered.filter((staff) => {
+            if (!staff.created_at) return false;
+            const staffDate = new Date(staff.created_at);
+            staffDate.setHours(0, 0, 0, 0);
+            return staffDate.getTime() === yesterday.getTime();
+          });
+          break;
+
+        case "week":
+          const lastWeek = new Date(today);
+          lastWeek.setDate(lastWeek.getDate() - 7);
+          filtered = filtered.filter((staff) => {
+            if (!staff.created_at) return false;
+            const staffDate = new Date(staff.created_at);
+            return staffDate >= lastWeek;
+          });
+          break;
+
+        case "month":
+          const lastMonth = new Date(today);
+          lastMonth.setDate(lastMonth.getDate() - 30);
+          filtered = filtered.filter((staff) => {
+            if (!staff.created_at) return false;
+            const staffDate = new Date(staff.created_at);
+            return staffDate >= lastMonth;
+          });
+          break;
+      }
+    }
+
+    // Apply search filter if there's text
+    if (searchInput && searchInput.value.trim()) {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      filtered = filtered.filter((staff) => {
+        return (
+          (staff.nama && staff.nama.toLowerCase().includes(searchTerm)) ||
+          (staff.email && staff.email.toLowerCase().includes(searchTerm)) ||
+          (staff.no_hp && staff.no_hp.toLowerCase().includes(searchTerm)) ||
+          (staff.status_kerja &&
+            staff.status_kerja.toLowerCase().includes(searchTerm))
+        );
+      });
+    }
+
+    // Update the filteredStaffData
+    filteredStaffData = filtered;
+    isSearchActive = true;
+
+    // Update UI
+    updateStaffCount();
+    renderStaffTable();
   }
 
   function setupEventListeners() {
@@ -172,12 +284,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (searchInput && searchBtn) {
       searchInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
-          searchStaff(searchInput.value);
+          applyFilters(); // Use the same filter function instead of searchStaff
         }
       });
 
       searchBtn.addEventListener("click", () => {
-        searchStaff(searchInput.value);
+        applyFilters(); // Use the same filter function
+      });
+
+      // Add input event to make filtering more responsive
+      searchInput.addEventListener("input", () => {
+        if (searchInput.value.trim() === "") {
+          applyFilters(); // Reapply filters without search term
+        }
       });
     }
 
@@ -297,6 +416,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await response.json();
       staffData = Array.isArray(data) ? data : [];
       filteredStaffData = [...staffData]; // Initialize with all staff
+      isSearchActive = false; // Reset search state
+
+      // Reset filter dropdowns
+      const statusFilter = document.querySelector(
+        '.filter-select[title="Filter by status"]'
+      );
+      const dateFilter = document.querySelector(
+        '.filter-select[title="Filter by date"]'
+      );
+
+      if (statusFilter) statusFilter.selectedIndex = 0;
+      if (dateFilter) dateFilter.selectedIndex = 0;
 
       updateStaffCount();
       renderStaffTable();
@@ -361,44 +492,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Search staff
-  async function searchStaff(query) {
-    if (!query || query.trim() === "") {
-      isSearchActive = false;
-      filteredStaffData = [...staffData];
-      updateStaffCount();
-      renderStaffTable();
-      return;
-    }
-
-    showLoader();
-
-    try {
-      const response = await fetch(
-        `${apiUrl}/searchstaff?query=${encodeURIComponent(query)}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            token: token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      isSearchActive = true;
-      filteredStaffData = Array.isArray(data) ? data : [];
-
-      updateStaffCount();
-      renderStaffTable();
-      hideLoader();
-    } catch (error) {
-      console.error("Error searching staff:", error);
-      hideLoader();
-      showErrorAlert("Failed to search staff. Please try again.");
-    }
+  function searchStaff(query) {
+    // Simply call applyFilters which now handles search too
+    applyFilters();
   }
 
   // Render staff table
@@ -1137,6 +1233,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const dropdown = document.createElement("div");
     dropdown.className = "sort-dropdown";
 
+    // Add a header to the dropdown
+    const header = document.createElement("div");
+    header.className = "sort-header";
+    header.style.padding = "10px 15px";
+    header.style.borderBottom = "1px solid #2d2d3f";
+    header.style.fontWeight = "500";
+    header.style.fontSize = "14px";
+    header.style.color = "var(--primary-color)";
+    header.textContent = "Sort by";
+    dropdown.appendChild(header);
+
     sortFields.forEach((sortField) => {
       const item = document.createElement("div");
       item.className = "sort-item";
@@ -1148,29 +1255,60 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="sort-directions">
           <span class="sort-direction ${
             isCurrentSort && sortDirection === "asc" ? "active" : ""
-          }" data-direction="asc">↑</span>
+          }" 
+                data-direction="asc" title="Sort ascending">↑</span>
           <span class="sort-direction ${
             isCurrentSort && sortDirection === "desc" ? "active" : ""
-          }" data-direction="desc">↓</span>
+          }" 
+                data-direction="desc" title="Sort descending">↓</span>
         </div>
       `;
 
       item.querySelectorAll(".sort-direction").forEach((dirElement) => {
         dirElement.addEventListener("click", (e) => {
+          e.stopPropagation(); // Prevent event bubbling
           const direction = e.target.dataset.direction;
           currentSortField = sortField.field;
           sortDirection = direction;
+
+          // Apply visual feedback
+          document.querySelectorAll(".sort-direction").forEach((el) => {
+            el.classList.remove("active");
+          });
+          e.target.classList.add("active");
+
+          // Update the sort button to indicate active sorting
+          sortBtn.innerHTML = `
+            <span class="material-icons">sort</span>
+            <span>Sort: ${sortField.label} ${
+            direction === "asc" ? "↑" : "↓"
+          }</span>
+          `;
+
           renderStaffTable();
-          dropdown.remove();
+
+          // Don't close the dropdown immediately to allow multiple sorts
+          // dropdown.remove();
         });
       });
 
       dropdown.appendChild(item);
     });
 
+    // Add a close button
+    const closeButton = document.createElement("div");
+    closeButton.className = "sort-item";
+    closeButton.style.justifyContent = "center";
+    closeButton.style.color = "var(--light-text)";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => {
+      dropdown.remove();
+    });
+    dropdown.appendChild(closeButton);
+
     // Position the dropdown
     const sortBtnRect = sortBtn.getBoundingClientRect();
-    dropdown.style.top = `${sortBtnRect.bottom + window.scrollY}px`;
+    dropdown.style.top = `${sortBtnRect.bottom + window.scrollY + 5}px`;
     dropdown.style.left = `${sortBtnRect.left + window.scrollX}px`;
 
     document.body.appendChild(dropdown);

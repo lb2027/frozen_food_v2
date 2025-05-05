@@ -544,7 +544,7 @@ tbody tr:hover::after {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
@@ -571,6 +571,60 @@ tbody tr:hover::after {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(50, 213, 131, 0.1);
+}
+
+/* Improve dropdown design in modal forms */
+.modal select,
+#add-staff-form select,
+#edit-staff-form select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: white;
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2332d583' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.modal select:hover,
+#add-staff-form select:hover,
+#edit-staff-form select:hover {
+  background-color: rgba(50, 213, 131, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.modal select:focus,
+#add-staff-form select:focus,
+#edit-staff-form select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(50, 213, 131, 0.2);
+}
+
+.modal select option,
+#add-staff-form select option,
+#edit-staff-form select option {
+  background-color: #1e1e2d;
+  color: white;
+  padding: 10px;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/* Add a subtle highlight for selected options */
+.modal select option:checked,
+#add-staff-form select option:checked,
+#edit-staff-form select option:checked {
+  background-color: rgba(50, 213, 131, 0.2);
+  font-weight: 500;
 }
 
 /* Button styles */
@@ -750,27 +804,71 @@ tbody tr:hover::after {
   color: var(--light-text);
 }
 
-/* Sort dropdown */
+/* Enhanced filter group styles */
+.filter-group {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-sm);
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  color: white;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2332d583' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.filter-select:hover {
+  background-color: rgba(50, 213, 131, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.filter-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(50, 213, 131, 0.2);
+}
+
+.filter-select option {
+  background-color: #1e1e2d;
+  color: white;
+  padding: 12px;
+  font-weight: 400;
+}
+
+/* Improved sort dropdown styling */
 .sort-dropdown {
   position: absolute;
   background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  width: 180px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 200px;
   z-index: 100;
-  border: 1px solid #2d2d3f;
+  border: 1px solid var(--primary-color);
   overflow: hidden;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.3s ease;
 }
 
 .sort-item {
-  padding: 10px 15px;
+  padding: 12px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   border-bottom: 1px solid #2d2d3f;
   color: var(--text-color);
+  transition: all 0.2s ease;
 }
 
 .sort-item:last-child {
@@ -778,28 +876,37 @@ tbody tr:hover::after {
 }
 
 .sort-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(50, 213, 131, 0.1);
 }
 
 .sort-directions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .sort-direction {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.6;
   transition: all 0.2s ease;
   font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .sort-direction:hover {
-  opacity: 0.8;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sort-direction.active {
   opacity: 1;
   color: var(--primary-color);
+  background-color: rgba(50, 213, 131, 0.1);
 }
 
 /* Bulk actions */
