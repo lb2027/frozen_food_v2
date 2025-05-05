@@ -447,6 +447,8 @@ header {
 }
 
 .products-table {
+  position: relative;
+
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -479,8 +481,22 @@ header {
   transition: all 0.3s;
 }
 
+.products-table tbody tr {
+  position: relative;
+}
+
 .products-table tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.03);
+}
+
+.products-table tbody tr:hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: var(--primary);
 }
 
 .action-btns {

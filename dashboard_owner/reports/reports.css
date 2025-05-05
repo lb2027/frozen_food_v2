@@ -1,0 +1,393 @@
+/* Fix the main layout structure */
+body {
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Ensure the sidebar has a fixed width */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+/* Adjust main content to have a proper layout */
+.main-content {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px 30px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+}
+
+.back-button .material-icons {
+  margin-right: 5px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.notification {
+  margin-right: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.report-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 5px;
+  border-radius: var(--border-radius-md);
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  color: #aaa;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  background-color: var(--primary);
+  color: black;
+}
+
+.date-filter {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  background-color: #2d2d3f;
+  padding: 8px 15px;
+  border-radius: var(--border-radius-md);
+}
+
+.date-range .material-icons {
+  margin-right: 10px;
+  color: #aaa;
+}
+
+.date-range input[type="date"] {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.date-range input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.range-separator {
+  margin: 0 10px;
+  color: #aaa;
+}
+
+.generate-btn {
+  padding: 8px 20px;
+  background-color: var(--primary);
+  color: black;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.generate-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.report-content {
+  display: none;
+}
+
+.report-content.active {
+  display: block;
+}
+
+/* Fix report cards layout */
+.report-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.report-card {
+  background-color: #1e1e2d;
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  flex: 1;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.report-card h3 {
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Set proper heights for charts */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Fixed height instead of percentage */
+  max-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-center-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.total-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.total-label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.report-chart {
+  background-color: #1e1e2d;
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  flex: 2;
+  box-shadow: var(--box-shadow-sm);
+  height: auto;
+  max-height: 400px;
+}
+
+canvas {
+  max-height: 350px;
+}
+
+.chart-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  padding: 5px 15px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn.active {
+  background-color: var(--primary);
+  color: black;
+}
+
+.report-table {
+  background-color: #1e1e2d;
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  box-shadow: var(--box-shadow-sm);
+  position: relative;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 12px 15px;
+  color: #aaa;
+  font-weight: 500;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+td {
+  padding: 12px 15px;
+  color: #fff;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.no-data-message {
+  display: none;
+  text-align: center;
+  padding: 40px;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Revenue Report Specific Styles */
+/* Make summary cards have consistent heights */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.summary-card {
+  background-color: #1e1e2d;
+  border-radius: var(--border-radius-md);
+  padding: 15px;
+  height: auto;
+  min-height: 100px;
+}
+
+.summary-card h3 {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.product-performance {
+  background-color: #1e1e2d;
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  margin-top: 30px;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.product-performance h3 {
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.performance-container {
+  display: flex;
+  gap: 20px;
+}
+
+.performance-chart {
+  flex: 2;
+}
+
+.top-products {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-md);
+  padding: 15px;
+}
+
+.top-products h4 {
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #aaa;
+}
+
+.top-products ul {
+  list-style: none;
+}
+
+.top-products li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+}
+
+.top-products li:last-child {
+  border-bottom: none;
+}
+
+.product-name {
+  font-size: 14px;
+  color: #fff;
+}
+
+.product-sales {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+/* Add responsive design for smaller screens */
+@media (max-width: 1024px) {
+  .report-cards {
+    flex-direction: column;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}

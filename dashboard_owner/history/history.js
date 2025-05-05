@@ -65,62 +65,25 @@ function initTransactionHistory() {
   });
 }
 
-// Function to load transaction data from the server
-function loadTransactionData(page = 1, filters = {}) {
+// Update the loadTransactionData function to use our local filtering logic
+function loadTransactionData(page = 1) {
   // Show loading state
   showLoading();
 
-  // Prepare query parameters
-  const queryParams = new URLSearchParams();
-  queryParams.append("page", page);
-
-  // Add any filters
-  if (filters.search) queryParams.append("search", filters.search);
-  if (filters.productFilter)
-    queryParams.append("product", filters.productFilter);
-  if (filters.dateFilter) queryParams.append("dateRange", filters.dateFilter);
-
   const token = localStorage.getItem("authToken");
 
-  console.log("JWT Token:", token);
-
-  // Function to check if the token is expired
-  function isTokenExpired(token) {
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const payload = JSON.parse(atob(payloadBase64));
-
-      // Check if the token has an expiration time
-      if (payload && payload.exp) {
-        const expiryTime = payload.exp * 1000; // Convert to milliseconds
-        const currentTime = Date.now();
-
-        // Check if the token is expired
-        return currentTime > expiryTime;
-      } else {
-        // If the token doesn't have an expiration time, consider it invalid
-        return true;
-      }
-    } catch (error) {
-      // If there's an error decoding the token, consider it invalid
-      console.error("Error decoding token:", error);
-      return true;
-    }
-  }
-
-  if (!token || isTokenExpired(token)) {
-    // Redirect to the login page if not logged in or token is expired
-    window.location.href = "/login/login.html"; // Replace with login page
+  if (!token) {
+    window.location.href = "/login/login.html";
     return;
   }
 
-  fetch(`${apiUrl}/displayhistory?${queryParams.toString()}`, {
+  fetch(`${apiUrl}/displayhistory`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       token: token,
     },
-  }) // Replace with your actual API endpoint
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -130,13 +93,16 @@ function loadTransactionData(page = 1, filters = {}) {
     .then((data) => {
       console.log("API Response:", data);
       if (data && Array.isArray(data)) {
-        transactionData = data; // Store the transaction data globally
-        displayTransactionGroups(data);
+        transactionData = data; // Store all transaction data
+
+        // Apply any active filters right away
+        applyFilters();
+
         updateStatistics(data);
       } else {
         console.warn("No transaction data received from the server.");
-        transactionData = []; // Store an empty array globally
-        displayTransactionGroups([]); // Display empty transaction groups
+        transactionData = [];
+        displayTransactionGroups([]);
       }
       hideLoading();
     })
@@ -427,63 +393,108 @@ function updatePagination(pagination) {
   paginationControls.appendChild(nextButton);
 }
 
-// Initialize search functionality
+// Update the initSearchFilter function
 function initSearchFilter() {
   const searchInput = document.getElementById("search-input");
 
   searchInput.addEventListener("input", function () {
-    const searchTerm = this.value.toLowerCase();
+    // Use the same filter function for consistency
+    applyFilters();
+  });
+}
 
-    if (searchTerm === "") {
-      // If search term is empty, show all data
-      displayTransactionGroups(transactionData);
-      return;
+// Update the initFilterDropdowns function
+function initFilterDropdowns() {
+  const productFilter = document.querySelectorAll(".filter-select")[0];
+  const dateFilter = document.querySelectorAll(".filter-select")[1];
+
+  if (productFilter) {
+    productFilter.addEventListener("change", function () {
+      applyFilters();
+    });
+  }
+
+  if (dateFilter) {
+    dateFilter.addEventListener("change", function () {
+      applyFilters();
+    });
+  }
+}
+
+// Add a new function to apply both filters together
+function applyFilters() {
+  const productFilter = document.querySelectorAll(".filter-select")[0];
+  const dateFilter = document.querySelectorAll(".filter-select")[1];
+  const searchInput = document.getElementById("search-input");
+
+  // Start with all transaction data
+  let filteredData = [...transactionData];
+
+  // Apply product filter if not "Semua Produk"
+  if (productFilter && productFilter.selectedIndex > 0) {
+    const selectedProduct = productFilter.value;
+    filteredData = filteredData.filter((transaction) =>
+      transaction.nama_produk.includes(selectedProduct)
+    );
+  }
+
+  // Apply date filter if not "Semua Tanggal"
+  if (dateFilter && dateFilter.selectedIndex > 0) {
+    const selectedDateOption = dateFilter.value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (selectedDateOption) {
+      case "Hari Ini":
+        filteredData = filteredData.filter((transaction) => {
+          const transactionDate = new Date(transaction.tanggal_transaksi);
+          transactionDate.setHours(0, 0, 0, 0);
+          return transactionDate.getTime() === today.getTime();
+        });
+        break;
+
+      case "Kemarin":
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        filteredData = filteredData.filter((transaction) => {
+          const transactionDate = new Date(transaction.tanggal_transaksi);
+          transactionDate.setHours(0, 0, 0, 0);
+          return transactionDate.getTime() === yesterday.getTime();
+        });
+        break;
+
+      case "7 Hari Terakhir":
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        filteredData = filteredData.filter((transaction) => {
+          const transactionDate = new Date(transaction.tanggal_transaksi);
+          transactionDate.setHours(0, 0, 0, 0);
+          return transactionDate >= sevenDaysAgo;
+        });
+        break;
+
+      case "30 Hari Terakhir":
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        filteredData = filteredData.filter((transaction) => {
+          const transactionDate = new Date(transaction.tanggal_transaksi);
+          transactionDate.setHours(0, 0, 0, 0);
+          return transactionDate >= thirtyDaysAgo;
+        });
+        break;
     }
+  }
 
-    // Filter transactions based on product name
-    const filteredTransactions = transactionData.filter((transaction) =>
+  // Apply search filter if there's text in the search box
+  if (searchInput && searchInput.value.trim() !== "") {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    filteredData = filteredData.filter((transaction) =>
       transaction.nama_produk.toLowerCase().includes(searchTerm)
     );
-
-    displayTransactionGroups(filteredTransactions);
-  });
-}
-
-// Initialize filter dropdowns
-function initFilterDropdowns() {
-  const filterSelects = document.querySelectorAll(".filter-select");
-
-  filterSelects.forEach((select, index) => {
-    select.addEventListener("change", function () {
-      const filters = getActiveFilters();
-      loadTransactionData(1, filters);
-    });
-  });
-}
-
-// Function to get active filters
-function getActiveFilters() {
-  const filters = {};
-
-  // Get search input value
-  const searchInput = document.getElementById("search-input");
-  if (searchInput.value.trim()) {
-    filters.search = searchInput.value.trim();
   }
 
-  // Get product filter value (first dropdown)
-  const productFilter = document.querySelectorAll(".filter-select")[0];
-  if (productFilter && productFilter.selectedIndex > 0) {
-    filters.productFilter = productFilter.value;
-  }
-
-  // Get date filter value (second dropdown)
-  const dateFilter = document.querySelectorAll(".filter-select")[1];
-  if (dateFilter && dateFilter.selectedIndex > 0) {
-    filters.dateFilter = dateFilter.value;
-  }
-
-  return filters;
+  // Display the filtered data
+  displayTransactionGroups(filteredData);
 }
 
 // Initialize action buttons
