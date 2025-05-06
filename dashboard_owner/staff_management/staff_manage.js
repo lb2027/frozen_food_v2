@@ -506,48 +506,40 @@ document.addEventListener("DOMContentLoaded", function () {
     // Use either filtered data (search results) or all staff data
     const dataToRender = isSearchActive ? filteredStaffData : staffData;
 
-    // Clear selection if the selected staff is not in the current view
-    selectedStaffIds = selectedStaffIds.filter((id) =>
-      dataToRender.some((staff) => staff.id === id)
-    );
-
-    // Update bulk actions visibility
-    updateBulkActionButtonsVisibility();
-
-    // Show no data message if appropriate
-    if (noDataMessage) {
-      noDataMessage.style.display =
-        dataToRender.length === 0 ? "block" : "none";
-    }
-
-    if (dataToRender.length === 0) {
-      return;
-    }
-
-    // Apply sorting to the data
+    // Sort the data before rendering
     const sortedData = [...dataToRender].sort((a, b) => {
-      let fieldA = a[currentSortField];
-      let fieldB = b[currentSortField];
+      // Handle null or undefined values
+      const aValue = a[currentSortField] || "";
+      const bValue = b[currentSortField] || "";
 
-      if (fieldA === null || fieldA === undefined) fieldA = "";
-      if (fieldB === null || fieldB === undefined) fieldB = "";
-
-      if (typeof fieldA === "string") {
-        fieldA = fieldA.toLowerCase();
-        fieldB = fieldB.toLowerCase();
-      }
-
+      // Compare values based on sort direction
       if (sortDirection === "asc") {
-        return fieldA > fieldB ? 1 : -1;
+        return aValue.toString().localeCompare(bValue.toString());
       } else {
-        return fieldA < fieldB ? 1 : -1;
+        return bValue.toString().localeCompare(aValue.toString());
       }
     });
 
-    // Render each staff row
+    // When rendering each staff row, calculate their age
     sortedData.forEach((staff) => {
       const isSelected = selectedStaffIds.includes(staff.id);
       const row = document.createElement("tr");
+
+      // Calculate age if date_of_birth is available
+      let age = "-";
+      if (staff.date_of_birth) {
+        const dob = new Date(staff.date_of_birth);
+        const today = new Date();
+        let ageValue = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < dob.getDate())
+        ) {
+          ageValue--;
+        }
+        age = ageValue.toString();
+      }
 
       row.innerHTML = `
         <td>
@@ -569,7 +561,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </td>
         <td>${staff.email || "-"}</td>
         <td>${staff.no_hp || "-"}</td>
-        <td>-</td>
+        <td>${age}</td>
         <td>-</td>
         <td>${staff.status_kerja || "-"}</td>
         <td>
@@ -686,6 +678,13 @@ document.addEventListener("DOMContentLoaded", function () {
                   <input type="text" id="staff-phone" name="no_hp" required placeholder="Enter phone number">
                 </div>
                 <div class="form-group">
+                  <label for="staff-dob">Date of Birth</label>
+                  <input type="date" id="staff-dob" name="date_of_birth" placeholder="Select date of birth">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
                   <label for="staff-status">Status*</label>
                   <select id="staff-status" name="status_kerja" required>
                     <option value="" disabled selected>Select status</option>
@@ -695,16 +694,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     <option value="Kasir">Kasir</option>
                   </select>
                 </div>
+                <div class="form-group">
+                  <label for="staff-user-id">User ID (Optional)</label>
+                  <input type="number" id="staff-user-id" name="user_id" placeholder="Enter user ID if applicable">
+                </div>
               </div>
               
               <div class="form-group">
                 <label for="staff-address">Address</label>
                 <textarea id="staff-address" name="alamat" rows="3" placeholder="Enter address"></textarea>
-              </div>
-              
-              <div class="form-group">
-                <label for="staff-user-id">User ID (Optional)</label>
-                <input type="number" id="staff-user-id" name="user_id" placeholder="Enter user ID if applicable">
               </div>
             </form>
           </div>
@@ -821,6 +819,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const staff = staffData.find((s) => s.id === id);
     if (!staff) return;
 
+    // Calculate age if date_of_birth is available
+    let ageText = "-";
+    if (staff.date_of_birth) {
+      const dob = new Date(staff.date_of_birth);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < dob.getDate())
+      ) {
+        age--;
+      }
+      ageText = `${age} years old`;
+    }
+
+    // Format date of birth for display
+    const formattedDOB = staff.date_of_birth
+      ? new Date(staff.date_of_birth).toLocaleDateString()
+      : "-";
+
     const modalHTML = `
       <div class="modal-overlay">
         <div class="modal">
@@ -831,7 +850,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="modal-body">
             <div class="staff-profile">
               <div class="staff-avatar-large">
-                <img src="../assets/default-avatar.png" alt="Staff" onerror="this.src='../assets/default-avatar.png'">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Ccircle cx='12' cy='8' r='5'%3E%3C/circle%3E%3Cpath d='M20 21v-2a7 7 0 0 0-14 0v2'%3E%3C/path%3E%3C/svg%3E" alt="Staff">
               </div>
               <h3>${staff.nama || "No Name"}</h3>
               <p class="staff-role">${staff.status_kerja || "Staff"}</p>
@@ -849,6 +868,14 @@ document.addEventListener("DOMContentLoaded", function () {
               <div class="detail-item">
                 <span class="detail-label">Phone:</span>
                 <span class="detail-value">${staff.no_hp || "-"}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date of Birth:</span>
+                <span class="detail-value">${formattedDOB}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Age:</span>
+                <span class="detail-value">${ageText}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Address:</span>
@@ -937,6 +964,15 @@ document.addEventListener("DOMContentLoaded", function () {
                   }" placeholder="Enter phone number">
                 </div>
                 <div class="form-group">
+                  <label for="edit-staff-dob">Date of Birth</label>
+                  <input type="date" id="edit-staff-dob" name="date_of_birth" value="${
+                    staff.date_of_birth || ""
+                  }" placeholder="Select date of birth">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
                   <label for="edit-staff-status">Status*</label>
                   <select id="edit-staff-status" name="status_kerja" required>
                     <option value="Owner" ${
@@ -953,6 +989,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     }>Kasir</option>
                   </select>
                 </div>
+                <div class="form-group">
+                  <label for="edit-staff-user-id">User ID</label>
+                  <input type="number" id="edit-staff-user-id" name="user_id" value="${
+                    staff.user_id || ""
+                  }" placeholder="Enter user ID if applicable">
+                </div>
               </div>
               
               <div class="form-group">
@@ -960,13 +1002,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 <textarea id="edit-staff-address" name="alamat" rows="3" placeholder="Enter address">${
                   staff.alamat || ""
                 }</textarea>
-              </div>
-              
-              <div class="form-group">
-                <label for="edit-staff-user-id">User ID</label>
-                <input type="number" id="edit-staff-user-id" name="user_id" value="${
-                  staff.user_id || ""
-                }" placeholder="Enter user ID if applicable">
               </div>
             </form>
           </div>
