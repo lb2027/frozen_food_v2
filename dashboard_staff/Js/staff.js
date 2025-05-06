@@ -664,7 +664,8 @@ function absen() {
   // Mendapatkan waktu dan tanggal saat ini
   const now = new Date();
   const tanggal = now.toISOString().split('T')[0]; // YYYY-MM-DD
-  const jamMasuk = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+  const jamMasuk = now.toLocaleTimeString('en-GB', { hour12: false }); // Format: HH:MM:SS (24 jam)
+
 
   // Mendapatkan lokasi pengguna (latitude dan longitude)
   navigator.geolocation.getCurrentPosition(function(position) {
