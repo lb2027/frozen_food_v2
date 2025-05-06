@@ -28,6 +28,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("authToken");
+    window.location.href = "/login/login.html";
+  });
+}
+
 
   logoutBtn.addEventListener("click", function () {
     localStorage.removeItem("authToken"); // atau "token" sesuai nama yang kamu pakai
@@ -587,13 +594,13 @@ function checkLocation() {
       document.getElementById("longitude").textContent = userLon.toFixed(6);
 
       // Lokasi kantor di Pakisaji, Malang
-      const officeLat = -8.071824671574776;
-      const officeLon = 112.59569907949185;
+      const officeLat = -7.939997656264779;
+      const officeLon = 112.6807606989787;
 
       const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
       const statusEl = document.getElementById("status");
-      if (distance <= 10) {
+      if (distance <= 100) {
         statusEl.textContent = "✅ Anda berada di dalam area absensi.";
         statusEl.className = "success";
         document.getElementById("absen-button-container").style.display = "block"; // Menampilkan tombol absen
@@ -610,76 +617,95 @@ function checkLocation() {
   }
 }
 
-// Fungsi untuk melakukan absensi
+// // Fungsi untuk melakukan absensi
+// function absen() {
+//   // Simpan data absensi ke dalam database (menggunakan AJAX atau fetch ke server)
+
+//   const absensiData = {
+//     latitude: userLat,
+//     longitude: userLon,
+//     status: "Hadir",
+//     timestamp: new Date().toISOString()
+//   };
+
+//   // Mengirim data absensi ke server menggunakan fetch
+//   fetch('http://localhost:5050/addabsensi', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify(absensiData)
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     if (data.success) {
+//       document.getElementById("absen-status").textContent = "✅ Absensi berhasil!";
+//       document.getElementById("absen-status").className = "success";
+//     } else {
+//       document.getElementById("absen-status").textContent = "❌ Absensi gagal!";
+//       document.getElementById("absen-status").className = "danger";
+//     }
+//   })
+//   .catch(error => {
+//     document.getElementById("absen-status").textContent = "❌ Terjadi kesalahan. Coba lagi.";
+//     document.getElementById("absen-status").className = "danger";
+//   });
+// }
+
+
 function absen() {
-  // Simpan data absensi ke dalam database (menggunakan AJAX atau fetch ke server)
+  const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
 
-  const absensiData = {
-    latitude: userLat,
-    longitude: userLon,
-    status: "Hadir",
-    timestamp: new Date().toISOString()
-  };
+  if (!token) {
+    alert("Anda belum login!");
+    window.location.href = "/login/login.html";
+    return;
+  }
+  // Mendapatkan waktu dan tanggal saat ini
+  const now = new Date();
+  const tanggal = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const jamMasuk = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
 
-  // Mengirim data absensi ke server menggunakan fetch
-  fetch('/save_absensi', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(absensiData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      document.getElementById("absen-status").textContent = "✅ Absensi berhasil!";
-      document.getElementById("absen-status").className = "success";
-    } else {
-      document.getElementById("absen-status").textContent = "❌ Absensi gagal!";
+  // Mendapatkan lokasi pengguna (latitude dan longitude)
+  navigator.geolocation.getCurrentPosition(function(position) {
+    const userLat = position.coords.latitude;
+    const userLon = position.coords.longitude;
+
+    const absensiData = {
+      staff_id: 1, // Ganti dengan ID staf yang sesuai
+      tanggal: tanggal,
+      jam_masuk: jamMasuk,
+      status: "Hadir",
+      keterangan: "Absen pagi",
+    };
+
+    // Mengirim data absensi ke server menggunakan fetch
+    fetch('http://localhost:5050/addabsensi', { // Pastikan endpoint sesuai
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': token 
+      },
+      body: JSON.stringify(absensiData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById("absen-status").textContent = "✅ Absensi berhasil!";
+        document.getElementById("absen-status").className = "success";
+      } else {
+        document.getElementById("absen-status").textContent = "❌ Absensi gagal!";
+        document.getElementById("absen-status").className = "danger";
+      }
+    })
+    .catch(error => {
+      document.getElementById("absen-status").textContent = "❌ Terjadi kesalahan. Coba lagi.";
       document.getElementById("absen-status").className = "danger";
-    }
-  })
-  .catch(error => {
-    document.getElementById("absen-status").textContent = "❌ Terjadi kesalahan. Coba lagi.";
+    });
+  }, function(error) {
+    document.getElementById("absen-status").textContent = "❌ Tidak dapat mendeteksi lokasi.";
     document.getElementById("absen-status").className = "danger";
   });
 }
 
-
-
-
-//Backend
-
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const mysql = require('mysql');
-
-app.use(cors());
-app.use(bodyParser.json());
-
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'absensi_db'
-});
-
-app.post('/save_absensi', (req, res) => {
-  const { latitude, longitude, status, timestamp } = req.body;
-  
-  const query = 'INSERT INTO absensi (latitude, longitude, status, timestamp) VALUES (?, ?, ?, ?)';
-  db.query(query, [latitude, longitude, status, timestamp], (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.json({ success: false, message: 'Gagal menyimpan data absensi' });
-    }
-    res.json({ success: true, message: 'Absensi berhasil disimpan' });
-  });
-});
-
-app.listen(3000, () => {
-  console.log('Server berjalan di port 3000');
-});
 
