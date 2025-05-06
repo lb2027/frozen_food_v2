@@ -415,8 +415,53 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
       `;
       productList.appendChild(row);
+
+
+
+      //tamabahan edit delete
+
+
+
+      
+
+      // Tambahkan event listener untuk delete
+const deleteBtn = row.querySelector(".delete-btn");
+if (deleteBtn) {
+  deleteBtn.addEventListener("click", () => {
+    const confirmDelete = confirm(`Yakin ingin menghapus produk ${produk.nama}?`);
+    if (confirmDelete) {
+      fetch(`/api/produk/${produk.produk_id}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert("Produk berhasil dihapus");
+            // Refresh daftar produk
+            fetchProducts(); // pastikan kamu punya fungsi ini untuk ambil ulang data
+          } else {
+            alert("Gagal menghapus produk");
+          }
+        })
+        .catch((error) => {
+          console.error("Terjadi kesalahan:", error);
+          alert("Terjadi kesalahan saat menghapus");
+        });
+    }
+  });
+}
+
+// Tambahkan event listener untuk edit
+const editBtn = row.querySelector(".edit-btn");
+if (editBtn) {
+  editBtn.addEventListener("click", () => {
+    // Misal kita munculkan modal edit
+    openEditModal(produk); // pastikan kamu punya fungsi modal edit
+  });
+}
+
     });
   }
+  
 
   function populateProductDropdown(products, dropdown) {
     if (!dropdown) {
@@ -637,3 +682,4 @@ app.post('/save_absensi', (req, res) => {
 app.listen(3000, () => {
   console.log('Server berjalan di port 3000');
 });
+
