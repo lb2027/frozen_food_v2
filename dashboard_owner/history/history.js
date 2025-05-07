@@ -1,5 +1,34 @@
 document.addEventListener("DOMContentLoaded", async function () {
-  await initializeApiUrl(); // Ensure the API URL is initialized before proceeding
+  const token = localStorage.getItem("authToken");
+
+  // Function to check if the token is expired
+  function isTokenExpired(token) {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payload = JSON.parse(atob(payloadBase64));
+
+      // Check if the token has an expiration time
+      if (payload && payload.exp) {
+        const expiryTime = payload.exp * 1000; // Convert to milliseconds
+        const currentTime = Date.now();
+
+        // Check if the token is expired
+        return currentTime > expiryTime;
+      } else {
+        // If the token doesn't have an expiration time, consider it invalid
+        return true;
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return true;
+    }
+  }
+
+  if (!token || isTokenExpired(token)) {
+    window.location.href = "/login/login.html";
+    return;
+  }
+  await initializeApiUrl();
   // Initialize the transaction history functionality
   initTransactionHistory();
 });
