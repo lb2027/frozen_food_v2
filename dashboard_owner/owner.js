@@ -1,6 +1,4 @@
-// Modify the existing document.addEventListener block to include our new functionality
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if the user is logged in
   const token = localStorage.getItem("authToken");
 
   // Function to check if the token is expired
@@ -28,9 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (!token || isTokenExpired(token)) {
-    // Redirect to the login page if not logged in or token is expired
-    window.location.href = "/login/login.html"; // Replace with login page
-    return; // Prevent further execution
+    window.location.href = "/login/login.html";
+    return;
   }
 
   // Get references to the modal and button elements
@@ -797,6 +794,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // Refresh the product list
         fetchProduk();
+        showSuccessAlert("Produk berhasil dihapus.");
       } else {
         console.error("Failed to delete product:", response.status);
       }
@@ -1027,4 +1025,42 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("An error occurred while updating the product.");
     }
   });
+
+  function showSuccessAlert(message) {
+    showAlert(message, "success");
+  }
+
+  function showAlert(message, type) {
+    // Remove any existing alerts
+    const existingAlerts = document.querySelectorAll(".alert");
+    existingAlerts.forEach((alert) => {
+      alert.remove();
+    });
+
+    const alertElement = document.createElement("div");
+    alertElement.className = `alert ${type}-alert`;
+    alertElement.innerHTML = `
+      <div class="alert-content">
+        <span class="alert-icon">
+          ${type === "success" ? "✓" : "⚠"}
+        </span>
+        <span class="alert-message">${message}</span>
+      </div>
+      <button class="close-alert">&times;</button>
+    `;
+
+    document.body.appendChild(alertElement);
+
+    // Add close button functionality
+    alertElement.querySelector(".close-alert").addEventListener("click", () => {
+      alertElement.remove();
+    });
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (alertElement.parentNode) {
+        alertElement.remove();
+      }
+    }, 5000);
+  }
 });
