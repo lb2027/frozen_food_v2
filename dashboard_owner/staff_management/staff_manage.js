@@ -645,26 +645,636 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Show payroll tab
+  // ...existing code...
+
+  // --- PAYROLL (GAJI) SECTION ---
+
+  // Function to show the payroll tab
   function showPayrollTab() {
-    // Create payroll container if it doesn't exist
+    hideTabContainers(); // Hide other tab sections
+
     let payrollContainer = document.querySelector(".payroll-container");
 
     if (!payrollContainer) {
       payrollContainer = document.createElement("div");
       payrollContainer.className = "payroll-container";
       payrollContainer.innerHTML = `
-        <h2>Staff Payroll</h2>
-        <p>This feature will be available in the next update.</p>
+        <div class="payroll-header section-header">
+          <h2 class="payroll-count">Payroll Records (0)</h2>
+          <div class="section-actions">
+            <button class="btn secondary-btn refresh-payroll-btn">
+              <span class="material-icons">refresh</span>
+              <span>Refresh</span>
+            </button>
+            <button class="btn primary-btn add-payroll-btn">
+              <span class="material-icons">add_card</span> 
+              <span>Add Salary Record</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="payroll-table-container table-responsive-container">
+          <table class="data-table payroll-table">
+            <thead>
+              <tr>
+                <th width="50">ID</th>
+                <th>Staff ID</th>
+                <th>Staff Name</th> <!-- Will need to fetch staff name separately or join in backend -->
+                <th>Salary Month</th>
+                <th>Amount (Rp)</th>
+                <th>Transfer Date</th>
+                <th>Notes</th>
+                <th width="120">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Payroll rows will be populated here -->
+            </tbody>
+          </table>
+          <div class="no-data-message payroll-no-data">No payroll data available.</div>
+        </div>
       `;
 
-      const container = document.querySelector(".container");
+      const container = document.querySelector(".container"); // Main content container
       if (container) {
         container.appendChild(payrollContainer);
+      }
+
+      // Add event listeners for payroll actions
+      const refreshBtn = payrollContainer.querySelector(".refresh-payroll-btn");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", fetchPayrollData);
+      }
+
+      const addBtn = payrollContainer.querySelector(".add-payroll-btn");
+      if (addBtn) {
+        addBtn.addEventListener("click", showAddPayrollModal);
       }
     }
 
     payrollContainer.style.display = "block";
+    fetchPayrollData(); // Fetch data when tab is shown
   }
+
+  // Fetch payroll data from API
+  async function fetchPayrollData() {
+    showLoader();
+    const payrollNoDataMsg = document.querySelector(".payroll-no-data");
+    const payrollCountElement = document.querySelector(".payroll-count");
+
+    try {
+      const response = await fetch(`${apiUrl}/getgaji`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: `HTTP error! Status: ${response.status}` }));
+        throw new Error(
+          errorData.message || `HTTP error! Status: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      if (payrollCountElement) {
+        payrollCountElement.textContent = `Payroll Records (${
+          data ? data.length : 0
+        })`;
+      }
+
+      // To display staff names, you might need to fetch staff data and map it
+      // For simplicity, this example assumes staff names might come from a join or will be handled later
+      renderPayrollTable(data || []);
+
+      if (payrollNoDataMsg) {
+        payrollNoDataMsg.style.display =
+          !data || data.length === 0 ? "block" : "none";
+      }
+    } catch (error) {
+      console.error("Error fetching payroll data:", error);
+      showErrorAlert(`Failed to load payroll data: ${error.message}`);
+      if (payrollNoDataMsg) payrollNoDataMsg.style.display = "block";
+      if (payrollCountElement)
+        payrollCountElement.textContent = `Payroll Records (0)`;
+      renderPayrollTable([]); // Clear table on error
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // Render payroll data into the table
+  function renderPayrollTable(payrollData) {
+    const tableBody = document.querySelector(".payroll-table tbody");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = ""; // Clear existing rows
+
+    if (!payrollData || payrollData.length === 0) {
+      return; // No data to render
+    }
+
+    payrollData.forEach((record) => {
+      const row = document.createElement("tr");
+      // Assuming you have a way to get staff name, e.g., from staffData array
+      const staffMember = staffData.find((s) => s.id === record.staff_id);
+      const staffName = staffMember
+        ? staffMember.nama
+        : `ID: ${record.staff_id}`;
+
+      row.innerHTML = `
+        <td>${record.id}</td>
+        <td>${record.staff_id}</td>
+        <td>${staffName}</td>
+        <td>${
+          record.bulan_gaji
+            ? new Date(record.bulan_gaji).toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "long",
+              })
+            : "-"
+        }</td>
+        <td>${
+          record.gaji_perbulan
+            ? record.gaji_perbulan.toLocaleString("id-ID")
+            : "-"
+        }</td>
+        <td>${
+          record.tanggal_transfer
+            ? new Date(record.tanggal_transfer).toLocaleDateString("id-ID")
+            : "-"
+        }</td>
+        <td>${record.keterangan || "-"}</td>
+        <td>
+          <div class="action-icons">
+            <button class="action-btn view-payroll-btn" data-id="${
+              record.id
+            }" title="View Details">
+              <span class="material-icons">visibility</span>
+            </button>
+            <button class="action-btn edit-payroll-btn" data-id="${
+              record.id
+            }" title="Edit Record">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="action-btn delete-payroll-btn" data-id="${
+              record.id
+            }" title="Delete Record">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(row);
+
+      // Add event listeners for action buttons
+      row
+        .querySelector(".view-payroll-btn")
+        .addEventListener("click", () => viewPayrollRecord(record));
+      row
+        .querySelector(".edit-payroll-btn")
+        .addEventListener("click", () => showEditPayrollModal(record));
+      row
+        .querySelector(".delete-payroll-btn")
+        .addEventListener("click", () => deletePayrollRecord(record.id));
+    });
+  }
+
+  // Show modal to add a new payroll record
+  function showAddPayrollModal() {
+    closeModal(); // Close any existing modal
+
+    const staffOptions = staffData
+      .map(
+        (staff) =>
+          `<option value="${staff.id}">${staff.nama} (ID: ${staff.id})</option>`
+      )
+      .join("");
+
+    const modalHTML = `
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Add New Salary Record</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="add-payroll-form">
+              <div class="form-group">
+                <label for="payroll-staff-id">Staff*</label>
+                <select id="payroll-staff-id" name="staff_id" required>
+                  <option value="" disabled selected>Select Staff</option>
+                  ${staffOptions}
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="payroll-bulan-gaji">Salary Month (YYYY-MM-DD)*</label>
+                  <input type="date" id="payroll-bulan-gaji" name="bulan_gaji" required>
+                </div>
+                <div class="form-group">
+                  <label for="payroll-gaji-perbulan">Amount (Rp)*</label>
+                  <input type="number" id="payroll-gaji-perbulan" name="gaji_perbulan" step="0.01" required placeholder="e.g., 5000000">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="payroll-tanggal-transfer">Transfer Date (YYYY-MM-DD)*</label>
+                <input type="date" id="payroll-tanggal-transfer" name="tanggal_transfer" required>
+              </div>
+              <div class="form-group">
+                <label for="payroll-keterangan">Notes</label>
+                <textarea id="payroll-keterangan" name="keterangan" rows="3" placeholder="Optional notes"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn secondary-btn" id="cancel-add-payroll">Cancel</button>
+            <button class="btn primary-btn" id="save-payroll-btn">Save Record</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    document
+      .querySelector(".close-modal")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("cancel-add-payroll")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("save-payroll-btn")
+      .addEventListener("click", addPayrollRecord);
+    document.querySelector(".modal-overlay").addEventListener("click", (e) => {
+      if (e.target.classList.contains("modal-overlay")) closeModal();
+    });
+  }
+
+  // Add a new payroll record
+  async function addPayrollRecord() {
+    const form = document.getElementById("add-payroll-form");
+    if (!form) return;
+
+    const staffIdField = form.querySelector('[name="staff_id"]');
+    const bulanGajiField = form.querySelector('[name="bulan_gaji"]');
+    const gajiPerbulanField = form.querySelector('[name="gaji_perbulan"]');
+    const tanggalTransferField = form.querySelector(
+      '[name="tanggal_transfer"]'
+    );
+
+    if (!staffIdField.value) {
+      showErrorAlert("Please select a staff member.");
+      staffIdField.focus();
+      return;
+    }
+    if (!bulanGajiField.value) {
+      showErrorAlert("Please select the salary month.");
+      bulanGajiField.focus();
+      return;
+    }
+    if (!gajiPerbulanField.value || parseFloat(gajiPerbulanField.value) <= 0) {
+      showErrorAlert("Please enter a valid salary amount.");
+      gajiPerbulanField.focus();
+      return;
+    }
+    if (!tanggalTransferField.value) {
+      showErrorAlert("Please select the transfer date.");
+      tanggalTransferField.focus();
+      return;
+    }
+
+    const payrollData = {
+      staff_id: parseInt(staffIdField.value),
+      bulan_gaji: bulanGajiField.value,
+      gaji_perbulan: parseFloat(gajiPerbulanField.value),
+      tanggal_transfer: tanggalTransferField.value,
+      keterangan:
+        form.querySelector('[name="keterangan"]').value.trim() || null,
+    };
+
+    showLoader();
+    try {
+      const response = await fetch(`${apiUrl}/addgaji`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify(payrollData),
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          responseData.Error ||
+            responseData.message ||
+            `HTTP error! Status: ${response.status}`
+        );
+      }
+
+      showSuccessAlert(
+        responseData.message || "Salary record added successfully!"
+      );
+      closeModal();
+      fetchPayrollData(); // Refresh table
+    } catch (error) {
+      console.error("Error adding payroll record:", error);
+      showErrorAlert(`Failed to add salary record: ${error.message}`);
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // Show modal to edit an existing payroll record
+  function showEditPayrollModal(record) {
+    closeModal();
+    if (!record) return;
+
+    const staffOptions = staffData
+      .map(
+        (staff) =>
+          `<option value="${staff.id}" ${
+            staff.id === record.staff_id ? "selected" : ""
+          }>${staff.nama} (ID: ${staff.id})</option>`
+      )
+      .join("");
+
+    const modalHTML = `
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Edit Salary Record (ID: ${record.id})</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="edit-payroll-form">
+              <input type="hidden" name="id" value="${record.id}">
+              <div class="form-group">
+                <label for="edit-payroll-staff-id">Staff*</label>
+                <select id="edit-payroll-staff-id" name="staff_id" required>
+                  ${staffOptions}
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="edit-payroll-bulan-gaji">Salary Month (YYYY-MM-DD)*</label>
+                  <input type="date" id="edit-payroll-bulan-gaji" name="bulan_gaji" value="${
+                    record.bulan_gaji || ""
+                  }" required>
+                </div>
+                <div class="form-group">
+                  <label for="edit-payroll-gaji-perbulan">Amount (Rp)*</label>
+                  <input type="number" id="edit-payroll-gaji-perbulan" name="gaji_perbulan" step="0.01" value="${
+                    record.gaji_perbulan || ""
+                  }" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="edit-payroll-tanggal-transfer">Transfer Date (YYYY-MM-DD)*</label>
+                <input type="date" id="edit-payroll-tanggal-transfer" name="tanggal_transfer" value="${
+                  record.tanggal_transfer || ""
+                }" required>
+              </div>
+              <div class="form-group">
+                <label for="edit-payroll-keterangan">Notes</label>
+                <textarea id="edit-payroll-keterangan" name="keterangan" rows="3">${
+                  record.keterangan || ""
+                }</textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn secondary-btn" id="cancel-edit-payroll">Cancel</button>
+            <button class="btn primary-btn" id="update-payroll-btn">Update Record</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    document
+      .querySelector(".close-modal")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("cancel-edit-payroll")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("update-payroll-btn")
+      .addEventListener("click", updatePayrollRecord);
+    document.querySelector(".modal-overlay").addEventListener("click", (e) => {
+      if (e.target.classList.contains("modal-overlay")) closeModal();
+    });
+  }
+
+  // Update an existing payroll record
+  async function updatePayrollRecord() {
+    const form = document.getElementById("edit-payroll-form");
+    if (!form) return;
+
+    const recordId = form.querySelector('[name="id"]').value;
+    const staffIdField = form.querySelector('[name="staff_id"]');
+    const bulanGajiField = form.querySelector('[name="bulan_gaji"]');
+    const gajiPerbulanField = form.querySelector('[name="gaji_perbulan"]');
+    const tanggalTransferField = form.querySelector(
+      '[name="tanggal_transfer"]'
+    );
+
+    if (!staffIdField.value) {
+      showErrorAlert("Please select a staff member.");
+      staffIdField.focus();
+      return;
+    }
+    if (!bulanGajiField.value) {
+      showErrorAlert("Please select the salary month.");
+      bulanGajiField.focus();
+      return;
+    }
+    if (!gajiPerbulanField.value || parseFloat(gajiPerbulanField.value) <= 0) {
+      showErrorAlert("Please enter a valid salary amount.");
+      gajiPerbulanField.focus();
+      return;
+    }
+    if (!tanggalTransferField.value) {
+      showErrorAlert("Please select the transfer date.");
+      tanggalTransferField.focus();
+      return;
+    }
+
+    const payrollData = {
+      id: parseInt(recordId),
+      staff_id: parseInt(staffIdField.value),
+      bulan_gaji: bulanGajiField.value,
+      gaji_perbulan: parseFloat(gajiPerbulanField.value),
+      tanggal_transfer: tanggalTransferField.value,
+      keterangan:
+        form.querySelector('[name="keterangan"]').value.trim() || null,
+    };
+
+    showLoader();
+    try {
+      const response = await fetch(`${apiUrl}/gaji/${recordId}`, {
+        // Assuming PUT to /gaji/{id}
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify(payrollData),
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          responseData.Error ||
+            responseData.message ||
+            `HTTP error! Status: ${response.status}`
+        );
+      }
+      showSuccessAlert(
+        responseData.message || "Salary record updated successfully!"
+      );
+      closeModal();
+      fetchPayrollData();
+    } catch (error) {
+      console.error("Error updating payroll record:", error);
+      showErrorAlert(`Failed to update salary record: ${error.message}`);
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // Delete a payroll record
+  async function deletePayrollRecord(id) {
+    if (
+      !confirm(
+        `Are you sure you want to delete salary record ID: ${id}? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    showLoader();
+    try {
+      const response = await fetch(`${apiUrl}/deletegaji/${id}`, {
+        // Assuming DELETE to /gaji/{id}
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          responseData.Error ||
+            responseData.message ||
+            `HTTP error! Status: ${response.status}`
+        );
+      }
+      showSuccessAlert(
+        responseData.message || "Salary record deleted successfully!"
+      );
+      fetchPayrollData();
+    } catch (error) {
+      console.error("Error deleting payroll record:", error);
+      showErrorAlert(`Failed to delete salary record: ${error.message}`);
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // View payroll record details (placeholder - build out a modal similar to viewStaffDetails)
+  function viewPayrollRecord(record) {
+    if (!record) return;
+    closeModal();
+
+    const staffMember = staffData.find((s) => s.id === record.staff_id);
+    const staffName = staffMember ? staffMember.nama : `ID: ${record.staff_id}`;
+
+    const modalHTML = `
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Salary Record Details (ID: ${record.id})</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="details-grid">
+              <div class="detail-row"><div class="detail-label">Record ID:</div><div class="detail-value">${
+                record.id
+              }</div></div>
+              <div class="detail-row"><div class="detail-label">Staff ID:</div><div class="detail-value">${
+                record.staff_id
+              }</div></div>
+              <div class="detail-row"><div class="detail-label">Staff Name:</div><div class="detail-value">${staffName}</div></div>
+              <div class="detail-row"><div class="detail-label">Salary Month:</div><div class="detail-value">${
+                record.bulan_gaji
+                  ? new Date(record.bulan_gaji).toLocaleDateString("id-ID", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "-"
+              }</div></div>
+              <div class="detail-row"><div class="detail-label">Amount:</div><div class="detail-value">Rp ${
+                record.gaji_perbulan
+                  ? record.gaji_perbulan.toLocaleString("id-ID")
+                  : "-"
+              }</div></div>
+              <div class="detail-row"><div class="detail-label">Transfer Date:</div><div class="detail-value">${
+                record.tanggal_transfer
+                  ? new Date(record.tanggal_transfer).toLocaleDateString(
+                      "id-ID",
+                      { year: "numeric", month: "long", day: "numeric" }
+                    )
+                  : "-"
+              }</div></div>
+              <div class="detail-row"><div class="detail-label">Notes:</div><div class="detail-value">${
+                record.keterangan || "-"
+              }</div></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn secondary-btn" id="close-view-payroll">Close</button>
+            <button class="btn primary-btn" id="edit-viewed-payroll-btn">Edit</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    document
+      .querySelector(".close-modal")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("close-view-payroll")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("edit-viewed-payroll-btn")
+      .addEventListener("click", () => {
+        closeModal();
+        showEditPayrollModal(record);
+      });
+    document.querySelector(".modal-overlay").addEventListener("click", (e) => {
+      if (e.target.classList.contains("modal-overlay")) closeModal();
+    });
+  }
+
+  // ...existing code...
+  // Make sure to call showPayrollTab when the payroll tab is clicked in setupEventListeners
+  // Example:
+  // else if (tabName.includes("payroll")) {
+  //    hideTabContainers();
+  //    showPayrollTab();
+  // }
+
+  // Ensure staffData is fetched and available for populating staff names in payroll.
+  // You might need to call fetchStaffData() if it's not already called or if payroll tab can be accessed independently.
+  // Consider fetching staff data within fetchPayrollData or ensuring it's up-to-date.
+
+  // ...rest of your existing staff_manage.js code...
 
   // Fetch staff data from API
   async function fetchStaffData() {

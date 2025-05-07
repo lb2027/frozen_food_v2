@@ -84,6 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        showSuccessAlert("Produk baru berhasil ditambahkan.");
+
         modal.style.display = "none";
 
         // Refresh the product list
@@ -193,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // Close the modal
         addStockModal.style.display = "none";
+        showSuccessAlert("Stok berhasil ditambahkan.");
 
         // Refresh the product list
         fetchProduk();
@@ -325,6 +328,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        showSuccessAlert("Stok berhasil terjual.");
+
         stokSoldModal.style.display = "none";
 
         // Refresh the product list
@@ -701,6 +706,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       editBtn.addEventListener("click", () => {
         const produkId = editBtn.dataset.produkId;
+
         openEditModal(produkId);
       });
 
@@ -1008,6 +1014,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        showSuccessAlert("Produk berhasil diedit.");
+
         editModal.style.display = "none";
 
         // Refresh the product list

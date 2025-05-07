@@ -27,6 +27,7 @@
   --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   --box-shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition-speed: 0.3s;
+  --card-bg: #1e1e2d;
 }
 
 * {
