@@ -973,6 +973,84 @@ tbody tr:hover::after {
   color: var(--light-text);
 }
 
+/* Attendance styles */
+.attendance-container {
+  margin-top: 20px;
+}
+
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.attendance-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.hadir {
+  background-color: #e6f7ed;
+  color: #00a854;
+}
+
+.status-badge.terlambat {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-badge.izin {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-badge.sakit {
+  background-color: #fff2f0;
+  color: #f5222d;
+}
+
+.status-badge.alpha {
+  background-color: #f5f5f5;
+  color: #8c8c8c;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   :root {

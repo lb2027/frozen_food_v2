@@ -331,28 +331,297 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Add this function to fetch attendance data from the API
+  async function fetchAttendanceData() {
+    showLoader();
+
+    try {
+      const response = await fetch(`${apiUrl}/getabsensi`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Update the attendance count - check if element exists first
+      const attendanceCountElement =
+        document.querySelector(".attendance-count");
+      if (attendanceCountElement) {
+        attendanceCountElement.textContent = `Attendance Records (${
+          data ? data.length : 0
+        })`;
+      }
+
+      // Render attendance data - check if data exists
+      if (data && Array.isArray(data)) {
+        renderAttendanceTable(data);
+      } else {
+        // Handle the case where data is not an array
+        const tableBody = document.querySelector(".attendance-table tbody");
+        if (tableBody) {
+          tableBody.innerHTML = "";
+        }
+
+        const noDataMessage = document.querySelector(
+          ".attendance-container .no-data-message"
+        );
+        if (noDataMessage) {
+          noDataMessage.style.display = "block";
+        }
+      }
+
+      hideLoader();
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      hideLoader();
+      showErrorAlert("Failed to load attendance data. Please try again.");
+    }
+  }
+
+  // Add this function to render the attendance data
+  function renderAttendanceTable(attendanceData) {
+    const tableBody = document.querySelector(".attendance-table tbody");
+    const noDataMessage = document.querySelector(
+      ".attendance-container .no-data-message"
+    );
+
+    if (!tableBody) return;
+
+    // Clear existing rows
+    tableBody.innerHTML = "";
+
+    // Show message if no data
+    if (!attendanceData || attendanceData.length === 0) {
+      if (noDataMessage) noDataMessage.style.display = "block";
+      return;
+    }
+
+    // Hide no data message
+    if (noDataMessage) noDataMessage.style.display = "none";
+
+    // Create table rows
+    attendanceData.forEach((record) => {
+      const row = document.createElement("tr");
+
+      // Format the date for display
+      const formattedDate = new Date(record.tanggal).toLocaleDateString();
+
+      // Create status badge based on attendance status
+      const statusClass = record.status.toLowerCase();
+      const statusBadge = `<span class="status-badge ${statusClass}">${record.status}</span>`;
+
+      row.innerHTML = `
+      <td>
+        <div class="checkbox-container">
+          <span class="custom-checkbox" data-id="${record.id}"></span>
+        </div>
+      </td>
+      <td>${record.id}</td>
+      <td>${record.nama}</td>
+      <td>${formattedDate}</td>
+      <td>${record.jam_masuk}</td>
+      <td>${record.jam_keluar || "-"}</td>
+      <td>${statusBadge}</td>
+      <td>${record.keterangan || "-"}</td>
+      <td>
+        <div class="action-icons">
+          <button class="action-btn view-btn" data-id="${record.id}">
+            <span class="material-icons">visibility</span>
+          </button>
+          <button class="action-btn edit-btn" data-id="${record.id}">
+            <span class="material-icons">edit</span>
+          </button>
+        </div>
+      </td>
+    `;
+
+      tableBody.appendChild(row);
+
+      // Add event listeners to the action buttons
+      const viewBtn = row.querySelector(".view-btn");
+      if (viewBtn) {
+        viewBtn.addEventListener("click", () =>
+          viewAttendanceDetails(record.id, record)
+        );
+      }
+
+      const editBtn = row.querySelector(".edit-btn");
+      if (editBtn) {
+        editBtn.addEventListener("click", () =>
+          editAttendanceRecord(record.id, record)
+        );
+      }
+    });
+  }
+
+  // Add this placeholder function (you can expand it later)
+  function showAddAttendanceModal() {
+    showAlert("Add attendance functionality will be available soon.", "info");
+  }
+
+  // Add this placeholder function (you can expand it later)
+  function viewAttendanceDetails(id, record) {
+    const modalHTML = `
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Attendance Details</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="details-grid">
+            <div class="detail-row">
+              <div class="detail-label">ID:</div>
+              <div class="detail-value">${record.id}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Staff Name:</div>
+              <div class="detail-value">${record.nama}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Date:</div>
+              <div class="detail-value">${new Date(
+                record.tanggal
+              ).toLocaleDateString()}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Time In:</div>
+              <div class="detail-value">${record.jam_masuk}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Time Out:</div>
+              <div class="detail-value">${
+                record.jam_keluar || "Not recorded"
+              }</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Status:</div>
+              <div class="detail-value">
+                <span class="status-badge ${record.status.toLowerCase()}">${
+      record.status
+    }</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Notes:</div>
+              <div class="detail-value">${record.keterangan || "-"}</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn secondary-btn" id="close-view">Close</button>
+          <button class="btn primary-btn" id="edit-attendance" data-id="${
+            record.id
+          }">Edit</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    document
+      .querySelector(".close-modal")
+      .addEventListener("click", closeModal);
+    document.getElementById("close-view").addEventListener("click", closeModal);
+    document.getElementById("edit-attendance").addEventListener("click", () => {
+      closeModal();
+      editAttendanceRecord(record.id, record);
+    });
+
+    document.querySelector(".modal-overlay").addEventListener("click", (e) => {
+      if (e.target.classList.contains("modal-overlay")) closeModal();
+    });
+  }
+
+  // Add this placeholder function (you can expand it later)
+  function editAttendanceRecord(id, record) {
+    showAlert("Edit attendance functionality will be available soon.", "info");
+  }
+
   // Show attendance tab
+  // Replace the existing showAttendanceTab() function with this one
   function showAttendanceTab() {
-    // Create attendance container if it doesn't exist
+    // Create or get attendance container
     let attendanceContainer = document.querySelector(".attendance-container");
 
     if (!attendanceContainer) {
       attendanceContainer = document.createElement("div");
       attendanceContainer.className = "attendance-container";
+
+      // Create attendance table structure
       attendanceContainer.innerHTML = `
-        <h2>Staff Attendance</h2>
-        <p>This feature will be available in the next update.</p>
-      `;
+      <div class="attendance-header">
+        <h2 class="attendance-count">Attendance Records (0)</h2>
+        <div class="attendance-actions">
+          <button class="refresh-btn">
+            <span class="material-icons">refresh</span>
+            <span>Refresh</span>
+          </button>
+          <button class="add-attendance-btn">
+            <span class="material-icons">add</span>
+            <span>Record Attendance</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="attendance-table-container">
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th width="40">
+                <div class="checkbox-container">
+                  <span class="custom-checkbox"></span>
+                </div>
+              </th>
+              <th width="60">ID</th>
+              <th>Staff Name</th>
+              <th>Date</th>
+              <th>Time In</th>
+              <th>Time Out</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th width="120">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Attendance rows will be populated here -->
+          </tbody>
+        </table>
+        <div class="no-data-message">No attendance data available.</div>
+      </div>
+    `;
 
       const container = document.querySelector(".container");
       if (container) {
         container.appendChild(attendanceContainer);
       }
+
+      // Add event listeners to attendance actions
+      const refreshBtn = attendanceContainer.querySelector(".refresh-btn");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", fetchAttendanceData);
+      }
+
+      const addAttendanceBtn = attendanceContainer.querySelector(
+        ".add-attendance-btn"
+      );
+      if (addAttendanceBtn) {
+        addAttendanceBtn.addEventListener("click", showAddAttendanceModal);
+      }
     }
 
     attendanceContainer.style.display = "block";
-  }
 
+    // Get attendance data from API
+    fetchAttendanceData();
+  }
   // Show performance tab
   function showPerformanceTab() {
     // Create performance container if it doesn't exist
