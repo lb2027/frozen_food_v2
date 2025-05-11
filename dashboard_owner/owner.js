@@ -1,6 +1,40 @@
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
 
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+
+  function renderProductList(products) {
+    const productList = document.getElementById("product-list");
+    if (!productList) {
+      console.error("Product list element not found!");
+      return;
+    }
+    productList.innerHTML = "";
+
+    products.forEach((produk) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${produk.produk_id}</td>
+        <td>${produk.nama}</td>
+        <td><div class="product-image"><img src="${apiUrl}/images/${
+        produk.foto
+      }" 
+            alt="${produk.nama}" width="50" 
+            onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANtSURBVHic7ZpNaxNRFIafSdOvfKi1KoK14gcVRHRRNMY/UNCNWrcu3Lh0JbgQROjCnYuCv8ClaF2L4KIIIgqKH9UWamurbcHaJJqatzk3TszEmcmZO3NnmswDL4FC7nvPeTI595wzbkBRFEVRFEVRlHLDAxaAH0AcSCop/UjHvCiGkfXAO66MgwK4Dqz7k48CzfgTuQMcB/YCLqCWqAbm5diPwAXZ7iQ5AX4CJ2RbMXk6HiVn/vEiO1MqJoFfwJZiOVQsNgEpYLxYjhSRadQV/pu9wCbgfbGdKRIvkWV5R7EdKRaHEJN3QzrjTFyBmaCnwE7gGnCV/B9Qm4F+4CrQYNK/TuAtcAZYMumDrRwBPoWHwLgch334f0yzK0EkS2xF3qKZBHAHuIl/Sm4CTiXkB3AImDDpg63UIrfzCnAPf62xPLADJoC0PLPZ5MUztQ44iQz+ALDBhC+2IQvMH8A2i+6fKsCfALBz8JEQv82CRCLfIz0OHLVw/S0FuBMI1wgnLfgXaKpC6l8x4FYO8WXgWj5fWoHRDNcYLuB+gaEu/TFMKDiSZxvvA5vTnFsiYK3A08I9DAzVWdigI2OTicAQcAA4k+WakcAdh4YzriedaXDPqUGrgaeZBgdbkBp9qt59DpQAR0uDztwyBHSjD8JA0gFcRFaNqht8gNgA9CEf1i/lgEKmwTuRFHdrBvEtSFq8H1husy/lxDIkRvuQGmZQqEcSIheAd1nEn/PJDgLPbfClHPmMBI7DiMmMb0Q2MmKSKcpkvB2JwdvAByz4PIdMd14LjgWReqALGfdLDPuScZAqJmPA7mzDroaYaegDRgKDvfUZ/LUTS/4QcBO4jRWTW9K8+oKsLJ6kx4EUkk7HSj5sT9NqjGwC/C0tScV6JLANp72JHZNbVsR3yA0i6U6Uvmsc6EGSrUCRdQcojKQavcDD9IdZGeAQUnh4iDweO4A9SP0xFsQbBIaFuJVVQP8HBZDE6YeQVvJVkaSJo1oqgAoAKoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKABVQAFWtAOoG1lloh6cajJJmxXMgJq3kX1bIQhnJAVtLPXiABuSngMVu/pId8zRa9kdRFEVRFEVRHM9fBnWbxULiR8UAAAAASUVORK5CYII='"></div></td>
+        <td>${produk.stok}</td>
+        <td>Rp ${produk.harga.toFixed(2)}</td>
+        <td>${produk.supplier}</td>
+        <td>
+            <div class="action-btns">
+              <!-- buttons -->
+            </div>
+        </td>
+      `;
+      productList.appendChild(row);
+    });
+  }
+
   // Function to check if the token is expired
   function isTokenExpired(token) {
     try {
@@ -379,14 +413,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Read the JSON file and set the API URL
-  let apiUrl = "";
   async function initializeApiUrl() {
     const envData = await readJsonFile("/json/env.json");
     if (envData && envData.api_url) {
-      apiUrl = envData.api_url;
+      localStorage.setItem("apiUrl", envData.api_url);
+      window.apiUrl = envData.api_url; // Make it global
     } else {
-      apiUrl = "http://localhost:5050"; // Default URL if reading fails
-      console.warn("Failed to read API URL from JSON, using default:", apiUrl);
+      console.warn("Failed to read API URL from JSON, using default");
     }
   }
 
@@ -651,11 +684,11 @@ document.addEventListener("DOMContentLoaded", function () {
     products.forEach((produk) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${produk.produk_id}</td>
-        <td>${produk.nama}</td>
-        <td><div class="product-image"><img src="/images/${produk.foto}" alt="${
-        produk.nama
-      }" width="50"></div></td>
+  <td>${produk.produk_id}</td>
+  <td>${produk.nama}</td>
+  <td><div class="product-image"><img src="${apiUrl}/images/${produk.foto}" 
+      alt="${produk.nama}" width="50" 
+      onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANtSURBVHic7ZpNaxNRFIafSdOvfKi1KoK14gcVRHRRNMY/UNCNWrcu3Lh0JbgQROjCnYuCv8ClaF2L4KIIIgqKH9UWamurbcHaJJqatzk3TszEmcmZO3NnmswDL4FC7nvPeTI595wzbkBRFEVRFEVRlHLDAxaAH0AcSCop/UjHvCiGkfXAO66MgwK4Dqz7k48CzfgTuQMcB/YCLqCWqAbm5diPwAXZ7iQ5AX4CJ2RbMXk6HiVn/vEiO1MqJoFfwJZiOVQsNgEpYLxYjhSRadQV/pu9wCbgfbGdKRIvkWV5R7EdKRaHEJN3QzrjTFyBmaCnwE7gGnCV/B9Qm4F+4CrQYNK/TuAtcAZYMumDrRwBPoWHwLgch334f0yzK0EkS2xF3qKZBHAHuIl/Sm4CTiXkB3AImDDpg63UIrfzCnAPf62xPLADJoC0PLPZ5MUztQ44iQz+ALDBhC+2IQvMH8A2i+6fKsCfALBz8JEQv82CRCLfIz0OHLVw/S0FuBMI1wgnLfgXaKpC6l8x4FYO8WXgWj5fWoHRDNcYLuB+gaEu/TFMKDiSZxvvA5vTnFsiYK3A08I9DAzVWdigI2OTicAQcAA4k+WakcAdh4YzriedaXDPqUGrgaeZBgdbkBp9qt59DpQAR0uDztwyBHSjD8JA0gFcRFaNqht8gNgA9CEf1i/lgEKmwTuRFHdrBvEtSFq8H1husy/lxDIkRvuQGmZQqEcSIheAd1nEn/PJDgLPbfClHPmMBI7DiMmMb0Q2MmKSKcpkvB2JwdvAByz4PIdMd14LjgWReqALGfdLDPuScZAqJmPA7mzDroaYaegDRgKDvfUZ/LUTS/4QcBO4jRWTW9K8+oKsLJ6kx4EUkk7HSj5sT9NqjGwC/C0tScV6JLANp72JHZNbVsR3yA0i6U6Uvmsc6EGSrUCRdQcojKQavcDD9IdZGeAQUnh4iDweO4A9SP0xFsQbBIaFuJVVQP8HBZDE6YeQVvJVkaSJo1oqgAoAKoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKABVQAFWtAOoG1lloh6cajJJmxXMgJq3kX1bIQhnJAVtLPXiABuSngMVu/pId8zRa9kdRFEVRFEVRHM9fBnWbxULiR8UAAAAASUVORK5CYII='"></div></td>
         <td>${produk.stok}</td>
         <td>Rp ${produk.harga.toFixed(2)}</td>
         <td>${produk.supplier}</td>
