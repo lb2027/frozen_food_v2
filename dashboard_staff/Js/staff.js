@@ -594,8 +594,8 @@ function checkLocation() {
       document.getElementById("longitude").textContent = userLon.toFixed(6);
 
       // Lokasi kantor di Pakisaji, Malang
-      const officeLat = -7.939997656264779;
-      const officeLon = 112.6807606989787;
+      const officeLat = -8.071849327021836;
+      const officeLon = 112.59568010781288;
 
       const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
@@ -681,7 +681,7 @@ function absen() {
     };
 
     // Mengirim data absensi ke server menggunakan fetch
-    fetch('http://localhost:5050/addabsensi', { // Pastikan endpoint sesuai
+    fetch('http://103.16.116.58:5050/addabsensi', { // Pastikan endpoint sesuai
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
