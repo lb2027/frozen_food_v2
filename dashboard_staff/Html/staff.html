@@ -32,6 +32,12 @@
         <span>Absensi</span>
       </div>
 
+      <div class="sidebar-item">
+        <div class="icon-circle" id="open-customer-modal">🧑‍🤝‍🧑</div>
+        <span>Member</span>
+        <span>Customer</span>
+      </div>
+
       <div class="sidebar-item logout-container" id="logoutBtn">
         <div class="icon-circle">⟲</div>
         <span>Logout</span>
@@ -337,6 +343,29 @@
         </form>
       </div>
     </div>
+
+
+    <!-- Modal Customer -->
+    <div id="customer-modal" class="customer-modal" style="display: none;">
+    <div class="customer-modal-content">
+      <span class="customer-close-btn" id="close-customer-modal">&times;</span>
+      <h2>Tambah Data Customer</h2>
+      <br>
+      <form id="customer-form" class="customer-form">
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" required>
+        <label for="no_hp">No HP:</label>
+        <input type="text" id="no_hp" name="no_hp" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="tanggal_daftar">Tanggal Daftar:</label>
+        <input type="date" id="tanggal_daftar" name="tanggal_daftar" required>
+        <label for="point_member">Point Member:</label>
+        <input type="number" id="point_member" name="point_member" value="0" required>
+        <button type="submit" class="customer-submit-btn">Simpan</button>
+      </form>
+    </div>
+
 
     <script src="../Js/staff.js"></script>
   </body>

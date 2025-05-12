@@ -1324,3 +1324,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+const openCustomerModal = document.getElementById('open-customer-modal');
+const customerModal = document.getElementById('customer-modal');
+const closeCustomerModal = document.getElementById('close-customer-modal');
+
+openCustomerModal.addEventListener('click', () => {
+  customerModal.style.display = 'block';
+});
+
+closeCustomerModal.addEventListener('click', () => {
+  customerModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target === customerModal) {
+    customerModal.style.display = 'none';
+  }
+});
