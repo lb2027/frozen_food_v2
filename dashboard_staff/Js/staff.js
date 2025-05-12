@@ -947,7 +947,7 @@ document.addEventListener("DOMContentLoaded", function () {
       row.innerHTML = `
         <td>${produk.produk_id}</td>
         <td>${produk.nama}</td>
-        <td><div class="product-image"><img src="/images/${produk.foto}" alt="${
+        <td><div class="product-image"><img src="http://103.16.116.58:5050/images/${produk.foto}" alt="${
         produk.nama
       }" width="50"></div></td>
         <td>${produk.stok}</td>
