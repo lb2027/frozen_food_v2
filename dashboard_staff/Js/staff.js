@@ -297,6 +297,64 @@ function absen() {
 }
 
 
+//customer member
+
+document.getElementById("customer-form").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    alert("Anda belum login!");
+    return;
+  }
+
+  const data = {
+    nama: document.getElementById("nama").value,
+    no_hp: document.getElementById("no_hp").value,
+    email: document.getElementById("email").value,
+    tanggal_daftar: document.getElementById("tanggal_daftar").value,
+    point_member: parseInt(document.getElementById("point_member").value)
+  };
+
+  fetch("http://localhost:5050/addcustomer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "token": token
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success === "true") {
+      alert("Customer berhasil ditambahkan!");
+      document.getElementById("customer-modal").style.display = "none";
+      document.getElementById("customer-form").reset();
+    } else {
+      alert("Gagal menambahkan customer.");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("Terjadi kesalahan saat menyimpan data.");
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Bagian dwiki
 
 
@@ -679,7 +737,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (envData && envData.api_url) {
       apiUrl = envData.api_url;
     } else {
-      apiUrl = "http://localhost:5050"; // Default URL if reading fails
+      apiUrl = "http://103.16.116.58:5050"; // Default URL if reading fails
       console.warn("Failed to read API URL from JSON, using default:", apiUrl);
     }
   }
