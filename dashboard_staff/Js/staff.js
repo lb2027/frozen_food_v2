@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const payload = JSON.parse(atob(payloadBase64));
 
       if (payload && payload.exp) {
-        const expiryTime = payload.exp * 1000; 
+        const expiryTime = payload.exp * 1000;
         const currentTime = Date.now();
 
         return currentTime > expiryTime;
@@ -23,18 +23,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (!token || isTokenExpired(token)) {
-    window.location.href = "/login/login.html"; 
-    return; 
+    window.location.href = "/login/login.html";
+    return;
   }
 
   const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", function () {
-    localStorage.removeItem("authToken");
-    window.location.href = "/login/login.html";
-  });
-}
-
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("authToken");
+      window.location.href = "/login/login.html";
+    });
+  }
 
   logoutBtn.addEventListener("click", function () {
     localStorage.removeItem("authToken"); // atau "token" sesuai nama yang kamu pakai
@@ -64,10 +63,10 @@ if (logoutBtn) {
           token: token,
         },
         body: JSON.stringify({
-          nama: nama, 
-          stok: parseInt(stok), 
-          harga: parseFloat(harga), 
-          harga_beli: parseFloat(harga_beli), 
+          nama: nama,
+          stok: parseInt(stok),
+          harga: parseFloat(harga),
+          harga_beli: parseFloat(harga_beli),
           foto: foto,
           supplier: supplier,
         }),
@@ -175,32 +174,30 @@ if (logoutBtn) {
   });
 });
 
-
-
 //Bagian Absensi
 
 // Membuka dan menutup modal
-document.getElementById("open-absensi-modal").onclick = function() {
+document.getElementById("open-absensi-modal").onclick = function () {
   document.getElementById("absensi-modal").style.display = "block";
   checkLocation(); // Otomatis memeriksa lokasi saat modal dibuka
 };
 
-document.getElementById("close-absensi-modal").onclick = function() {
+document.getElementById("close-absensi-modal").onclick = function () {
   document.getElementById("absensi-modal").style.display = "none";
 };
 
 // Fungsi untuk menghitung jarak
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // meter
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
@@ -209,32 +206,37 @@ let userLat, userLon;
 
 function checkLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      userLat = position.coords.latitude;
-      userLon = position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        userLat = position.coords.latitude;
+        userLon = position.coords.longitude;
 
-      document.getElementById("latitude").textContent = userLat.toFixed(6);
-      document.getElementById("longitude").textContent = userLon.toFixed(6);
+        document.getElementById("latitude").textContent = userLat.toFixed(6);
+        document.getElementById("longitude").textContent = userLon.toFixed(6);
 
-      // Lokasi kantor di Pakisaji, Malang
-      const officeLat = -8.071849327021836;
-      const officeLon = 112.59568010781288;
+        // Lokasi kantor di Pakisaji, Malang
+        const officeLat = -7.939657571798691;
+        const officeLon = 112.68114471423225;
 
-      const distance = getDistance(userLat, userLon, officeLat, officeLon);
+        const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
-      const statusEl = document.getElementById("status");
-      if (distance <= 100) {
-        statusEl.textContent = "✅ Anda berada di dalam area absensi.";
-        statusEl.className = "success";
-        document.getElementById("absen-button-container").style.display = "block"; // Menampilkan tombol absen
-      } else {
-        statusEl.textContent = "❌ Anda berada di luar area absensi.";
-        statusEl.className = "danger";
-        document.getElementById("absen-button-container").style.display = "none"; // Menyembunyikan tombol absen
+        const statusEl = document.getElementById("status");
+        if (distance <= 100) {
+          statusEl.textContent = "✅ Anda berada di dalam area absensi.";
+          statusEl.className = "success";
+          document.getElementById("absen-button-container").style.display =
+            "block"; // Menampilkan tombol absen
+        } else {
+          statusEl.textContent = "❌ Anda berada di luar area absensi.";
+          statusEl.className = "danger";
+          document.getElementById("absen-button-container").style.display =
+            "none"; // Menyembunyikan tombol absen
+        }
+      },
+      function () {
+        alert("Gagal mendapatkan lokasi. Aktifkan GPS atau izinkan lokasi.");
       }
-    }, function() {
-      alert("Gagal mendapatkan lokasi. Aktifkan GPS atau izinkan lokasi.");
-    });
+    );
   } else {
     alert("Browser Anda tidak mendukung Geolocation.");
   }
@@ -250,113 +252,105 @@ function absen() {
   }
   // Mendapatkan waktu dan tanggal saat ini
   const now = new Date();
-  const tanggal = now.toISOString().split('T')[0]; // YYYY-MM-DD
-  const jamMasuk = now.toLocaleTimeString('en-GB', { hour12: false }); // Format: HH:MM:SS (24 jam)
-
+  const tanggal = now.toISOString().split("T")[0]; // YYYY-MM-DD
+  const jamMasuk = now.toLocaleTimeString("en-GB", { hour12: false }); // Format: HH:MM:SS (24 jam)
 
   // Mendapatkan lokasi pengguna (latitude dan longitude)
-  navigator.geolocation.getCurrentPosition(function(position) {
-    const userLat = position.coords.latitude;
-    const userLon = position.coords.longitude;
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      const userLat = position.coords.latitude;
+      const userLon = position.coords.longitude;
 
-    const absensiData = {
-      staff_id: 1, // Ganti dengan ID staf yang sesuai
-      tanggal: tanggal,
-      jam_masuk: jamMasuk,
-      status: "Hadir",
-      keterangan: "Absen pagi",
-    };
+      const absensiData = {
+        staff_id: staffid, // Ganti dengan ID staf yang sesuai
+        tanggal: tanggal,
+        jam_masuk: jamMasuk,
+        status: "Hadir",
+        keterangan: "Absen pagi",
+      };
 
-    // Mengirim data absensi ke server menggunakan fetch
-    fetch('http://103.16.116.58:5050/addabsensi', { // Pastikan endpoint sesuai
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': token 
-      },
-      body: JSON.stringify(absensiData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById("absen-status").textContent = "✅ Absensi berhasil!";
-        document.getElementById("absen-status").className = "success";
-      } else {
-        document.getElementById("absen-status").textContent = "❌ Absensi gagal!";
-        document.getElementById("absen-status").className = "danger";
-      }
-    })
-    .catch(error => {
-      document.getElementById("absen-status").textContent = "❌ Terjadi kesalahan. Coba lagi.";
+      // Mengirim data absensi ke server menggunakan fetch
+      fetch("http://103.16.116.58:5050/addabsensi", {
+        // Pastikan endpoint sesuai
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify(absensiData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            document.getElementById("absen-status").textContent =
+              "✅ Absensi berhasil!";
+            document.getElementById("absen-status").className = "success";
+          } else {
+            document.getElementById("absen-status").textContent =
+              "❌ Absensi gagal!";
+            document.getElementById("absen-status").className = "danger";
+          }
+        })
+        .catch((error) => {
+          document.getElementById("absen-status").textContent =
+            "❌ Terjadi kesalahan. Coba lagi.";
+          document.getElementById("absen-status").className = "danger";
+        });
+    },
+    function (error) {
+      document.getElementById("absen-status").textContent =
+        "❌ Tidak dapat mendeteksi lokasi.";
       document.getElementById("absen-status").className = "danger";
-    });
-  }, function(error) {
-    document.getElementById("absen-status").textContent = "❌ Tidak dapat mendeteksi lokasi.";
-    document.getElementById("absen-status").className = "danger";
-  });
+    }
+  );
 }
-
 
 //customer member
 
-document.getElementById("customer-form").addEventListener("submit", function(event) {
-  event.preventDefault();
+document
+  .getElementById("customer-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
 
-  const token = localStorage.getItem("authToken");
-  if (!token) {
-    alert("Anda belum login!");
-    return;
-  }
-
-  const data = {
-    nama: document.getElementById("nama").value,
-    no_hp: document.getElementById("no_hp").value,
-    email: document.getElementById("email").value,
-    tanggal_daftar: document.getElementById("tanggal_daftar").value,
-    point_member: parseInt(document.getElementById("point_member").value)
-  };
-
-  fetch("http://localhost:5050/addcustomer", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "token": token
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-    if (result.success === "true") {
-      alert("Customer berhasil ditambahkan!");
-      document.getElementById("customer-modal").style.display = "none";
-      document.getElementById("customer-form").reset();
-    } else {
-      alert("Gagal menambahkan customer.");
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Anda belum login!");
+      return;
     }
-  })
-  .catch(error => {
-    console.error("Error:", error);
-    alert("Terjadi kesalahan saat menyimpan data.");
+
+    const data = {
+      nama: document.getElementById("nama").value,
+      no_hp: document.getElementById("no_hp").value,
+      email: document.getElementById("email").value,
+      tanggal_daftar: document.getElementById("tanggal_daftar").value,
+      point_member: parseInt(document.getElementById("point_member").value),
+    };
+
+    fetch("http://103.16.116.58:5050/addcustomer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success === "true") {
+          alert("Customer berhasil ditambahkan!");
+          document.getElementById("customer-modal").style.display = "none";
+          document.getElementById("customer-form").reset();
+        } else {
+          alert("Gagal menambahkan customer.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Terjadi kesalahan saat menyimpan data.");
+      });
   });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Bagian dwiki
-
 
 // Modify the existing document.addEventListener block to include our new functionality
 document.addEventListener("DOMContentLoaded", function () {
@@ -1005,9 +999,9 @@ document.addEventListener("DOMContentLoaded", function () {
       row.innerHTML = `
         <td>${produk.produk_id}</td>
         <td>${produk.nama}</td>
-        <td><div class="product-image"><img src="http://103.16.116.58:5050/images/${produk.foto}" alt="${
-        produk.nama
-      }" width="50"></div></td>
+        <td><div class="product-image"><img src="http://103.16.116.58:5050/images/${
+          produk.foto
+        }" alt="${produk.nama}" width="50"></div></td>
         <td>${produk.stok}</td>
         <td>Rp ${produk.harga.toFixed(2)}</td>
         <td>${produk.supplier}</td>
@@ -1383,20 +1377,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-const openCustomerModal = document.getElementById('open-customer-modal');
-const customerModal = document.getElementById('customer-modal');
-const closeCustomerModal = document.getElementById('close-customer-modal');
+const openCustomerModal = document.getElementById("open-customer-modal");
+const customerModal = document.getElementById("customer-modal");
+const closeCustomerModal = document.getElementById("close-customer-modal");
 
-openCustomerModal.addEventListener('click', () => {
-  customerModal.style.display = 'block';
+openCustomerModal.addEventListener("click", () => {
+  customerModal.style.display = "block";
 });
 
-closeCustomerModal.addEventListener('click', () => {
-  customerModal.style.display = 'none';
+closeCustomerModal.addEventListener("click", () => {
+  customerModal.style.display = "none";
 });
 
-window.addEventListener('click', (e) => {
+window.addEventListener("click", (e) => {
   if (e.target === customerModal) {
-    customerModal.style.display = 'none';
+    customerModal.style.display = "none";
   }
 });
