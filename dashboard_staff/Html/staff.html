@@ -1,34 +1,46 @@
+<!--SAVE UPDATE-->
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Staff</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="../Css/staff.css" />
-    
   </head>
-  
-  <!-- Bagian Sidebar-->
+
+  <!--Bagian Sidebar-->
+
   <body>
     <div class="sidebar">
       <div class="logo">
         <img src="../Foto/logo.png" alt="Logo Bintang Jaya">
-      </div>      
+      </div>
+
       <div class="sidebar-item active">
-        <div class="icon-circle">📦</div>
+        <div class="icon-circle action-btn btn-add" id="open-add-stock-modal">📦</div>
         <span>Barang Masuk</span>
       </div>
+
       <div class="sidebar-item">
-        <div class="icon-circle">🛒</div>
+        <div class="icon-circle action-btn btn-outgoing" id="open-outgoing-stock-modal">🛒</div>
         <span>Barang Terjual</span>
       </div>
-      <div class="sidebar-item logout-container">
+
+      <div class="sidebar-item">
+        <div class="icon-circle" id="open-absensi-modal">📅</div>
+        <span>Absensi</span>
+      </div>
+
+      <div class="sidebar-item logout-container" id="logoutBtn">
         <div class="icon-circle">⟲</div>
         <span>Logout</span>
       </div>
+      
     </div>
 
     <!--Bagian Header-->
+
     <div class="main-content">
       <header>
         <div class="header-title">
@@ -39,12 +51,14 @@
           <h2>Staff Frozen Food - Bintang Jaya</h2>
       </header>
 
-      <!--Bagian Search Bar-->
+    <!--Bagian Search Bar-->
+
       <div class="search-container">
         <input
           type="text"
           class="search-input"
           placeholder="Cari nama produk..."
+          id="search-input"
         />
         <div class="search-icon">
           <svg
@@ -61,36 +75,56 @@
         </div>
       </div>
 
+      <!--Bagian Action-->
+
+        <div class="" id="open-add-modal">
+        </div>
+        <div class="action-btn btn-history">
+        </div>
+
       <!--Bagian Daftar Produk-->
-      <body>
-        <div class="content-section">
-          <div class="section-container">
-            <div class="section-header">
-              <div class="section-title">Daftar Produk</div>
-            </div>
-            <table class="product-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nama</th>
-                  <th>Foto</th>
-                  <th>Stok</th>
-                  <th>Harga</th>
-                  <th>Supplier</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Data produk akan ditampilkan di sini -->
-                <tr>
-                  <td>1</td>
-                  <td>Chicken Parmesan</td>
-                  <td><img src="../Foto/1.jpg" alt="Chicken Parmesan"></td>
-                  <td>10</td>
-                  <td>12.000</td>
-                  <td>Murtiasih Frozen Food</td>
-                  <td>
-                    <button class="edit">
+
+      <h3 class="product-list-header">Daftar Produk</h3>
+
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Foto</th>
+            <th>Stok</th>
+            <th>Harga</th>
+            <th>Supplier</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="product-list">
+          <tr>
+            <td>199</td>
+            <td>Cireng Nikmat Rasa Isi 105</td>
+            <td>
+              <div class="product-image">
+                <img src="/api/placeholder/50/50" alt="Foto Produk" />
+              </div>
+            </td>
+            <td>14</td>
+            <td>Rp 12.500</td>
+            <td>Murtiasih Frozen Food</td>
+            <td>
+              <tr>
+                <td>208</td>
+                <td>Bakso Sapi Vitalia</td>
+                <td>
+                  <div class="product-image">
+                    <img src="/api/placeholder/50/50" alt="Foto Produk" />
+                  </div>
+                </td>
+                <td>16</td>
+                <td>Rp 11.000</td>
+                <td>Murtiasih Frozen Food</td>
+                <td>
+                  <div class="action-btns">
+                    <div class="edit-btn">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
@@ -107,9 +141,9 @@
                         <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                       </svg>
                       Edit
-                    </button>
+                    </div>
                     
-                    <button class="delete">
+                    <div class="delete-btn">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
@@ -128,166 +162,139 @@
                         <line x1="14" y1="11" x2="14" y2="17" />
                       </svg>
                       Delete
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Spaghetti Bolognese</td>
-                  <td><img src="../Foto/2.jpg" alt="Spaghetti Bolognese"></td>
-                  <td>20</td>
-                  <td>20.000</td>
-                  <td>Murtiasih Frozen Food</td>
-                  <td>
-                    <button class="edit">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        viewBox="0 0 24 24"
-                        style="margin-right: 5px"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                      </svg>
-                      Edit
-                    </button>
-                    
-                    <button class="delete">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        viewBox="0 0 24 24"
-                        style="margin-right: 5px"
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>Caesar Salad</td>
-                  <td><img src="../Foto/3.jpg" alt="Caesar Salad"></td>
-                  <td>17</td>
-                  <td>19.500</td>
-                  <td>Murtiasih Frozen Food</td>
-                  <td>
-                    <button class="edit">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        viewBox="0 0 24 24"
-                        style="margin-right: 5px"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                      </svg>
-                      Edit
-                    </button>
-                    
-                    <button class="delete">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        viewBox="0 0 24 24"
-                        style="margin-right: 5px"
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-                
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!--Bagian Modal Add Produk-->
+
+    <div class="modal" id="add-product-modal">
+      <div class="modal-content">
+        <span class="close-button" id="close-add-modal">&times;</span>
+        <h2>Tambah Produk</h2>
+        <form id="add-product-form">
+          <div class="form-group">
+            <label for="nama">Nama Produk:</label>
+            <input type="text" id="nama" name="nama" required />
           </div>
-        </div>
-      </body>
-
-
-        <!--Bagian Modal Fitur-->
-
-        <!--Input Barang Masuk-->
-
-        <div id="modalBarangMasuk" class="modal">
-          <div class="modal-content">
-            <span class="close-btn" onclick="tutupModal()">✖</span>
-            <h2>Input Barang Masuk</h2>
-        
-            <div class="form-group">
-              <label for="produk">Pilih Produk</label>
-              <select id="produk">
-                <option>-- Pilih Produk --</option>
-                <option>Produk A</option>
-                <option>Produk B</option>
-              </select>
-            </div>
-        
-            <div class="form-group">
-              <label for="jumlah">Jumlah Barang Masuk</label>
-              <input type="number" id="jumlah" placeholder="Masukkan jumlah barang">
-            </div>
-        
-            <button class="submit-btn" onclick="tutupModal()">Tambahkan Stok</button>
+          <div class="form-group">
+            <label for="deskripsi">Deskripsi:</label>
+            <textarea id="deskripsi" name="deskripsi" rows="4"></textarea>
           </div>
-        </div>
-        
-        <!--Input Barang Terjual-->
-        <div id="modalBarangTerjual" class="modal">
-          <div class="modal-content">
-            <span class="close-btn" onclick="tutupModalTerjual()">✖</span>
-            <h2>Input Barang Terjual</h2>
-        
-            <div class="form-group">
-              <label for="produkTerjual">Pilih Produk</label>
-              <select id="produkTerjual">
-                <option>-- Pilih Produk --</option>
-                <option>Produk A</option>
-                <option>Produk B</option>
-              </select>
-            </div>
-        
-            <div class="form-group">
-              <label for="jumlahTerjual">Jumlah Barang Terjual</label>
-              <input type="number" id="jumlahTerjual" placeholder="Masukkan jumlah terjual">
-            </div>
-
-            <button class="submit-btn" onclick="tutupModalTerjual()">Kurangi Stok</button>
+          <div class="form-group">
+            <label for="stok">Stok:</label>
+            <input type="number" id="stok" name="stok" required />
           </div>
+          <div class="form-group">
+            <label for="harga">Harga:</label>
+            <input type="number" id="harga" name="harga" required />
+          </div>
+          <div class="form-group">
+            <label for="harga_beli">Harga Beli:</label>
+            <input type="number" id="harga_beli" name="harga_beli" required />
+          </div>
+          <div class="form-group">
+            <label for="foto">Foto (URL):</label>
+            <input type="url" id="foto" name="foto" required />
+          </div>
+          <div class="form-group">
+            <label for="supplier">Supplier:</label>
+            <input type="text" id="supplier" name="supplier" required />
+          </div>
+          <button type="submit" class="submit-btn">Simpan</button>
+          <button type="button" id="closeBtn" id="close-add-modal">
+            Batal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!--Bagian Modal Stok Masuk-->
+
+    <div class="modal" id="add-stock-modal">
+      <div class="modal-content">
+        <span class="close-button" id="close-add-stock-modal">&times;</span>
+        <h2>Tambah Stok</h2>
+        <form id="add-stock-form">
+          <div class="form-group">
+            <label for="produk">Pilih Produk:</label>
+            <select class="produk" id="produk" name="produk" required>
+              <!-- Options will be dynamically added here -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stok_masuk">Stok Masuk:</label>
+            <input type="number" id="stok_masuk" name="stok_masuk" required />
+          </div>
+          <button type="submit" class="submit-btn">Simpan</button>
+          <button type="button" id="closeBtnStock" id="close-add-stock-modal">
+            Batal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!--Bagian Modal Stok Keluar-->
+
+    <div class="modal" id="stok-sold-modal">
+      <div class="modal-content">
+        <span class="close-button" id="close-stok-sold-modal">&times;</span>
+        <h2>Stok Terjual</h2>
+        <form id="stok-sold-form">
+          <div id="sold-items-list">
+            <div class="sold-item">
+              <div class="form-group">
+                <label for="produk">Pilih Produk:</label>
+                <select class="produk" name="produk" required>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="stok_terjual">Stok Terjual:</label>
+                <input
+                  type="number"
+                  class="stok_terjual"
+                  name="stok_terjual"
+                  required
+                />
+              </div>
+              <button type="button" class="remove-item-btn">Hapus</button>
+            </div>
+          </div>
+          <button type="button" id="add-item-btn">Tambah Produk</button>
+          <button type="submit" class="submit-btn">Simpan</button>
+          <button
+            type="button"
+            id="closeBtnStokSold"
+            id="close-stok-sold-modal"
+          >
+            Batal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!--Bagian Modal Absensi-->
+
+    <div id="absensi-modal" class="modalabsensi">
+      <div class="modal-contentabsensi">
+        <span class="close-btnabsensi" id="close-absensi-modal">&times;</span>
+        <h1>Absensi </h1>
+        <p><strong>Lokasi Anda Sekarang:</strong></p>
+        <p>Latitude: <span id="latitude">-</span></p>
+        <p>Longitude: <span id="longitude">-</span></p>
+        <p id="status" class="info">Menunggu lokasi...</p>
+        <div id="absen-button-container" style="display: none;">
+          <button id="absen-btn" onclick="absen()">Absen</button>
+          <p id="absen-status" class="info"></p>
         </div>
-      
+      </div>
+    </div>
 
     <script src="../Js/staff.js"></script>
   </body>
