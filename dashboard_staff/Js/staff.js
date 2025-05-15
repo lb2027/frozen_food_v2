@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
-  const staffid = localStorage.setItem("staffId", data.staff_id);
+  const staffid = localStorage.setItem("staffid", data.staff_id);
 
   function isTokenExpired(token) {
     try {
