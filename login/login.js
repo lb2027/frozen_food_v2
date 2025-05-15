@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         localStorage.setItem("authToken", token);
         localStorage.setItem("userRole", role);
+        localStorage.setItem("staffid", data.user_id);
 
         if (role === "admin") {
           window.location.href = "/dashboard_owner/owner.html";
