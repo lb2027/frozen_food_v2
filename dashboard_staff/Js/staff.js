@@ -2,7 +2,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
-  const staffid = localStorage.setItem("staffid", data.staff_id);
 
   function isTokenExpired(token) {
     try {
@@ -218,8 +217,8 @@ function checkLocation() {
       document.getElementById("longitude").textContent = userLon.toFixed(6);
 
       // Lokasi kantor di Pakisaji, Malang
-      const officeLat = -7.939657571798691;
-      const officeLon = 112.68114471423225;
+      const officeLat = -8.071849327021836;
+      const officeLon = 112.59568010781288;
 
       const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
@@ -243,7 +242,7 @@ function checkLocation() {
 
 function absen() {
   const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
-  
+
   if (!token) {
     alert("Anda belum login!");
     window.location.href = "/login/login.html";
@@ -261,7 +260,7 @@ function absen() {
     const userLon = position.coords.longitude;
 
     const absensiData = {
-      staff_id: staffid, // Ganti dengan ID staf yang sesuai
+      staff_id: 1, // Ganti dengan ID staf yang sesuai
       tanggal: tanggal,
       jam_masuk: jamMasuk,
       status: "Hadir",
@@ -317,7 +316,7 @@ document.getElementById("customer-form").addEventListener("submit", function(eve
     point_member: parseInt(document.getElementById("point_member").value)
   };
 
-  fetch("http://103.16.116.58:5050/addcustomer", {
+  fetch("http://localhost:5050/addcustomer", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
