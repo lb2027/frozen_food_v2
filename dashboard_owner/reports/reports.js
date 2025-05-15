@@ -278,6 +278,9 @@ document.addEventListener("DOMContentLoaded", function () {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const weeklyStartDate = sevenDaysAgo.toISOString().split("T")[0];
       const weeklyEndDate = new Date().toISOString().split("T")[0];
+      console.log(sevenDaysAgo);
+      console.log(weeklyStartDate);
+      console.log(weeklyEndDate);
 
       const weeklyResponse = await fetch(
         `${apiUrl}/weeklysales?startDate=${weeklyStartDate}&endDate=${weeklyEndDate}`,
