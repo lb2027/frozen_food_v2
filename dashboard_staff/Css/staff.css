@@ -39,7 +39,7 @@ body {
 }
 
 /*Bagian Side Bar*/
-
+  
 .icon-circle {
   transition: transform 0.2s ease;
 }
@@ -77,6 +77,9 @@ body {
   justify-content: center;
 }
 
+
+
+
 /*Bagian Header*/
 
 .main-content {
@@ -101,14 +104,16 @@ header {
 
 .back-btn {
   background-color: #2a2a2a;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
+
+
 
 /*Bagian Search Bar*/
 
@@ -167,6 +172,8 @@ header {
   background-color: #39adfd;
 }
 */
+
+
 
 /*Bagian List Produk*/
 
@@ -238,15 +245,14 @@ header {
   object-fit: cover;
 }
 
+
 /*Bagian Modal*/
 .modal {
   display: none;
   position: fixed;
   z-index: 1000;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -352,24 +358,16 @@ button[type="submit"]:hover,
 
 /* Animasi */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
+
+
 
 /* Transaction History Modal Styles 
 #transaction-history-modal .modal-content {
@@ -415,14 +413,18 @@ button[type="submit"]:hover,
 }
 */
 
-/*Logo Bintang jaya*/
 
+
+/*Logo Bintang jaya*/
+  
 .logo img {
   width: 80px;
   height: 70px;
   display: block;
   margin: 0 auto;
 }
+
+
 
 /*Bagian Foto Profile*/
 
@@ -439,16 +441,16 @@ button[type="submit"]:hover,
   object-fit: cover;
 }
 
+
+
 /* Modal Absensi */
 
 .modalabsensi {
   display: none;
   position: fixed;
   z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -523,34 +525,22 @@ button[type="submit"]:hover,
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from {transform: translateY(30px); opacity: 0;}
+  to {transform: translateY(0); opacity: 1;}
 }
 
+
+
+
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @media (max-width: 768px) {
@@ -570,3 +560,103 @@ button[type="submit"]:hover,
     width: 95%;
   }
 }
+
+
+
+/* Customer Modal Styles */
+.customer-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.customer-modal-content {
+  background-color: #2a2a2a;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.customer-close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.customer-close-btn:hover,
+.customer-close-btn:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+.customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.customer-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.customer-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.customer-form input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.customer-submit-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.customer-submit-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .customer-modal-content {
+    width: 95%;
+    margin: 20% auto;
+  }
+}
+
