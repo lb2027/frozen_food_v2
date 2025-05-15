@@ -270,7 +270,7 @@ function absen() {
       };
 
       // Mengirim data absensi ke server menggunakan fetch
-      fetch("http://103.16.116.58:5050/addabsensi", {
+      fetch("http://localhost:5050/addabsensi", {
         // Pastikan endpoint sesuai
         method: "POST",
         headers: {
