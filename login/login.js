@@ -53,16 +53,27 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         const data = await response.json();
         const token = data.token;
-        const role = data.role; // Get the role from the API response
+        const role = data.role;
+        const userId = data.user_id; // Extract user_id
 
         // display from api response username, password, and role
         console.log("Username:", username);
         console.log("Password:", password);
         console.log("Role:", role);
+        console.log("User ID from API:", userId); // Log the actual user_id value
 
+        // Set everything in localStorage
         localStorage.setItem("authToken", token);
         localStorage.setItem("userRole", role);
-        localStorage.setItem("staffid", data.user_id);
+        localStorage.setItem("staffid", userId);
+
+        // Now log the stored value to confirm it's working
+        console.log(
+          "User ID in localStorage:",
+          localStorage.getItem("staffid")
+        );
+
+        alert("Login successful!");
 
         if (role === "admin") {
           window.location.href = "/dashboard_owner/owner.html";
