@@ -406,6 +406,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function formatTimeOnly(timeString) {
+    if (!timeString) return "-";
+
+    // Check if it's a full ISO timestamp
+    if (timeString.includes("T")) {
+      // Extract just the time portion from ISO timestamp (after the T)
+      const timePart = timeString.split("T")[1];
+      // Get just HH:MM:SS
+      return timePart.substring(0, 8);
+    }
+    // If it's just a time string already
+    else if (timeString.includes(":")) {
+      // Return first 8 chars (HH:MM:SS) if longer
+      return timeString.substring(0, 8);
+    }
+
+    return timeString;
+  }
+
   // Add this function to render the attendance data
   function renderAttendanceTable(attendanceData) {
     const tableBody = document.querySelector(".attendance-table tbody");
@@ -433,7 +452,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Format the date for display
       const formattedDate = new Date(record.tanggal).toLocaleDateString();
-
+      const formattedDateTimeIn = new Date(record.jam_masuk).toLocaleTimeString(
+        "id-ID",
+        { hour12: false }
+      );
       // Create status badge based on attendance status
       const statusClass = record.status.toLowerCase();
       const statusBadge = `<span class="status-badge ${statusClass}">${record.status}</span>`;
@@ -447,7 +469,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <td>${record.id}</td>
       <td>${record.nama}</td>
       <td>${formattedDate}</td>
-      <td>${record.jam_masuk}</td>
+      <td>${formatTimeOnly(record.jam_masuk)}</td>
       <td>${record.jam_keluar || "-"}</td>
       <td>${statusBadge}</td>
       <td>${record.keterangan || "-"}</td>

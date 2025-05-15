@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
 
   function isTokenExpired(token) {
     try {
@@ -25,6 +26,16 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!token || isTokenExpired(token)) {
     window.location.href = "/login/login.html";
     return;
+  }
+
+  async function initializeApiUrl() {
+    const envData = await readJsonFile("/json/env.json");
+    if (envData && envData.api_url) {
+      localStorage.setItem("apiUrl", envData.api_url);
+      window.apiUrl = envData.api_url; // Make it global
+    } else {
+      console.warn("Failed to read API URL from JSON, using default");
+    }
   }
 
   const logoutBtn = document.getElementById("logoutBtn");
@@ -319,17 +330,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  let apiUrl = "";
-  async function initializeApiUrl() {
-    const envData = await readJsonFile("/json/env.json");
-    if (envData && envData.api_url) {
-      apiUrl = envData.api_url;
-    } else {
-      apiUrl = "http://localhost:5050";
-      console.warn("Failed to read API URL from JSON, using default:", apiUrl);
-    }
-  }
-
   async function fetchProduk() {
     try {
       const response = await fetch(`${apiUrl}/selectproduk`, {
@@ -539,6 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   initializeApiUrl().then(() => {
+    initializeApiUrl();
     fetchProduk();
   });
 });
@@ -674,7 +675,7 @@ function absen() {
       };
 
       // Mengirim data absensi ke server menggunakan fetch
-      fetch("http://localhost:5050/addabsensi", {
+      fetch(`${apiUrl}/addabsensi`, {
         // Pastikan endpoint sesuai
         method: "POST",
         headers: {
