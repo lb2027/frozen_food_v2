@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
-  
+
   function isTokenExpired(token) {
     try {
       const payloadBase64 = token.split(".")[1];
@@ -243,38 +243,46 @@ function checkLocation() {
 }
 
 function absen() {
-  const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
+  const token = localStorage.getItem("authToken");
   const staffid = localStorage.getItem("staffid");
 
-  console.log(staffid);
-  
+  // Get API URL from proper source
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+
+  console.log("Staff ID being used:", staffid);
+
   if (!token) {
     alert("Anda belum login!");
     window.location.href = "/login/login.html";
     return;
   }
-  // Mendapatkan waktu dan tanggal saat ini
+
+  // Get current date and time in ISO format
   const now = new Date();
   const tanggal = now.toISOString().split("T")[0]; // YYYY-MM-DD
-  const jamMasuk = now.toLocaleTimeString("en-GB", { hour12: false }); // Format: HH:MM:SS (24 jam)
+  const jamMasuk = now.toTimeString().split(" ")[0]; // HH:MM:SS in 24-hour format
 
-  // Mendapatkan lokasi pengguna (latitude dan longitude)
+  console.log("Date:", tanggal);
+  console.log("Time:", jamMasuk);
+
+  // Get user location
   navigator.geolocation.getCurrentPosition(
     function (position) {
       const userLat = position.coords.latitude;
       const userLon = position.coords.longitude;
 
       const absensiData = {
-        staff_id: staffid, // Ganti dengan ID staf yang sesuai
+        staff_id: parseInt(staffid),
         tanggal: tanggal,
         jam_masuk: jamMasuk,
         status: "Hadir",
         keterangan: "Absen pagi",
       };
 
-      // Mengirim data absensi ke server menggunakan fetch
-      fetch("http://localhost/addabsensi", {
-        // Pastikan endpoint sesuai
+      console.log("Sending data:", JSON.stringify(absensiData));
+
+      // Use the dynamic apiUrl
+      fetch(`${apiUrl}/addabsensi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -282,9 +290,23 @@ function absen() {
         },
         body: JSON.stringify(absensiData),
       })
-        .then((response) => response.json())
+        .then((response) => {
+          // Log the status code first
+          console.log("Response status:", response.status);
+          if (!response.ok) {
+            // If status is not 2xx, log the response text for debugging
+            return response.text().then((text) => {
+              console.error("Error response:", text);
+              throw new Error(
+                `Server responded with ${response.status}: ${text}`
+              );
+            });
+          }
+          return response.json();
+        })
         .then((data) => {
-          if (data.success) {
+          console.log("Success response:", data);
+          if (data.success === "true" || data.message.includes("berhasil")) {
             document.getElementById("absen-status").textContent =
               "✅ Absensi berhasil!";
             document.getElementById("absen-status").className = "success";
@@ -295,12 +317,14 @@ function absen() {
           }
         })
         .catch((error) => {
+          console.error("Error details:", error);
           document.getElementById("absen-status").textContent =
             "❌ Terjadi kesalahan. Coba lagi.";
           document.getElementById("absen-status").className = "danger";
         });
     },
     function (error) {
+      console.error("Geolocation error:", error);
       document.getElementById("absen-status").textContent =
         "❌ Tidak dapat mendeteksi lokasi.";
       document.getElementById("absen-status").className = "danger";
