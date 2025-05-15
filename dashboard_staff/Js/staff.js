@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
-
+  
   function isTokenExpired(token) {
     try {
       const payloadBase64 = token.split(".")[1];
@@ -244,7 +244,10 @@ function checkLocation() {
 
 function absen() {
   const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
+  const staffid = localStorage.getItem("staffid");
 
+  console.log(staffid);
+  
   if (!token) {
     alert("Anda belum login!");
     window.location.href = "/login/login.html";
@@ -270,7 +273,7 @@ function absen() {
       };
 
       // Mengirim data absensi ke server menggunakan fetch
-      fetch("http://localhost:5050/addabsensi", {
+      fetch("http://localhost/addabsensi", {
         // Pastikan endpoint sesuai
         method: "POST",
         headers: {
