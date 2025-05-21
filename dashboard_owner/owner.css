@@ -710,7 +710,8 @@ button[type="submit"]:hover,
 
 #closeBtn,
 #closeBtnStock,
-#closeBtnStokSold {
+#closeBtnStokSold,
+#closeBtnEdit {
   background-color: #444;
   color: white;
   padding: 14px 28px;

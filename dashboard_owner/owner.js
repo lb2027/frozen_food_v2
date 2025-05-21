@@ -842,40 +842,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  async function editProduk(produkId) {
-    // Implement edit functionality here
-    try {
-      const response = await fetch(`${apiUrl}/editproduk/${produkId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-
-        body: JSON.stringify({
-          // Add the fields you want to edit
-          nama: "New Name",
-          stok: 10,
-          harga: 10000,
-          harga_beli: 8000,
-          foto: "new_image_url.jpg",
-          supplier: "New Supplier",
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the product list
-        fetchProduk();
-      } else {
-        console.error("Failed to edit product:", response.status);
-      }
-    } catch (error) {
-      console.error("Error editing product:", error);
-    }
-
-    console.log("Edit product with ID:", produkId);
-  }
-
   // Get the search input element
   const searchInput = document.getElementById("search-input");
 
@@ -1003,7 +969,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", closeEditModal);
 
   // Add event listener to the close button
-  document.getElementById("closeEditBtn").addEventListener("click", () => {
+  document.getElementById("closeBtnEdit").addEventListener("click", () => {
     editModal.style.display = "none";
   });
 

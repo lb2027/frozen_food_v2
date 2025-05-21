@@ -215,13 +215,13 @@ function checkLocation() {
         document.getElementById("longitude").textContent = userLon.toFixed(6);
 
         // Lokasi kantor di Pakisaji, Malang
-        const officeLat = -7.939657571798691;
-        const officeLon = 112.68114471423225;
+        const officeLat = -7.850200290575959;
+        const officeLon = 112.69948133462827;
 
         const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
         const statusEl = document.getElementById("status");
-        if (distance <= 100) {
+        if (distance <= 100000000000000000000000000000) {
           statusEl.textContent = "✅ Anda berada di dalam area absensi.";
           statusEl.className = "success";
           document.getElementById("absen-button-container").style.display =
@@ -244,12 +244,13 @@ function checkLocation() {
 
 function absen() {
   const token = localStorage.getItem("authToken");
-  const staffid = localStorage.getItem("staffid");
+  const userid = localStorage.getItem("userid");
 
   // Get API URL from proper source
   const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
 
-  console.log("Staff ID being used:", staffid);
+  // Use userid instead of undefined staffid variable
+  console.log("Staff ID being used:", userid);
 
   if (!token) {
     alert("Anda belum login!");
@@ -272,7 +273,7 @@ function absen() {
       const userLon = position.coords.longitude;
 
       const absensiData = {
-        staff_id: parseInt(staffid),
+        staff_id: parseInt(userid),
         tanggal: tanggal,
         jam_masuk: jamMasuk,
         status: "Hadir",
@@ -282,7 +283,7 @@ function absen() {
       console.log("Sending data:", JSON.stringify(absensiData));
 
       // Use the dynamic apiUrl
-      fetch(`${apiUrl}/addabsensi`, {
+      fetch(`http://103.16.116.58:5050/addabsensi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

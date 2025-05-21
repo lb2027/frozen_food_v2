@@ -65,13 +65,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Set everything in localStorage
         localStorage.setItem("authToken", token);
         localStorage.setItem("userRole", role);
-        localStorage.setItem("staffid", userId);
+        localStorage.setItem("userid", userId);
 
         // Now log the stored value to confirm it's working
-        console.log(
-          "User ID in localStorage:",
-          localStorage.getItem("staffid")
-        );
+        console.log("User ID in localStorage:", localStorage.getItem("userid"));
 
         alert("Login successful!");
 
