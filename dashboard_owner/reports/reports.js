@@ -330,7 +330,6 @@ document.addEventListener("DOMContentLoaded", function () {
       updateSalesReport(dailyData, weeklyData, monthlyData, inventoryData);
     } catch (error) {
       console.error("Error fetching sales data:", error);
-      // Show fallback data or error message
     }
   }
 
