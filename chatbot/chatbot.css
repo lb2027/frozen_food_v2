@@ -480,3 +480,23 @@
   content: "🎤 ";
   margin-right: 5px;
 }
+
+.message-time {
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.user-message .message-time {
+  text-align: left;
+}
+
+.message {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.message-content {
+  flex: 1;
+}
