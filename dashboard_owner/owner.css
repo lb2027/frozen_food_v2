@@ -1,3 +1,5 @@
+@import "/chatbot/chatbot.css";
+
 :root {
   --primary: #32d583;
   --primary-hover: #2bb974;
@@ -806,6 +808,7 @@ button[type="submit"]:hover,
   cursor: pointer;
   transition: all 0.3s;
   height: 48px;
+  margin-bottom: 2em;
 }
 
 .remove-item-btn:hover {

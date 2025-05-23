@@ -1,3 +1,5 @@
+@import "/chatbot/chatbot.css";
+
 /*Bagian Dashboard*/
 
 * {
@@ -39,7 +41,7 @@ body {
 }
 
 /*Bagian Side Bar*/
-  
+
 .icon-circle {
   transition: transform 0.2s ease;
 }
@@ -77,9 +79,6 @@ body {
   justify-content: center;
 }
 
-
-
-
 /*Bagian Header*/
 
 .main-content {
@@ -104,16 +103,14 @@ header {
 
 .back-btn {
   background-color: #2a2a2a;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
-
-
 
 /*Bagian Search Bar*/
 
@@ -172,8 +169,6 @@ header {
   background-color: #39adfd;
 }
 */
-
-
 
 /*Bagian List Produk*/
 
@@ -245,14 +240,15 @@ header {
   object-fit: cover;
 }
 
-
 /*Bagian Modal*/
 .modal {
   display: none;
   position: fixed;
   z-index: 1000;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -358,16 +354,24 @@ button[type="submit"]:hover,
 
 /* Animasi */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
-
-
 
 /* Transaction History Modal Styles 
 #transaction-history-modal .modal-content {
@@ -413,18 +417,14 @@ button[type="submit"]:hover,
 }
 */
 
-
-
 /*Logo Bintang jaya*/
-  
+
 .logo img {
   width: 80px;
   height: 70px;
   display: block;
   margin: 0 auto;
 }
-
-
 
 /*Bagian Foto Profile*/
 
@@ -441,16 +441,16 @@ button[type="submit"]:hover,
   object-fit: cover;
 }
 
-
-
 /* Modal Absensi */
 
 .modalabsensi {
   display: none;
   position: fixed;
   z-index: 9999;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -525,22 +525,34 @@ button[type="submit"]:hover,
 
 /* Animations */
 @keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from {transform: translateY(30px); opacity: 0;}
-  to {transform: translateY(0); opacity: 1;}
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-
-
-
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 768px) {
@@ -560,8 +572,6 @@ button[type="submit"]:hover,
     width: 95%;
   }
 }
-
-
 
 /* Customer Modal Styles */
 .customer-modal {
@@ -643,13 +653,23 @@ button[type="submit"]:hover,
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */
@@ -659,4 +679,3 @@ button[type="submit"]:hover,
     margin: 20% auto;
   }
 }
-
