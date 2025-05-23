@@ -59,10 +59,7 @@ class POSChatbot {
 
     this.recognition.continuous = false;
     this.recognition.interimResults = true;
-
-    // FIX: Don't set both languages - choose one
     this.recognition.lang = "en-US"; // Start with English
-    // this.recognition.lang = "id-ID"; // Comment out or use this for Indonesian
 
     this.recognition.onstart = () => {
       this.isListening = true;
@@ -71,17 +68,17 @@ class POSChatbot {
       if (this.voiceTranscript) {
         this.voiceTranscript.style.display = "none";
       }
-      console.log("Voice recognition started"); // Debug log
+      console.log("Voice recognition started");
     };
 
     this.recognition.onresult = (event) => {
-      console.log("Voice recognition result received"); // Debug log
+      console.log("Voice recognition result received");
       let transcript = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
 
-      console.log("Transcript:", transcript); // Debug log
+      console.log("Transcript:", transcript);
 
       if (transcript.trim() && this.voiceTranscript) {
         this.voiceTranscript.textContent = `"${transcript}"`;
@@ -90,7 +87,7 @@ class POSChatbot {
 
       // If final result
       if (event.results[event.results.length - 1].isFinal) {
-        console.log("Final transcript:", transcript); // Debug log
+        console.log("Final transcript:", transcript);
         this.processVoiceCommand(transcript.trim());
       }
     };
@@ -106,38 +103,52 @@ class POSChatbot {
     };
 
     this.recognition.onend = () => {
-      console.log("Voice recognition ended"); // Debug log
+      console.log("Voice recognition ended");
       this.stopListening();
     };
   }
 
   attachEventListeners() {
     // Toggle chatbot
-    this.chatbotToggle.addEventListener("click", () => this.toggleChatbot());
+    if (this.chatbotToggle) {
+      this.chatbotToggle.addEventListener("click", () => this.toggleChatbot());
+    }
 
     // Close and minimize
-    this.chatbotClose.addEventListener("click", () => this.closeChatbot());
-    this.chatbotMinimize.addEventListener("click", () =>
-      this.minimizeChatbot()
-    );
+    if (this.chatbotClose) {
+      this.chatbotClose.addEventListener("click", () => this.closeChatbot());
+    }
+    if (this.chatbotMinimize) {
+      this.chatbotMinimize.addEventListener("click", () =>
+        this.minimizeChatbot()
+      );
+    }
 
     // Send message
-    this.chatbotSend.addEventListener("click", () => this.sendMessage());
-    this.chatbotInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") this.sendMessage();
-    });
+    if (this.chatbotSend) {
+      this.chatbotSend.addEventListener("click", () => this.sendMessage());
+    }
+    if (this.chatbotInput) {
+      this.chatbotInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") this.sendMessage();
+      });
 
-    // Input validation
-    this.chatbotInput.addEventListener("input", () => {
-      this.chatbotSend.disabled = this.chatbotInput.value.trim() === "";
-    });
+      // Input validation
+      this.chatbotInput.addEventListener("input", () => {
+        if (this.chatbotSend) {
+          this.chatbotSend.disabled = this.chatbotInput.value.trim() === "";
+        }
+      });
+    }
 
     // Suggestion buttons
     this.suggestions.forEach((btn) => {
       btn.addEventListener("click", () => {
         const suggestion = btn.getAttribute("data-suggestion");
-        this.chatbotInput.value = suggestion;
-        this.sendMessage();
+        if (this.chatbotInput) {
+          this.chatbotInput.value = suggestion;
+          this.sendMessage();
+        }
       });
     });
 
@@ -237,27 +248,39 @@ class POSChatbot {
   }
 
   openChatbot() {
-    this.chatbotContainer.classList.add("active");
-    this.chatbotContainer.classList.remove("minimized");
-    this.chatbotToggle.style.display = "none";
+    if (this.chatbotContainer) {
+      this.chatbotContainer.classList.add("active");
+      this.chatbotContainer.classList.remove("minimized");
+    }
+    if (this.chatbotToggle) {
+      this.chatbotToggle.style.display = "none";
+    }
     this.isOpen = true;
     this.isMinimized = false;
 
     // Focus input
     setTimeout(() => {
-      this.chatbotInput.focus();
+      if (this.chatbotInput) {
+        this.chatbotInput.focus();
+      }
     }, 300);
   }
 
   closeChatbot() {
-    this.chatbotContainer.classList.remove("active");
-    this.chatbotToggle.style.display = "flex";
+    if (this.chatbotContainer) {
+      this.chatbotContainer.classList.remove("active");
+    }
+    if (this.chatbotToggle) {
+      this.chatbotToggle.style.display = "flex";
+    }
     this.isOpen = false;
     this.isMinimized = false;
   }
 
   minimizeChatbot() {
-    this.chatbotContainer.classList.toggle("minimized");
+    if (this.chatbotContainer) {
+      this.chatbotContainer.classList.toggle("minimized");
+    }
     this.isMinimized = !this.isMinimized;
   }
 
@@ -294,17 +317,23 @@ class POSChatbot {
       this.recognition.stop();
     }
     this.isListening = false;
-    this.voiceBtn.classList.remove("recording", "processing");
+    if (this.voiceBtn) {
+      this.voiceBtn.classList.remove("recording", "processing");
+    }
     this.updateVoiceStatus("");
 
     setTimeout(() => {
-      this.voiceTranscript.classList.remove("show");
+      if (this.voiceTranscript) {
+        this.voiceTranscript.classList.remove("show");
+      }
     }, 2000);
   }
 
   processVoiceCommand(transcript) {
-    this.voiceBtn.classList.remove("recording");
-    this.voiceBtn.classList.add("processing");
+    if (this.voiceBtn) {
+      this.voiceBtn.classList.remove("recording");
+      this.voiceBtn.classList.add("processing");
+    }
     this.updateVoiceStatus("Processing...");
 
     // Process the voice command
@@ -315,12 +344,16 @@ class POSChatbot {
       this.executeDirectCommand(processedCommand.command);
     } else {
       // Send to chatbot
-      this.chatbotInput.value = processedCommand.message;
-      this.sendMessage();
+      if (this.chatbotInput) {
+        this.chatbotInput.value = processedCommand.message;
+        this.sendMessage();
+      }
     }
 
     setTimeout(() => {
-      this.voiceBtn.classList.remove("processing");
+      if (this.voiceBtn) {
+        this.voiceBtn.classList.remove("processing");
+      }
       this.updateVoiceStatus("");
     }, 1000);
   }
@@ -422,7 +455,9 @@ class POSChatbot {
   }
 
   toggleVoiceHelp() {
-    this.voiceCommandsHelp.classList.toggle("show");
+    if (this.voiceCommandsHelp) {
+      this.voiceCommandsHelp.classList.toggle("show");
+    }
   }
 
   updateVoiceStatus(message) {
@@ -462,12 +497,16 @@ class POSChatbot {
 
   // Enhanced sendMessage with voice response option
   async sendMessage() {
+    if (!this.chatbotInput) return;
+
     const message = this.chatbotInput.value.trim();
     if (!message) return;
 
     this.addMessage(message, "user");
     this.chatbotInput.value = "";
-    this.chatbotSend.disabled = true;
+    if (this.chatbotSend) {
+      this.chatbotSend.disabled = true;
+    }
 
     this.showTyping();
 
@@ -735,19 +774,14 @@ User Input: "${userMessage}"`;
     const responses = {
       sales:
         "I'd love to help you analyze your sales data! You can find detailed sales information in your Reports section, or I can help you interpret what you're seeing there.",
-
       inventory:
         "For inventory management, I can help you understand stock levels, identify which products need restocking, and suggest optimization strategies for your frozen food business.",
-
       staff:
         "Staff management is crucial for business success! I can help with scheduling, performance tracking, or strategies to improve team efficiency and customer service.",
-
       customer:
         "Customer relationships are the heart of any business! I can help you analyze customer data, improve retention strategies, or enhance the customer experience.",
-
       business:
         "I'm here to help with all aspects of your frozen food business - from operations and growth strategies to daily management tasks. What specific area would you like to explore?",
-
       general:
         "I'm having a technical moment, but I'm still here to help! I can assist with POS operations, business advice, inventory management, or any questions about running your frozen food business efficiently.",
     };
@@ -759,6 +793,84 @@ User Input: "${userMessage}"`;
     }
 
     return responses.general;
+  }
+
+  // Missing methods that were causing the error
+  addMessage(content, sender) {
+    if (!this.chatbotMessages) return;
+
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${sender}-message`;
+
+    const avatar = sender === "bot" ? "🤖" : "👤";
+
+    messageDiv.innerHTML = `
+      <div class="message-avatar">${avatar}</div>
+      <div class="message-content">
+        ${this.formatMessage(content)}
+      </div>
+    `;
+
+    this.chatbotMessages.appendChild(messageDiv);
+    this.scrollToBottom();
+  }
+
+  formatMessage(content) {
+    // Convert markdown-like formatting to HTML
+    let formatted = content
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      .replace(/\n/g, "<br>");
+
+    // Convert lists
+    formatted = formatted.replace(/^- (.+)$/gm, "<li>$1</li>");
+    if (formatted.includes("<li>")) {
+      formatted = formatted.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+    }
+
+    return formatted;
+  }
+
+  showTyping() {
+    if (this.chatbotTyping) {
+      this.chatbotTyping.style.display = "flex";
+      this.scrollToBottom();
+    }
+  }
+
+  hideTyping() {
+    if (this.chatbotTyping) {
+      this.chatbotTyping.style.display = "none";
+    }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      if (this.chatbotMessages) {
+        this.chatbotMessages.scrollTop = this.chatbotMessages.scrollHeight;
+      }
+    }, 100);
+  }
+
+  saveChatHistory() {
+    // Save basic chat state
+    const history = {
+      isOpen: this.isOpen,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem("pos_chatbot_history", JSON.stringify(history));
+  }
+
+  loadChatHistory() {
+    // Load basic chat state
+    try {
+      const history = JSON.parse(
+        localStorage.getItem("pos_chatbot_history") || "{}"
+      );
+      // You can restore previous conversation here if needed
+    } catch (error) {
+      console.log("Could not load chat history:", error);
+    }
   }
 }
 
