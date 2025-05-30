@@ -230,14 +230,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // Logout button
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("authToken");
-        window.location.href = "../index.html";
-      });
-    }
-
     // Main checkbox (select all)
     if (mainCheckbox) {
       mainCheckbox.addEventListener("click", toggleAllCheckboxes);
