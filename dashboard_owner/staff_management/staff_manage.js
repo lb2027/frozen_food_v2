@@ -224,11 +224,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Back button
-    if (backButton) {
-      backButton.addEventListener("click", () => {
-        window.location.href = "../owner.html";
-      });
-    }
 
     // Main checkbox (select all)
     if (mainCheckbox) {

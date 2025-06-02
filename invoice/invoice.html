@@ -137,7 +137,6 @@
       <!-- Header (consistent with other pages) -->
       <div class="header">
         <div class="back-button">
-          <span class="material-icons">chevron_left</span>
           <span>Invoice Management</span>
         </div>
         <div class="user-info">
@@ -468,26 +467,25 @@
       </svg>
     </button>
     <script>
-      if (typeof POSChatbot !== 'undefined') {
-           const chatbot = new POSChatbot();
+      if (typeof POSChatbot !== "undefined") {
+        const chatbot = new POSChatbot();
 
-           // Set invoice-specific context
-           chatbot.posContext = {
-             currentPage: "Invoice Management",
-             userRole: "Owner",
-             businessType: "Frozen Food Store",
-             businessName: "Bintang Jaya",
-             availableFeatures: [
-               "Invoice Generation",
-               "Payment Tracking",
-               "Invoice History",
-               "Revenue Reports",
-               "Invoice Preview",
-               "Professional Printing"
-             ]
-           };
-         }
-       });
+        // Set invoice-specific context
+        chatbot.posContext = {
+          currentPage: "Invoice Management",
+          userRole: "Owner",
+          businessType: "Frozen Food Store",
+          businessName: "Bintang Jaya",
+          availableFeatures: [
+            "Invoice Generation",
+            "Payment Tracking",
+            "Invoice History",
+            "Revenue Reports",
+            "Invoice Preview",
+            "Professional Printing",
+          ],
+        };
+      }
     </script>
     <script src="/chatbot/chatbot.js"></script>
     <script src="invoice.js"></script>
