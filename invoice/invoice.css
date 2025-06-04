@@ -804,6 +804,25 @@
   .table-container {
     overflow-x: scroll;
   }
+
+  .quick-filters,
+  .status-quick-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .quick-filter-label {
+    margin-bottom: 8px;
+    margin-right: 0;
+  }
+
+  .quick-filters .btn,
+  .status-quick-filters .btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
 }
 
 /* Print Styles */
@@ -840,4 +859,91 @@
   .business-info p {
     color: black;
   }
+}
+
+.quick-filters,
+.status-quick-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+}
+
+.quick-filter-label {
+  color: #aaabb8;
+  font-size: 14px;
+  margin-right: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.quick-filters .btn,
+.status-quick-filters .btn {
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.quick-filters .btn:hover,
+.status-quick-filters .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-filters .btn.active,
+.status-quick-filters .btn.active {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #aaabb8;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+.filter-indicator {
+  background-color: var(--primary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-left: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Filter validation styles */
+.filter-error {
+  color: #ff5252;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.date-input-invalid {
+  border-color: #ff5252 !important;
+  box-shadow: 0 0 0 2px rgba(255, 82, 82, 0.2) !important;
 }

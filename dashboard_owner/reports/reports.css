@@ -1,3 +1,4 @@
+@import "/chatbot/chatbot.css";
 /* Fix the main layout structure */
 body {
   display: flex;

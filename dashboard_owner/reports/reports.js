@@ -83,12 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-  // Logout button
-  document.getElementById("logout-btn").addEventListener("click", function () {
-    localStorage.removeItem("authToken");
-    window.location.href = "../index.html";
-  });
-
   // Initialize charts
   initializeCharts();
 

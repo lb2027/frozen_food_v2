@@ -137,7 +137,6 @@
       <!-- Header (consistent with other pages) -->
       <div class="header">
         <div class="back-button">
-          <span class="material-icons">chevron_left</span>
           <span>Invoice Management</span>
         </div>
         <div class="user-info">
@@ -158,16 +157,103 @@
             <option value="PENDING">Pending</option>
             <option value="OVERDUE">Overdue</option>
           </select>
-          <button id="filterBtn" class="btn btn-primary">
-            <span class="material-icons">filter_list</span>
-            Filter
-          </button>
+
           <button id="refreshBtn" class="btn btn-secondary">
             <span class="material-icons">refresh</span>
             Refresh
           </button>
         </div>
       </div>
+
+      <!-- Add this section after your existing filter section -->
+      <div class="quick-filters">
+        <div class="quick-filter-label">Quick Filters:</div>
+
+        <!-- ✅ Today & Yesterday -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setToday()"
+        >
+          📅 Today
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setYesterday()"
+        >
+          📅 Yesterday
+        </button>
+
+        <!-- ✅ Time Range Filters -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(7)"
+        >
+          📅 Last 7 Days
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(30)"
+        >
+          📅 Last 30 Days
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(90)"
+        >
+          📅 Last 3 Months
+        </button>
+
+        <!-- ✅ Period Filters -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setThisWeek()"
+        >
+          📅 This Week
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setThisMonth()"
+        >
+          📅 This Month
+        </button>
+
+        <!-- ✅ Clear Filter -->
+        <button
+          class="btn btn-sm btn-outline"
+          onclick="invoiceQuickFilters.clearAll()"
+        >
+          🗑️ Clear All
+        </button>
+      </div>
+
+      <!-- ✅ Also add status quick filters -->
+      <!-- <div class="status-quick-filters" style="margin-top: 10px">
+        <div class="quick-filter-label">Status:</div>
+        <button
+          class="btn btn-sm btn-success"
+          onclick="window.invoiceManager.setStatusFilter('PAID')"
+        >
+          ✅ Paid Only
+        </button>
+        <button
+          class="btn btn-sm btn-warning"
+          onclick="window.invoiceManager.setStatusFilter('PENDING')"
+        >
+          ⏳ Pending Only
+        </button>
+        <button
+          class="btn btn-sm btn-danger"
+          onclick="window.invoiceManager.setStatusFilter('OVERDUE')"
+        >
+          ⚠️ Overdue Only
+        </button>
+        <button
+          class="btn btn-sm btn-outline"
+          onclick="window.invoiceManager.setStatusFilter('')"
+        >
+          📋 All Status
+        </button>
+      </div> -->
 
       <!-- Invoice Statistics Cards -->
       <div class="stats-cards">
@@ -252,12 +338,7 @@
       <div class="invoice-list">
         <div class="list-header">
           <h3 class="section-title">Invoice List</h3>
-          <div class="list-actions">
-            <button class="btn btn-export">
-              <span class="material-icons">download</span>
-              Export
-            </button>
-          </div>
+          <div class="list-actions"></div>
         </div>
 
         <div class="table-container">
@@ -320,8 +401,8 @@
     </div>
 
     <!-- Chatbot Integration -->
+    <!-- Replace the existing chatbot section (lines 308-366) with this corrected version -->
     <div class="chatbot-container" id="chatbot-container">
-      <!-- Chatbot content same as other pages -->
       <div class="chatbot-header">
         <div class="chatbot-title">
           <div class="chatbot-avatar">🤖</div>
@@ -330,26 +411,125 @@
         <button class="chatbot-minimize" id="chatbot-minimize">−</button>
         <button class="chatbot-close" id="chatbot-close">×</button>
       </div>
-      <div class="chatbot-messages" id="chatbot-messages"></div>
+
+      <div class="chatbot-messages" id="chatbot-messages">
+        <div class="message bot-message">
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <p>Hello! I'm your POS Assistant. I can help you with:</p>
+            <ul>
+              <li>Product management questions</li>
+              <li>Sales analysis</li>
+              <li>Inventory insights</li>
+              <li>System guidance</li>
+            </ul>
+            <p>How can I help you today?</p>
+          </div>
+        </div>
+      </div>
+
       <div class="chatbot-input-container">
-        <input
-          type="text"
-          id="chatbot-input"
-          placeholder="Ask about invoices..."
-        />
-        <button id="chatbot-send" disabled>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+        <div class="voice-transcript" id="voice-transcript"></div>
+        <div class="voice-status" id="voice-status"></div>
+        <div class="chatbot-suggestions" id="chatbot-suggestions">
+          <button
+            class="suggestion-btn"
+            data-suggestion="How are my sales today?"
           >
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22,2 15,22 11,13 2,9"></polygon>
-          </svg>
-        </button>
+            📊 Sales Today
+          </button>
+          <button
+            class="suggestion-btn"
+            data-suggestion="Which products need restocking?"
+          >
+            📦 Low Stock
+          </button>
+          <button
+            class="suggestion-btn"
+            data-suggestion="Show me top selling products"
+          >
+            🏆 Top Products
+          </button>
+        </div>
+        <div class="chatbot-input-area">
+          <input
+            type="text"
+            id="chatbot-input"
+            placeholder="Ask me anything or use voice commands..."
+            maxlength="500"
+          />
+          <div class="voice-controls">
+            <button id="voice-btn" class="voice-btn" title="Voice Input">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
+                ></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
+            <button
+              id="voice-help-btn"
+              class="voice-btn"
+              title="Voice Commands Help"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+          <button id="chatbot-send" disabled>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22,2 15,22 11,13 2,9"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="chatbot-typing" id="chatbot-typing" style="display: none">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span>POS Assistant is typing...</span>
+        </div>
+      </div>
+
+      <!-- Voice Commands Help -->
+      <div class="voice-commands-help" id="voice-commands-help">
+        <h4>Voice Commands:</h4>
+        <ul>
+          <li>"Show sales today" - View today's sales</li>
+          <li>"Check stock for [product]" - Check product stock</li>
+          <li>"Add product" - Open add product modal</li>
+          <li>"Show low stock items" - Display low stock</li>
+          <li>"Calculate total sales" - Get sales summary</li>
+          <li>"Help" - Show available commands</li>
+        </ul>
       </div>
     </div>
 
@@ -368,7 +548,27 @@
         ></path>
       </svg>
     </button>
+    <script>
+      if (typeof POSChatbot !== "undefined") {
+        const chatbot = new POSChatbot();
 
+        // Set invoice-specific context
+        chatbot.posContext = {
+          currentPage: "Invoice Management",
+          userRole: "Owner",
+          businessType: "Frozen Food Store",
+          businessName: "Bintang Jaya",
+          availableFeatures: [
+            "Invoice Generation",
+            "Payment Tracking",
+            "Invoice History",
+            "Revenue Reports",
+            "Invoice Preview",
+            "Professional Printing",
+          ],
+        };
+      }
+    </script>
     <script src="/chatbot/chatbot.js"></script>
     <script src="invoice.js"></script>
   </body>
