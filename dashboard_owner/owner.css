@@ -1,3 +1,5 @@
+@import "/chatbot/chatbot.css";
+
 :root {
   --primary: #32d583;
   --primary-hover: #2bb974;
@@ -710,7 +712,8 @@ button[type="submit"]:hover,
 
 #closeBtn,
 #closeBtnStock,
-#closeBtnStokSold {
+#closeBtnStokSold,
+#closeBtnEdit {
   background-color: #444;
   color: white;
   padding: 14px 28px;
@@ -805,6 +808,7 @@ button[type="submit"]:hover,
   cursor: pointer;
   transition: all 0.3s;
   height: 48px;
+  margin-bottom: 2em;
 }
 
 .remove-item-btn:hover {

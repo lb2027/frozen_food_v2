@@ -473,16 +473,6 @@ document.addEventListener("DOMContentLoaded", function () {
       <td>${record.jam_keluar || "-"}</td>
       <td>${statusBadge}</td>
       <td>${record.keterangan || "-"}</td>
-      <td>
-        <div class="action-icons">
-          <button class="action-btn view-btn" data-id="${record.id}">
-            <span class="material-icons">visibility</span>
-          </button>
-          <button class="action-btn edit-btn" data-id="${record.id}">
-            <span class="material-icons">edit</span>
-          </button>
-        </div>
-      </td>
     `;
 
       tableBody.appendChild(row);
@@ -608,10 +598,6 @@ document.addEventListener("DOMContentLoaded", function () {
             <span class="material-icons">refresh</span>
             <span>Refresh</span>
           </button>
-          <button class="add-attendance-btn">
-            <span class="material-icons">add</span>
-            <span>Record Attendance</span>
-          </button>
         </div>
       </div>
       
@@ -619,19 +605,18 @@ document.addEventListener("DOMContentLoaded", function () {
         <table class="attendance-table">
           <thead>
             <tr>
-              <th width="40">
+              <th width="60">
                 <div class="checkbox-container">
                   <span class="custom-checkbox"></span>
                 </div>
               </th>
-              <th width="60">ID</th>
+              <th width="90">ID</th>
               <th>Staff Name</th>
               <th>Date</th>
               <th>Time In</th>
               <th>Time Out</th>
               <th>Status</th>
-              <th>Notes</th>
-              <th width="120">Actions</th>
+              <th width="180">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -689,8 +674,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Show payroll tab
-  // ...existing code...
-
   // --- PAYROLL (GAJI) SECTION ---
 
   // Function to show the payroll tab
@@ -1306,19 +1289,161 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // ...existing code...
-  // Make sure to call showPayrollTab when the payroll tab is clicked in setupEventListeners
-  // Example:
-  // else if (tabName.includes("payroll")) {
-  //    hideTabContainers();
-  //    showPayrollTab();
-  // }
+  // Add staff with registration (like register.html)
+  async function addStaffWithRegistration() {
+    const form = document.getElementById("add-staff-form");
+    if (!form) return;
 
-  // Ensure staffData is fetched and available for populating staff names in payroll.
-  // You might need to call fetchStaffData() if it's not already called or if payroll tab can be accessed independently.
-  // Consider fetching staff data within fetchPayrollData or ensuring it's up-to-date.
+    // Get form values
+    const username = document.getElementById("staff-username").value;
+    const password = document.getElementById("staff-password").value;
+    const confirmPassword = document.getElementById(
+      "staff-confirm-password"
+    ).value;
+    const nama = document.getElementById("staff-name").value;
+    const noHp = document.getElementById("staff-phone").value;
+    const alamat = document.getElementById("staff-address").value;
+    const email = document.getElementById("staff-email").value;
+    const tanggalLahir = document.getElementById("staff-dob").value;
+    const statusKerja = document.getElementById("staff-status").value;
+    const role = document.getElementById("staff-role").value;
 
-  // ...rest of your existing staff_manage.js code...
+    const passwordError = document.getElementById("staff-password-error");
+    const registerError = document.getElementById("staff-register-error");
+
+    // Validate required fields
+    if (!username.trim()) {
+      showErrorAlert("Username is required");
+      return;
+    }
+
+    if (!password.trim()) {
+      showErrorAlert("Password is required");
+      return;
+    }
+
+    if (!nama.trim()) {
+      showErrorAlert("Full name is required");
+      return;
+    }
+
+    if (!noHp.trim()) {
+      showErrorAlert("Phone number is required");
+      return;
+    }
+
+    if (!statusKerja) {
+      showErrorAlert("Status is required");
+      return;
+    }
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      passwordError.style.display = "block";
+      return;
+    } else {
+      passwordError.style.display = "none";
+    }
+
+    // Prepare data for API
+    const userData = {
+      username: username,
+      password: password,
+      role: role || "staff", // Default role is staff
+    };
+
+    console.log("Attempting registration with:", userData);
+
+    showLoader();
+
+    try {
+      // First, create user account
+      const registerResponse = await fetch(`${apiUrl}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const registerResult = await registerResponse.json();
+      console.log("User registration result:", registerResult);
+
+      if (
+        !registerResult.message ||
+        !registerResult.message.includes("successfully")
+      ) {
+        throw new Error(
+          "User registration failed: " + JSON.stringify(registerResult)
+        );
+      }
+
+      // Login to get token
+      const loginResponse = await fetch(`${apiUrl}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      const loginData = await loginResponse.json();
+      console.log("Login response:", loginData);
+
+      if (!loginData.token || !loginData.user_id) {
+        throw new Error("Failed to get authentication token");
+      }
+
+      // Now create staff record with the user_id from login
+      const staffData = {
+        nama: nama,
+        no_hp: noHp,
+        alamat: alamat,
+        email: email,
+        status_kerja: statusKerja,
+        user_id: parseInt(loginData.user_id), // Ensure it's a number
+        tanggal_lahir: tanggalLahir || null,
+      };
+
+      console.log("Creating staff with data:", staffData);
+      console.log("Using token:", loginData.token);
+
+      const staffResponse = await fetch(`${apiUrl}/addstaff`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: loginData.token,
+        },
+        body: JSON.stringify(staffData),
+      });
+
+      const staffResult = await staffResponse.json();
+      console.log("Staff creation result:", staffResult);
+
+      if (
+        staffResult.success === "true" ||
+        (staffResult.message && staffResult.message.includes("success"))
+      ) {
+        showSuccessAlert("Staff added successfully!");
+        closeModal();
+        fetchStaffData(); // Refresh the staff list
+      } else {
+        registerError.textContent =
+          "Staff profile creation failed. Please contact support.";
+        registerError.style.display = "block";
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      registerError.textContent =
+        error.message || "Registration failed. Please try again.";
+      registerError.style.display = "block";
+    } finally {
+      hideLoader();
+    }
+  }
 
   // Fetch staff data from API
   async function fetchStaffData() {
@@ -1574,68 +1699,150 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Show add staff modal
+  // Show add staff modal
   function showAddStaffModal() {
     const modalHTML = `
-      <div class="modal-overlay">
-        <div class="modal">
-          <div class="modal-header">
-            <h3>Add New Staff</h3>
-            <button class="close-modal">&times;</button>
-          </div>
-          <div class="modal-body">
-            <form id="add-staff-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="staff-name">Full Name*</label>
-                  <input type="text" id="staff-name" name="nama" required placeholder="Enter full name">
-                </div>
-                <div class="form-group">
-                  <label for="staff-email">Email</label>
-                  <input type="email" id="staff-email" name="email" placeholder="Enter email">
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add New Staff</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="add-staff-form">
+            <!-- Account Information - Full width -->
+            <div class="form-row">
+              <div class="form-group col-full">
+                <label for="staff-username">Username*</label>
+                <input
+                  type="text"
+                  id="staff-username"
+                  name="username"
+                  class="form-control"
+                  placeholder="Enter username"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Password fields - Two columns -->
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="staff-password">Password*</label>
+                <input
+                  type="password"
+                  id="staff-password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+              <div class="form-group col-half">
+                <label for="staff-confirm-password">Confirm Password*</label>
+                <input
+                  type="password"
+                  id="staff-confirm-password"
+                  name="confirm_password"
+                  class="form-control"
+                  placeholder="Confirm password"
+                  required
+                />
+                <div class="error-message" id="staff-password-error" style="display: none;">
+                  Passwords do not match
                 </div>
               </div>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="staff-phone">Phone Number*</label>
-                  <input type="text" id="staff-phone" name="no_hp" required placeholder="Enter phone number">
-                </div>
-                <div class="form-group">
-                  <label for="staff-dob">Date of Birth</label>
-                  <input type="date" id="staff-dob" name="date_of_birth" placeholder="Select date of birth">
-                </div>
+            </div>
+
+            <!-- Personal Information - Two columns -->
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="staff-name">Full Name*</label>
+                <input
+                  type="text"
+                  id="staff-name"
+                  name="nama"
+                  class="form-control"
+                  placeholder="Enter full name"
+                  required
+                />
               </div>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="staff-status">Status*</label>
-                  <select id="staff-status" name="status_kerja" required>
-                    <option value="" disabled selected>Select status</option>
-                    <option value="Owner">Owner</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Kasir">Kasir</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="staff-user-id">User ID (Optional)</label>
-                  <input type="number" id="staff-user-id" name="user_id" placeholder="Enter user ID if applicable">
-                </div>
+              <div class="form-group col-half">
+                <label for="staff-email">Email</label>
+                <input
+                  type="email"
+                  id="staff-email"
+                  name="email"
+                  class="form-control"
+                  placeholder="Enter email"
+                />
               </div>
-              
-              <div class="form-group">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="staff-phone">Phone Number*</label>
+                <input
+                  type="text"
+                  id="staff-phone"
+                  name="no_hp"
+                  class="form-control"
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+              <div class="form-group col-half">
+                <label for="staff-dob">Date of Birth</label>
+                <input type="date" id="staff-dob" name="tanggal_lahir" class="form-control" />
+              </div>
+            </div>
+
+            <!-- Status and Role - Two columns -->
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="staff-status">Status*</label>
+                <select id="staff-status" name="status_kerja" class="form-control" required>
+                  <option value="" disabled selected>Select status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              <div class="form-group col-half">
+                <label for="staff-role">Role</label>
+                <select id="staff-role" name="role" class="form-control">
+                  <option value="staff" selected>Staff</option>
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Address - Full width -->
+            <div class="form-row">
+              <div class="form-group col-full">
                 <label for="staff-address">Address</label>
-                <textarea id="staff-address" name="alamat" rows="3" placeholder="Enter address"></textarea>
+                <textarea
+                  id="staff-address"
+                  name="alamat"
+                  class="form-control"
+                  placeholder="Enter address"
+                  rows="2"
+                ></textarea>
               </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn secondary-btn" id="cancel-add-staff">Cancel</button>
-            <button class="btn primary-btn" id="save-staff-btn">Save</button>
-          </div>
+            </div>
+
+            <div class="error-message" id="staff-register-error" style="display: none;">
+              Registration failed. Please try again.
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn secondary-btn" id="cancel-add-staff">Cancel</button>
+          <button class="btn primary-btn" id="save-staff-btn">Add Staff</button>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
     document.body.insertAdjacentHTML("beforeend", modalHTML);
 
@@ -1648,16 +1855,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .addEventListener("click", closeModal);
     document
       .getElementById("save-staff-btn")
-      .addEventListener("click", addStaff);
+      .addEventListener("click", addStaffWithRegistration);
 
     // Close modal if clicked outside
     document
       .querySelector(".modal-overlay")
       .addEventListener("click", function (e) {
-        if (e.target === this) closeModal();
+        if (e.target === this) {
+          closeModal();
+        }
       });
   }
-
   // Close any open modal
   function closeModal() {
     const modal = document.querySelector(".modal-overlay");

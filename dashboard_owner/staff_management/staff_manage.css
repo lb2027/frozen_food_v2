@@ -987,7 +987,7 @@ tbody tr:hover::after {
 
 .attendance-actions {
   display: flex;
-  gap: 10px;
+  gap: 20px;
 }
 
 .attendance-table {
@@ -1162,4 +1162,72 @@ tbody tr:hover::after {
   font-size: 14px;
   margin-top: 15px;
   border: 1px solid #2d2d3f;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2d2d3f;
+  color: var(--text-color);
+  padding: 0.5em;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-items: center;
+}
+
+/* Two-column layout styling for modal forms */
+.modal .form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -10px; /* Negative margin to offset padding */
+}
+
+.modal .form-group {
+  margin-bottom: 1.5rem;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Column sizing */
+.modal .col-full {
+  width: 100%;
+}
+
+.modal .col-half {
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  /* On smaller screens, make all columns full width */
+  .modal .col-half {
+    width: 100%;
+  }
+}
+
+.modal .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #2d2d3f;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+.modal .form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(50, 213, 131, 0.1);
+}
+
+.modal .error-message {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  display: none;
 }

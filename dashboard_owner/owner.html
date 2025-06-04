@@ -82,6 +82,31 @@
           <span>Reports</span>
         </div>
       </a>
+
+      <!-- Add this after Reports in the sidebar -->
+      <a href="/invoice/invoice.html">
+        <div class="sidebar-item">
+          <div class="icon-circle">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </div>
+          <span>Invoice</span>
+        </div>
+      </a>
       <!-- <div class="sidebar-item">
         <div class="icon-circle">
           <svg
@@ -165,9 +190,6 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-          </div>
-          <div class="profile-pic">
-            <img src="/api/placeholder/36/36" alt="Profile Picture" />
           </div>
         </div>
       </header>
@@ -562,11 +584,159 @@
             <input type="text" id="edit_supplier" name="supplier" required />
           </div>
           <button type="submit" class="submit-btn">Simpan</button>
-          <button type="button" id="closeEditBtn">Batal</button>
+          <button type="button" id="closeBtnEdit">Batal</button>
         </form>
       </div>
     </div>
 
+    <!-- Chatbot Integration -->
+    <div class="chatbot-container" id="chatbot-container">
+      <div class="chatbot-header">
+        <div class="chatbot-title">
+          <div class="chatbot-avatar">🤖</div>
+          <span>POS Assistant</span>
+        </div>
+        <button class="chatbot-minimize" id="chatbot-minimize">−</button>
+        <button class="chatbot-close" id="chatbot-close">×</button>
+      </div>
+
+      <div class="chatbot-messages" id="chatbot-messages">
+        <div class="message bot-message">
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <p>Hello! I'm your POS Assistant. I can help you with:</p>
+            <ul>
+              <li>Product management questions</li>
+              <li>Sales analysis</li>
+              <li>Inventory insights</li>
+              <li>System guidance</li>
+            </ul>
+            <p>How can I help you today?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chatbot-input-container">
+        <div class="voice-transcript" id="voice-transcript"></div>
+        <div class="voice-status" id="voice-status"></div>
+        <div class="chatbot-suggestions" id="chatbot-suggestions">
+          <button
+            class="suggestion-btn"
+            data-suggestion="How are my sales today?"
+          >
+            📊 Sales Today
+          </button>
+          <button
+            class="suggestion-btn"
+            data-suggestion="Which products need restocking?"
+          >
+            📦 Low Stock
+          </button>
+          <button
+            class="suggestion-btn"
+            data-suggestion="Show me top selling products"
+          >
+            🏆 Top Products
+          </button>
+        </div>
+        <div class="chatbot-input-area">
+          <input
+            type="text"
+            id="chatbot-input"
+            placeholder="Ask me anything or use voice commands..."
+            maxlength="500"
+          />
+          <div class="voice-controls">
+            <button id="voice-btn" class="voice-btn" title="Voice Input">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
+                ></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
+            <button
+              id="voice-help-btn"
+              class="voice-btn"
+              title="Voice Commands Help"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+          <button id="chatbot-send" disabled>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22,2 15,22 11,13 2,9"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="chatbot-typing" id="chatbot-typing" style="display: none">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span>POS Assistant is typing...</span>
+        </div>
+      </div>
+
+      <!-- Voice Commands Help -->
+      <div class="voice-commands-help" id="voice-commands-help">
+        <h4>Voice Commands:</h4>
+        <ul>
+          <li>"Show sales today" - View today's sales</li>
+          <li>"Check stock for [product]" - Check product stock</li>
+          <li>"Add product" - Open add product modal</li>
+          <li>"Show low stock items" - Display low stock</li>
+          <li>"Calculate total sales" - Get sales summary</li>
+          <li>"Help" - Show available commands</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Chatbot Toggle Button -->
+    <button class="chatbot-toggle" id="chatbot-toggle">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+        ></path>
+      </svg>
+    </button>
+    <script src="/chatbot/chatbot.js"></script>
     <script src="/dashboard_owner/owner.js"></script>
   </body>
 </html>
