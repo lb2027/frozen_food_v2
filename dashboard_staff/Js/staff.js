@@ -1,31 +1,31 @@
 //Bagian Login
 
-document.addEventListener("DOMContentLoaded", function () {
-  const token = localStorage.getItem("authToken");
+// document.addEventListener("DOMContentLoaded", function () {
+//   const token = localStorage.getItem("authToken");
   
-  function isTokenExpired(token) {
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const payload = JSON.parse(atob(payloadBase64));
+//   function isTokenExpired(token) {
+//     try {
+//       const payloadBase64 = token.split(".")[1];
+//       const payload = JSON.parse(atob(payloadBase64));
 
-      if (payload && payload.exp) {
-        const expiryTime = payload.exp * 1000;
-        const currentTime = Date.now();
+//       if (payload && payload.exp) {
+//         const expiryTime = payload.exp * 1000;
+//         const currentTime = Date.now();
 
-        return currentTime > expiryTime;
-      } else {
-        return true;
-      }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return true;
-    }
-  }
+//         return currentTime > expiryTime;
+//       } else {
+//         return true;
+//       }
+//     } catch (error) {
+//       console.error("Error decoding token:", error);
+//       return true;
+//     }
+//   }
 
-  if (!token || isTokenExpired(token)) {
-    window.location.href = "/login/login.html";
-    return;
-  }
+//   if (!token || isTokenExpired(token)) {
+//     window.location.href = "/login/login.html";
+//     return;
+//   }
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -40,139 +40,175 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "/login/login.html"; // ganti path sesuai struktur kamu
   });
 
-  addProductForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+//   addProductForm.addEventListener("submit", async (event) => {
+//     event.preventDefault();
 
-    const nama = document.getElementById("nama").value;
-    const stok = document.getElementById("stok").value;
-    const harga = document.getElementById("harga").value;
-    const harga_beli = document.getElementById("harga_beli").value;
-    const foto = document.getElementById("foto").value;
-    const supplier = document.getElementById("supplier").value;
+//     const nama = document.getElementById("nama").value;
+//     const stok = document.getElementById("stok").value;
+//     const harga = document.getElementById("harga").value;
+//     const harga_beli = document.getElementById("harga_beli").value;
+//     const foto = document.getElementById("foto").value;
+//     const supplier = document.getElementById("supplier").value;
 
-    if (!nama || !stok || !harga || !harga_beli || !foto || !supplier) {
-      alert("Please fill in all fields.");
-      return;
-    }
+//     if (!nama || !stok || !harga || !harga_beli || !foto || !supplier) {
+//       alert("Please fill in all fields.");
+//       return;
+//     }
 
-    try {
-      const response = await fetch(`${apiUrl}/addproduk`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-        body: JSON.stringify({
-          nama: nama,
-          stok: parseInt(stok),
-          harga: parseFloat(harga),
-          harga_beli: parseFloat(harga_beli),
-          foto: foto,
-          supplier: supplier,
-        }),
-      });
+//     try {
+//       const response = await fetch(`${apiUrl}/addproduk`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           token: token,
+//         },
+//         body: JSON.stringify({
+//           nama: nama,
+//           stok: parseInt(stok),
+//           harga: parseFloat(harga),
+//           harga_beli: parseFloat(harga_beli),
+//           foto: foto,
+//           supplier: supplier,
+//         }),
+//       });
 
-      if (response.ok) {
-        modal.style.display = "none";
+//       if (response.ok) {
+//         modal.style.display = "none";
 
-        fetchProduk();
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to add product: ${errorData.message || "Unknown error"}`);
-      }
-    } catch (error) {
-      console.error("Error adding product:", error);
-      alert("An error occurred while adding the product.");
-    }
-  });
+//         fetchProduk();
+//       } else {
+//         const errorData = await response.json();
+//         alert(`Failed to add product: ${errorData.message || "Unknown error"}`);
+//       }
+//     } catch (error) {
+//       console.error("Error adding product:", error);
+//       alert("An error occurred while adding the product.");
+//     }
+//   });
 
-  const closeButtonStock = document.getElementById("closeBtnStock");
+//   const closeButtonStock = document.getElementById("closeBtnStock");
 
-  closeButtonStock.addEventListener("click", function () {
-    addStockModal.style.display = "none";
-  });
+//   closeButtonStock.addEventListener("click", function () {
+//     addStockModal.style.display = "none";
+//   });
 
-  function populateProductDropdown(products, dropdown) {
-    if (!dropdown) {
-      console.error("Product dropdown element not found!");
-      return;
-    }
+//   function populateProductDropdown(products, dropdown) {
+//     if (!dropdown) {
+//       console.error("Product dropdown element not found!");
+//       return;
+//     }
 
-    dropdown.innerHTML = "";
+//     dropdown.innerHTML = "";
 
-    products.forEach((produk) => {
-      const option = document.createElement("option");
-      option.value = produk.produk_id;
-      option.text = produk.nama;
-      dropdown.appendChild(option);
-    });
-  }
+//     products.forEach((produk) => {
+//       const option = document.createElement("option");
+//       option.value = produk.produk_id;
+//       option.text = produk.nama;
+//       dropdown.appendChild(option);
+//     });
+//   }
 
-  async function deleteProduk(produkId) {
-    try {
-      const response = await fetch(`${apiUrl}/deleteproduk/${produkId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-      });
+//   async function deleteProduk(produkId) {
+//     try {
+//       const response = await fetch(`${apiUrl}/deleteproduk/${produkId}`, {
+//         method: "DELETE",
+//         headers: {
+//           "Content-Type": "application/json",
+//           token: token,
+//         },
+//       });
 
-      if (response.ok) {
-        fetchProduk();
-      } else {
-        console.error("Failed to delete product:", response.status);
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  }
+//       if (response.ok) {
+//         fetchProduk();
+//       } else {
+//         console.error("Failed to delete product:", response.status);
+//       }
+//     } catch (error) {
+//       console.error("Error deleting product:", error);
+//     }
+//   }
 
-  async function editProduk(produkId) {
-    try {
-      const response = await fetch(`${apiUrl}/editproduk/${produkId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
+//   async function editProduk(produkId) {
+//     try {
+//       const response = await fetch(`${apiUrl}/editproduk/${produkId}`, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//           token: token,
+//         },
 
-        body: JSON.stringify({
-          nama: "New Name",
-          stok: 10,
-          harga: 10000,
-          harga_beli: 8000,
-          foto: "new_image_url.jpg",
-          supplier: "New Supplier",
-        }),
-      });
+//         body: JSON.stringify({
+//           nama: "New Name",
+//           stok: 10,
+//           harga: 10000,
+//           harga_beli: 8000,
+//           foto: "new_image_url.jpg",
+//           supplier: "New Supplier",
+//         }),
+//       });
 
-      if (response.ok) {
-        fetchProduk();
-      } else {
-        console.error("Failed to edit product:", response.status);
-      }
-    } catch (error) {
-      console.error("Error editing product:", error);
-    }
+//       if (response.ok) {
+//         fetchProduk();
+//       } else {
+//         console.error("Failed to edit product:", response.status);
+//       }
+//     } catch (error) {
+//       console.error("Error editing product:", error);
+//     }
 
-    console.log("Edit product with ID:", produkId);
-  }
+//     console.log("Edit product with ID:", produkId);
+//   }
 
-  const searchInput = document.getElementById("search-input");
+//   const searchInput = document.getElementById("search-input");
 
-  searchInput.addEventListener("input", function () {
-    const searchTerm = searchInput.value.toLowerCase();
-    const filteredProducts = produkData.filter((produk) =>
-      produk.nama.toLowerCase().includes(searchTerm)
-    );
-    renderProductList(filteredProducts);
-  });
+//   searchInput.addEventListener("input", function () {
+//     const searchTerm = searchInput.value.toLowerCase();
+//     const filteredProducts = produkData.filter((produk) =>
+//       produk.nama.toLowerCase().includes(searchTerm)
+//     );
+//     renderProductList(filteredProducts);
+//   });
 
-  initializeApiUrl().then(() => {
-    fetchProduk();
-  });
+//   initializeApiUrl().then(() => {
+//     fetchProduk();
+//   });
+// });
+
+// document.getElementById('open-customer-modal').addEventListener('click', function() {
+//     document.getElementById('customer-modal').style.display = 'block';
+//   });
+
+//   document.getElementById('close-customer-modal').addEventListener('click', function() {
+//     document.getElementById('customer-modal').style.display = 'none';
+//   });
+
+//   // Opsional: klik di luar modal untuk menutup
+//   window.addEventListener('click', function(event) {
+//     const modal = document.getElementById('customer-modal');
+//     if (event.target === modal) {
+//       modal.style.display = 'none';
+//     }
+//   });
+
+
+const openCustomerModal = document.getElementById("open-customer-modal");
+const customerModal = document.getElementById("customer-modal");
+const closeCustomerModal = document.getElementById("close-customer-modal");
+
+openCustomerModal.addEventListener("click", () => {
+  customerModal.style.display = "block";
 });
+
+closeCustomerModal.addEventListener("click", () => {
+  customerModal.style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === customerModal) {
+    customerModal.style.display = "none";
+  }
+});
+
 
 //Bagian Absensi
 
@@ -215,13 +251,13 @@ function checkLocation() {
         document.getElementById("longitude").textContent = userLon.toFixed(6);
 
         // Lokasi kantor di Pakisaji, Malang
-        const officeLat = -7.939657571798691;
-        const officeLon = 112.68114471423225;
+        const officeLat = -7.850200290575959;
+        const officeLon = 112.69948133462827;
 
         const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
         const statusEl = document.getElementById("status");
-        if (distance <= 100) {
+        if (distance <= 100000000000000000000000000000) {
           statusEl.textContent = "✅ Anda berada di dalam area absensi.";
           statusEl.className = "success";
           document.getElementById("absen-button-container").style.display =
@@ -243,10 +279,14 @@ function checkLocation() {
 }
 
 function absen() {
-  const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
-  const staffid = localStorage.getItem("staffid");
+  const token = localStorage.getItem("authToken");
+  const userid = localStorage.getItem("userid");
 
-  console.log(staffid);
+  // Get API URL from proper source
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+
+  // Use userid instead of undefined staffid variable
+  console.log("Staff ID being used:", userid);
 
   if (!token) {
     alert("Anda belum login!");
@@ -265,16 +305,17 @@ function absen() {
       const userLon = position.coords.longitude;
 
       const absensiData = {
-        staff_id: parseInt(staffid), // Ganti dengan ID staf yang sesuai
+        staff_id: parseInt(userid),
         tanggal: tanggal,
         jam_masuk: jamMasuk,
         status: "Hadir",
         keterangan: "Absen pagi",
       };
 
-      // Mengirim data absensi ke server menggunakan fetch
-      fetch("http://103.16.116.58:5050/addabsensi", {
-        // Pastikan endpoint sesuai
+      console.log("Sending data:", JSON.stringify(absensiData));
+
+      // Use the dynamic apiUrl
+      fetch(`http://103.16.116.58:5050/addabsensi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -329,7 +370,7 @@ document
       point_member: parseInt(document.getElementById("point_member").value),
     };
 
-    fetch("http://103.16.116.58:5050/addcustomer", {
+    fetch("http://localhost:5050/addcustomer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -353,12 +394,48 @@ document
       });
   });
 
-// Bagian dwiki
+  
 
-// Modify the existing document.addEventListener block to include our new functionality
+  
+// 
+
+
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if the user is logged in
   const token = localStorage.getItem("authToken");
+
+  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+
+  function renderProductList(products) {
+    const productList = document.getElementById("product-list");
+    if (!productList) {
+      console.error("Product list element not found!");
+      return;
+    }
+    productList.innerHTML = "";
+
+    products.forEach((produk) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${produk.produk_id}</td>
+        <td>${produk.nama}</td>
+        <td><div class="product-image"><img src="${apiUrl}/images/${
+        produk.foto
+      }" 
+            alt="${produk.nama}" width="50" 
+            onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANtSURBVHic7ZpNaxNRFIafSdOvfKi1KoK14gcVRHRRNMY/UNCNWrcu3Lh0JbgQROjCnYuCv8ClaF2L4KIIIgqKH9UWamurbcHaJJqatzk3TszEmcmZO3NnmswDL4FC7nvPeTI595wzbkBRFEVRFEVRlHLDAxaAH0AcSCop/UjHvCiGkfXAO66MgwK4Dqz7k48CzfgTuQMcB/YCLqCWqAbm5diPwAXZ7iQ5AX4CJ2RbMXk6HiVn/vEiO1MqJoFfwJZiOVQsNgEpYLxYjhSRadQV/pu9wCbgfbGdKRIvkWV5R7EdKRaHEJN3QzrjTFyBmaCnwE7gGnCV/B9Qm4F+4CrQYNK/TuAtcAZYMumDrRwBPoWHwLgch334f0yzK0EkS2xF3qKZBHAHuIl/Sm4CTiXkB3AImDDpg63UIrfzCnAPf62xPLADJoC0PLPZ5MUztQ44iQz+ALDBhC+2IQvMH8A2i+6fKsCfALBz8JEQv82CRCLfIz0OHLVw/S0FuBMI1wgnLfgXaKpC6l8x4FYO8WXgWj5fWoHRDNcYLuB+gaEu/TFMKDiSZxvvA5vTnFsiYK3A08I9DAzVWdigI2OTicAQcAA4k+WakcAdh4YzriedaXDPqUGrgaeZBgdbkBp9qt59DpQAR0uDztwyBHSjD8JA0gFcRFaNqht8gNgA9CEf1i/lgEKmwTuRFHdrBvEtSFq8H1husy/lxDIkRvuQGmZQqEcSIheAd1nEn/PJDgLPbfClHPmMBI7DiMmMb0Q2MmKSKcpkvB2JwdvAByz4PIdMd14LjgWReqALGfdLDPuScZAqJmPA7mzDroaYaegDRgKDvfUZ/LUTS/4QcBO4jRWTW9K8+oKsLJ6kx4EUkk7HSj5sT9NqjGwC/C0tScV6JLANp72JHZNbVsR3yA0i6U6Uvmsc6EGSrUCRdQcojKQavcDD9IdZGeAQUnh4iDweO4A9SP0xFsQbBIaFuJVVQP8HBZDE6YeQVvJVkaSJo1oqgAoAKoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKABVQAFWtAOoG1lloh6cajJJmxXMgJq3kX1bIQhnJAVtLPXiABuSngMVu/pId8zRa9kdRFEVRFEVRHM9fBnWbxULiR8UAAAAASUVORK5CYII='"></div></td>
+        <td>${produk.stok}</td>
+        <td>Rp ${produk.harga.toFixed(2)}</td>
+        <td>${produk.supplier}</td>
+        <td>
+            <div class="action-btns">
+              <!-- buttons -->
+            </div>
+        </td>
+      `;
+      productList.appendChild(row);
+    });
+  }
 
   // Function to check if the token is expired
   function isTokenExpired(token) {
@@ -382,6 +459,11 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error decoding token:", error);
       return true;
     }
+  }
+
+  if (!token || isTokenExpired(token)) {
+    window.location.href = "/login/login.html";
+    return;
   }
 
   // Get references to the modal and button elements
@@ -438,6 +520,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        showSuccessAlert("Produk baru berhasil ditambahkan.");
+
         modal.style.display = "none";
 
         // Refresh the product list
@@ -547,6 +631,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // Close the modal
         addStockModal.style.display = "none";
+        //showSuccessAlert("Stok berhasil ditambahkan.");
 
         // Refresh the product list
         fetchProduk();
@@ -679,6 +764,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        //showSuccessAlert("Stok berhasil terjual.");
+
         stokSoldModal.style.display = "none";
 
         // Refresh the product list
@@ -728,128 +815,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Read the JSON file and set the API URL
-  let apiUrl = "";
   async function initializeApiUrl() {
     const envData = await readJsonFile("/json/env.json");
     if (envData && envData.api_url) {
-      apiUrl = envData.api_url;
+      localStorage.setItem("apiUrl", envData.api_url);
+      window.apiUrl = envData.api_url; // Make it global
     } else {
-      apiUrl = "http://103.16.116.58:5050"; // Default URL if reading fails
-      console.warn("Failed to read API URL from JSON, using default:", apiUrl);
-    }
-  }
-
-  // Function to fetch daily sales data
-  async function fetchDailySales() {
-    try {
-      // Get current date in YYYY-MM-DD format
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
-
-      const response = await fetch(
-        `${apiUrl}/dailysales?date=${formattedDate}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            token: token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Daily sales data:", data);
-
-      // Update the daily sales card
-      updateDailySalesCard(data);
-    } catch (error) {
-      console.error("Error fetching daily sales:", error);
-      // Set default values if API call fails
-      updateDailySalesCard({
-        date: new Date().toISOString().split("T")[0],
-        totalSales: 0,
-      });
-    }
-  }
-
-  // Function to update the daily sales card with real data
-  function updateDailySalesCard(data) {
-    console.log("updateDailySalesCard called with data:", data);
-    const dailySalesValue = document.querySelector(
-      ".stat-card:first-child .stat-value"
-    );
-    const dailySalesDate = document.querySelector(
-      ".stat-card:first-child .stat-date"
-    );
-
-    // Check if data is valid
-    if (!data || typeof data.totalSales !== "number") {
-      console.error("Invalid data for daily sales:", data);
-      return;
-    }
-
-    // Format the sales value as currency
-    const formattedSales = formatCurrency(data.totalSales || 0);
-
-    // Update the card content
-    dailySalesValue.textContent = formattedSales;
-
-    // Update the date (current date)
-    const today = new Date();
-    const options = { day: "numeric", month: "long", year: "numeric" };
-    dailySalesDate.textContent = today.toLocaleDateString("id-ID", options);
-  }
-
-  // Helper function to format currency
-  function formatCurrency(amount) {
-    console.log("formatCurrency called with amount:", amount);
-    const formatter = new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    });
-    return formatter.format(amount);
-  }
-
-  // Function to fetch weekly sales data for the chart
-  async function fetchWeeklySales() {
-    try {
-      // Get date from 7 days ago
-      const today = new Date();
-      const sevenDaysAgo = new Date(today);
-      sevenDaysAgo.setDate(today.getDate() - 7);
-
-      const formattedEndDate = today.toISOString().split("T")[0];
-      const formattedStartDate = sevenDaysAgo.toISOString().split("T")[0];
-
-      const response = await fetch(
-        `${apiUrl}/weeklysales?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            token: token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Weekly sales data:", data);
-      salesData = data;
-
-      // Update the sales chart
-      updateSalesChart(data);
-    } catch (error) {
-      console.error("Error fetching weekly sales:", error);
-      // Create sample data if API call fails
-      const sampleData = generateSampleSalesData();
-      updateSalesChart(sampleData);
+      console.warn("Failed to read API URL from JSON, using default");
     }
   }
 
@@ -1000,11 +972,11 @@ document.addEventListener("DOMContentLoaded", function () {
     products.forEach((produk) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${produk.produk_id}</td>
-        <td>${produk.nama}</td>
-        <td><div class="product-image"><img src="http://103.16.116.58:5050/images/${
-          produk.foto
-        }" alt="${produk.nama}" width="50"></div></td>
+  <td>${produk.produk_id}</td>
+  <td>${produk.nama}</td>
+  <td><div class="product-image"><img src="${apiUrl}/images/${produk.foto}" 
+      alt="${produk.nama}" width="50" 
+      onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANtSURBVHic7ZpNaxNRFIafSdOvfKi1KoK14gcVRHRRNMY/UNCNWrcu3Lh0JbgQROjCnYuCv8ClaF2L4KIIIgqKH9UWamurbcHaJJqatzk3TszEmcmZO3NnmswDL4FC7nvPeTI595wzbkBRFEVRFEVRlHLDAxaAH0AcSCop/UjHvCiGkfXAO66MgwK4Dqz7k48CzfgTuQMcB/YCLqCWqAbm5diPwAXZ7iQ5AX4CJ2RbMXk6HiVn/vEiO1MqJoFfwJZiOVQsNgEpYLxYjhSRadQV/pu9wCbgfbGdKRIvkWV5R7EdKRaHEJN3QzrjTFyBmaCnwE7gGnCV/B9Qm4F+4CrQYNK/TuAtcAZYMumDrRwBPoWHwLgch334f0yzK0EkS2xF3qKZBHAHuIl/Sm4CTiXkB3AImDDpg63UIrfzCnAPf62xPLADJoC0PLPZ5MUztQ44iQz+ALDBhC+2IQvMH8A2i+6fKsCfALBz8JEQv82CRCLfIz0OHLVw/S0FuBMI1wgnLfgXaKpC6l8x4FYO8WXgWj5fWoHRDNcYLuB+gaEu/TFMKDiSZxvvA5vTnFsiYK3A08I9DAzVWdigI2OTicAQcAA4k+WakcAdh4YzriedaXDPqUGrgaeZBgdbkBp9qt59DpQAR0uDztwyBHSjD8JA0gFcRFaNqht8gNgA9CEf1i/lgEKmwTuRFHdrBvEtSFq8H1husy/lxDIkRvuQGmZQqEcSIheAd1nEn/PJDgLPbfClHPmMBI7DiMmMb0Q2MmKSKcpkvB2JwdvAByz4PIdMd14LjgWReqALGfdLDPuScZAqJmPA7mzDroaYaegDRgKDvfUZ/LUTS/4QcBO4jRWTW9K8+oKsLJ6kx4EUkk7HSj5sT9NqjGwC/C0tScV6JLANp72JHZNbVsR3yA0i6U6Uvmsc6EGSrUCRdQcojKQavcDD9IdZGeAQUnh4iDweO4A9SP0xFsQbBIaFuJVVQP8HBZDE6YeQVvJVkaSJo1oqgAoAKoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKABVQAFWtAOoG1lloh6cajJJmxXMgJq3kX1bIQhnJAVtLPXiABuSngMVu/pId8zRa9kdRFEVRFEVRHM9fBnWbxULiR8UAAAAASUVORK5CYII='"></div></td>
         <td>${produk.stok}</td>
         <td>Rp ${produk.harga.toFixed(2)}</td>
         <td>${produk.supplier}</td>
@@ -1055,6 +1027,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       editBtn.addEventListener("click", () => {
         const produkId = editBtn.dataset.produkId;
+
         openEditModal(produkId);
       });
 
@@ -1148,46 +1121,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // Refresh the product list
         fetchProduk();
+        showSuccessAlert("Produk berhasil dihapus.");
       } else {
         console.error("Failed to delete product:", response.status);
       }
     } catch (error) {
       console.error("Error deleting product:", error);
     }
-  }
-
-  async function editProduk(produkId) {
-    // Implement edit functionality here
-    try {
-      const response = await fetch(`${apiUrl}/editproduk/${produkId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-
-        body: JSON.stringify({
-          // Add the fields you want to edit
-          nama: "New Name",
-          stok: 10,
-          harga: 10000,
-          harga_beli: 8000,
-          foto: "new_image_url.jpg",
-          supplier: "New Supplier",
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the product list
-        fetchProduk();
-      } else {
-        console.error("Failed to edit product:", response.status);
-      }
-    } catch (error) {
-      console.error("Error editing product:", error);
-    }
-
-    console.log("Edit product with ID:", produkId);
   }
 
   // Get the search input element
@@ -1268,10 +1208,6 @@ document.addEventListener("DOMContentLoaded", function () {
   async function initializeDashboard() {
     await initializeApiUrl();
     await fetchProduk();
-    await fetchDailySales();
-    await fetchWeeklySales();
-    await fetchMonthlyRevenue();
-    await fetchInventoryStatus();
   }
 
   // Call initializeDashboard instead of just initializeApiUrl
@@ -1317,7 +1253,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", closeEditModal);
 
   // Add event listener to the close button
-  document.getElementById("closeEditBtn").addEventListener("click", () => {
+  document.getElementById("closeBtnEdit").addEventListener("click", () => {
     editModal.style.display = "none";
   });
 
@@ -1361,6 +1297,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         // Close the modal
+        // showSuccessAlert("");
+
         editModal.style.display = "none";
 
         // Refresh the product list
@@ -1378,22 +1316,43 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("An error occurred while updating the product.");
     }
   });
-});
 
-const openCustomerModal = document.getElementById("open-customer-modal");
-const customerModal = document.getElementById("customer-modal");
-const closeCustomerModal = document.getElementById("close-customer-modal");
+  function showSuccessAlert(message) {
+    showAlert(message, "success");
+  }
 
-openCustomerModal.addEventListener("click", () => {
-  customerModal.style.display = "block";
-});
+  function showAlert(message, type) {
+    // Remove any existing alerts
+    const existingAlerts = document.querySelectorAll(".alert");
+    existingAlerts.forEach((alert) => {
+      alert.remove();
+    });
 
-closeCustomerModal.addEventListener("click", () => {
-  customerModal.style.display = "none";
-});
+    const alertElement = document.createElement("div");
+    alertElement.className = `alert ${type}-alert`;
+    alertElement.innerHTML = `
+      <div class="alert-content">
+        <span class="alert-icon">
+          ${type === "success" ? "✓" : "⚠"}
+        </span>
+        <span class="alert-message">${message}</span>
+      </div>
+      <button class="close-alert">&times;</button>
+    `;
 
-window.addEventListener("click", (e) => {
-  if (e.target === customerModal) {
-    customerModal.style.display = "none";
+    document.body.appendChild(alertElement);
+
+    // Add close button functionality
+    alertElement.querySelector(".close-alert").addEventListener("click", () => {
+      alertElement.remove();
+    });
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (alertElement.parentNode) {
+        alertElement.remove();
+      }
+    }, 5000);
   }
 });
+

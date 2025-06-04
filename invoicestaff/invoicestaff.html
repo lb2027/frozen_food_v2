@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Management - BINTANG JAYA</title>
+    <link rel="stylesheet" href="../dashboard_owner/foundation.css" />
+    <link rel="stylesheet" href="invoicestaff.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header (consistent with other pages) -->
+      <div class="header">
+        <div class="back-button">
+          <span class="material-icons">chevron_left</span>
+          <span>Kembali</span>
+        </div>
+      </div>
+      
+      <!-- Invoice Filter Section -->
+      <div class="filter-section">
+        <div class="filter-row">
+          <input type="date" id="startDate" placeholder="Start Date" />
+          <input type="date" id="endDate" placeholder="End Date" />
+          <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="PAID">Paid</option>
+            <option value="PENDING">Pending</option>
+            <option value="OVERDUE">Overdue</option>
+          </select>
+          <button id="filterBtn" class="btn btn-primary">
+            <span class="material-icons">filter_list</span>
+            Filter
+          </button>
+          <button id="refreshBtn" class="btn btn-secondary">
+            <span class="material-icons">refresh</span>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Invoice List -->
+      <div class="invoice-list">
+          <div class="list-actions">
+          </div>
+
+        <div class="table-container">
+          <table id="invoiceTable">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTableBody">
+              <!-- Invoices will be loaded here -->
+            </tbody>
+          </table>
+          <div class="no-data-message" id="noDataMessage" style="display: none">
+            <div class="no-data-icon">📄</div>
+            <h3>No invoices found</h3>
+            <p>Try adjusting your filters or check back later.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span id="paginationInfo">Showing 0 of 0 invoices</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="page-btn" id="prevBtn" disabled>
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <div class="page-numbers" id="pageNumbers">
+            <!-- Page numbers will be generated here -->
+          </div>
+          <button class="page-btn" id="nextBtn" disabled>
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoiceModal" class="modal">
+      <div class="modal-content invoice-modal">
+        <span class="close">&times;</span>
+        <div id="invoiceContent">
+          <!-- Invoice details will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loader" id="loader" style="display: none">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Chatbot Integration -->
+    <div class="chatbot-container" id="chatbot-container">
+      <!-- Chatbot content same as other pages -->
+      <div class="chatbot-header">
+        <div class="chatbot-title">
+          <div class="chatbot-avatar">🤖</div>
+          <span>POS Assistant</span>
+        </div>
+        <button class="chatbot-minimize" id="chatbot-minimize">−</button>
+        <button class="chatbot-close" id="chatbot-close">×</button>
+      </div>
+      <div class="chatbot-messages" id="chatbot-messages"></div>
+      <div class="chatbot-input-container">
+        <input
+          type="text"
+          id="chatbot-input"
+          placeholder="Ask about invoices..."
+        />
+        <button id="chatbot-send" disabled>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22,2 15,22 11,13 2,9"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chatbot Toggle Button -->
+    <button class="chatbot-toggle" id="chatbot-toggle">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+        ></path>
+      </svg>
+    </button>
+
+    <script src="/chatbot/chatbot.js"></script>
+    <script src="invoicestaff.js"></script>
+  </body>
+</html>

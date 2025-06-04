@@ -1,3 +1,5 @@
+@import "/chatbot/chatbot.css";
+
 /*Bagian Dashboard*/
 
 * {
@@ -39,7 +41,7 @@ body {
 }
 
 /*Bagian Side Bar*/
-  
+
 .icon-circle {
   transition: transform 0.2s ease;
 }
@@ -77,9 +79,6 @@ body {
   justify-content: center;
 }
 
-
-
-
 /*Bagian Header*/
 
 .main-content {
@@ -104,16 +103,14 @@ header {
 
 .back-btn {
   background-color: #2a2a2a;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
-
-
 
 /*Bagian Search Bar*/
 
@@ -172,8 +169,6 @@ header {
   background-color: #39adfd;
 }
 */
-
-
 
 /*Bagian List Produk*/
 
@@ -245,31 +240,163 @@ header {
   object-fit: cover;
 }
 
-
 /*Bagian Modal*/
 .modal {
   display: none;
   position: fixed;
-  z-index: 1000;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  animation: fadeIn 0.3s ease-in-out;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
-  background-color: #1b1b1b;
-  margin: 10% auto;
-  padding: 25px;
-  border-radius: 15px;
-  max-width: 600px;
+  background-color: #1d1d1d;
+  margin: 10vh auto;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   width: 90%;
-  color: #f1f1f1;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  max-width: 700px;
+  border-radius: 16px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
   position: relative;
+  color: #fff;
   animation: slideUp 0.3s ease;
-  font-family: "Segoe UI", sans-serif;
 }
+
+/*Bagian stok terjual*/
+.sold-item {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  padding: 15px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background-color: #252525;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ccc;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="url"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background-color: #2a2a2a;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #fff;
+  transition: all 0.3s;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="url"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(50, 213, 131, 0.2);
+}
+
+#add-item-btn {
+  background-color: #555;
+  color: white;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+#add-item-btn:hover {
+  background-color: #666;
+}
+
+#add-item-btn::before {
+  content: "+";
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#closeBtn,
+#closeBtnStock,
+#closeBtnStokSold,
+#closeBtnEdit {
+  background-color: #444;
+  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+#closeBtn:hover,
+#closeBtnStock:hover,
+#closeBtnStokSold:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+}
+
+
+
+.remove-item-btn {
+  background-color: var(--danger);
+  color: white;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  height: 48px;
+  margin-bottom: 22px;
+}
+
+.remove-item-btn:hover {
+  background-color: var(--danger-hover);
+}
+
 
 .close-button {
   position: absolute;
@@ -358,16 +485,24 @@ button[type="submit"]:hover,
 
 /* Animasi */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
-
-
 
 /* Transaction History Modal Styles 
 #transaction-history-modal .modal-content {
@@ -413,18 +548,14 @@ button[type="submit"]:hover,
 }
 */
 
-
-
 /*Logo Bintang jaya*/
-  
+
 .logo img {
   width: 80px;
   height: 70px;
   display: block;
   margin: 0 auto;
 }
-
-
 
 /*Bagian Foto Profile*/
 
@@ -441,16 +572,16 @@ button[type="submit"]:hover,
   object-fit: cover;
 }
 
-
-
 /* Modal Absensi */
 
 .modalabsensi {
   display: none;
   position: fixed;
   z-index: 9999;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -525,22 +656,34 @@ button[type="submit"]:hover,
 
 /* Animations */
 @keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from {transform: translateY(30px); opacity: 0;}
-  to {transform: translateY(0); opacity: 1;}
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-
-
-
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 768px) {
@@ -560,8 +703,6 @@ button[type="submit"]:hover,
     width: 95%;
   }
 }
-
-
 
 /* Customer Modal Styles */
 .customer-modal {
@@ -643,13 +784,23 @@ button[type="submit"]:hover,
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */
@@ -659,4 +810,15 @@ button[type="submit"]:hover,
     margin: 20% auto;
   }
 }
+
+
+
+
+
+
+
+
+
+
+/* Bagian Dwiki */
 
