@@ -370,7 +370,7 @@ document
       point_member: parseInt(document.getElementById("point_member").value),
     };
 
-    fetch("http://localhost:5050/addcustomer", {
+    fetch("http://103.16.116.58:5050/addcustomer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
