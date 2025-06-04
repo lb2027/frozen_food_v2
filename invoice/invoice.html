@@ -157,16 +157,103 @@
             <option value="PENDING">Pending</option>
             <option value="OVERDUE">Overdue</option>
           </select>
-          <button id="filterBtn" class="btn btn-primary">
-            <span class="material-icons">filter_list</span>
-            Filter
-          </button>
+
           <button id="refreshBtn" class="btn btn-secondary">
             <span class="material-icons">refresh</span>
             Refresh
           </button>
         </div>
       </div>
+
+      <!-- Add this section after your existing filter section -->
+      <div class="quick-filters">
+        <div class="quick-filter-label">Quick Filters:</div>
+
+        <!-- ✅ Today & Yesterday -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setToday()"
+        >
+          📅 Today
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setYesterday()"
+        >
+          📅 Yesterday
+        </button>
+
+        <!-- ✅ Time Range Filters -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(7)"
+        >
+          📅 Last 7 Days
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(30)"
+        >
+          📅 Last 30 Days
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setDateRange(90)"
+        >
+          📅 Last 3 Months
+        </button>
+
+        <!-- ✅ Period Filters -->
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setThisWeek()"
+        >
+          📅 This Week
+        </button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onclick="invoiceQuickFilters.setThisMonth()"
+        >
+          📅 This Month
+        </button>
+
+        <!-- ✅ Clear Filter -->
+        <button
+          class="btn btn-sm btn-outline"
+          onclick="invoiceQuickFilters.clearAll()"
+        >
+          🗑️ Clear All
+        </button>
+      </div>
+
+      <!-- ✅ Also add status quick filters -->
+      <!-- <div class="status-quick-filters" style="margin-top: 10px">
+        <div class="quick-filter-label">Status:</div>
+        <button
+          class="btn btn-sm btn-success"
+          onclick="window.invoiceManager.setStatusFilter('PAID')"
+        >
+          ✅ Paid Only
+        </button>
+        <button
+          class="btn btn-sm btn-warning"
+          onclick="window.invoiceManager.setStatusFilter('PENDING')"
+        >
+          ⏳ Pending Only
+        </button>
+        <button
+          class="btn btn-sm btn-danger"
+          onclick="window.invoiceManager.setStatusFilter('OVERDUE')"
+        >
+          ⚠️ Overdue Only
+        </button>
+        <button
+          class="btn btn-sm btn-outline"
+          onclick="window.invoiceManager.setStatusFilter('')"
+        >
+          📋 All Status
+        </button>
+      </div> -->
 
       <!-- Invoice Statistics Cards -->
       <div class="stats-cards">
@@ -251,12 +338,7 @@
       <div class="invoice-list">
         <div class="list-header">
           <h3 class="section-title">Invoice List</h3>
-          <div class="list-actions">
-            <button class="btn btn-export">
-              <span class="material-icons">download</span>
-              Export
-            </button>
-          </div>
+          <div class="list-actions"></div>
         </div>
 
         <div class="table-container">

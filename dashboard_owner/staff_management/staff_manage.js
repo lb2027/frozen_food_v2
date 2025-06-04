@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Add search functionality
   const searchElement = document.createElement("div");
-  searchElement.className = "search-container";
+  searchElement.className = "filter-group-staff search-container";
   searchElement.innerHTML = `
     <input type="text" id="staff-search" placeholder="Search staff..." class="search-input">
     <button id="search-btn" class="search-btn">
@@ -96,10 +96,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Modified init() function to include filter initialization
   function init() {
-    fetchStaffData();
-    fetchStaffStats();
+    initFilters(); // ✅ Initialize filters properly
     setupEventListeners();
-    initFilters();
+    fetchStaffData();
+    updateBulkActionButtonsVisibility();
+
+    // ✅ Start with Staff Management tab active
+    showStaffManagementTab();
   }
 
   // New function to initialize filters
@@ -113,10 +116,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (statusFilter) {
       statusFilter.addEventListener("change", applyFilters);
+      // ✅ Ensure "All Status" option exists and works
+      if (!statusFilter.querySelector('option[value=""]')) {
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "✓ All Status";
+        statusFilter.insertBefore(allOption, statusFilter.firstChild);
+      }
     }
 
     if (dateFilter) {
       dateFilter.addEventListener("change", applyFilters);
+      // ✅ Ensure "All Time" option exists and works
+      if (!dateFilter.querySelector('option[value=""]')) {
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "✓ All Time";
+        dateFilter.insertBefore(allOption, dateFilter.firstChild);
+      }
     }
   }
 
@@ -133,16 +150,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Start with all staff data
     let filtered = [...staffData];
 
-    // Apply status filter if selected
-    if (statusFilter && statusFilter.value) {
+    // Apply status filter if selected and not "All Status"
+    if (statusFilter && statusFilter.value && statusFilter.value !== "") {
       const selectedStatus = statusFilter.value;
       filtered = filtered.filter(
         (staff) => staff.status_kerja === selectedStatus
       );
     }
 
-    // Apply date filter if selected
-    if (dateFilter && dateFilter.value) {
+    // Apply date filter if selected and not "All Time"
+    if (dateFilter && dateFilter.value && dateFilter.value !== "") {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -233,53 +250,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // Tab buttons
     if (tabButtons) {
       tabButtons.forEach((tab) => {
-        tab.addEventListener("click", () => {
+        tab.addEventListener("click", (e) => {
+          // Remove active class from all tabs
           tabButtons.forEach((t) => t.classList.remove("active"));
+
+          // Add active class to clicked tab
           tab.classList.add("active");
 
           const tabName = tab.textContent.toLowerCase();
-          currentTab = tabName;
+          console.log("Switching to tab:", tabName);
 
-          // Handle tab switching
-          if (tabName.includes("management")) {
-            // Show main staff table
-            const tableContainer = document.querySelector(".table-container");
-            if (tableContainer) tableContainer.style.display = "block";
-
-            // Hide any other containers that might be open
-            hideTabContainers();
-
-            // Update bulk actions visibility
-            updateBulkActionButtonsVisibility();
+          if (tabName.includes("staff") || tabName.includes("management")) {
+            // ✅ STAFF MANAGEMENT TAB
+            showStaffManagementTab();
           } else if (tabName.includes("attendance")) {
-            // Hide staff table and show attendance section
-            const tableContainer = document.querySelector(".table-container");
-            if (tableContainer) tableContainer.style.display = "none";
-
-            const bulkActions = document.querySelector(".bulk-actions");
-            if (bulkActions) bulkActions.style.display = "none";
-
-            hideTabContainers();
+            // ✅ ATTENDANCE TAB
             showAttendanceTab();
-          } else if (tabName.includes("performance")) {
-            // Hide staff table and show performance section
-            const tableContainer = document.querySelector(".table-container");
-            if (tableContainer) tableContainer.style.display = "none";
-
-            const bulkActions = document.querySelector(".bulk-actions");
-            if (bulkActions) bulkActions.style.display = "none";
-
-            hideTabContainers();
-            showPerformanceTab();
           } else if (tabName.includes("payroll")) {
-            // Hide staff table and show payroll section
-            const tableContainer = document.querySelector(".table-container");
-            if (tableContainer) tableContainer.style.display = "none";
-
-            const bulkActions = document.querySelector(".bulk-actions");
-            if (bulkActions) bulkActions.style.display = "none";
-
-            hideTabContainers();
+            // ✅ PAYROLL TAB
             showPayrollTab();
           }
         });
@@ -318,6 +306,287 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     }
+  }
+
+  // Show staff management tab
+  function showStaffManagementTab() {
+    console.log("Showing Staff Management tab");
+
+    // Show staff table and related elements
+    const tableContainer = document.querySelector(".table-container");
+    if (tableContainer) {
+      tableContainer.style.display = "block";
+    }
+
+    // ✅ SHOW staff management filters and actions
+    showStaffFiltersAndActions();
+
+    // Show bulk actions
+    const bulkActions = document.querySelector(".bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = selectedStaffIds.length > 0 ? "flex" : "none";
+    }
+
+    // Hide other tab containers
+    hideTabContainers();
+
+    // Update UI
+    updateBulkActionButtonsVisibility();
+    updateStaffCount();
+    renderStaffTable();
+  }
+
+  // Show/hide filters dan actions
+  function showStaffFiltersAndActions() {
+    // Show filter dropdowns
+    const statusFilter = document.querySelector(
+      '.filter-select[title="Filter by status"]'
+    );
+    const dateFilter = document.querySelector(
+      '.filter-select[title="Filter by date"]'
+    );
+
+    if (statusFilter) {
+      statusFilter.style.display = "block";
+      statusFilter.parentElement.style.display = "flex"; // Show parent filter-group
+    }
+    if (dateFilter) {
+      dateFilter.style.display = "block";
+    }
+
+    // Show action buttons
+    const addStaffBtn = document.querySelector(".add-staff-btn");
+    const sortBtn = document.querySelector(".sort-btn");
+
+    if (addStaffBtn) {
+      addStaffBtn.style.display = "flex";
+    }
+    if (sortBtn) {
+      sortBtn.style.display = "flex";
+    }
+
+    // Show the entire actions container
+    const actionsContainer = document.querySelector(".actions");
+    if (actionsContainer) {
+      actionsContainer.style.display = "flex";
+    }
+
+    // Show filter group container
+    const filterGroup = document.querySelector(".filter-group");
+    if (filterGroup) {
+      filterGroup.style.display = "flex";
+    }
+  }
+
+  // Hide filters dan actions
+  function hideStaffFiltersAndActions() {
+    // Hide filter dropdowns
+    const statusFilter = document.querySelector(
+      '.filter-select[title="Filter by status"]'
+    );
+    const dateFilter = document.querySelector(
+      '.filter-select[title="Filter by date"]'
+    );
+
+    if (statusFilter) {
+      statusFilter.style.display = "none";
+    }
+    if (dateFilter) {
+      dateFilter.style.display = "none";
+    }
+
+    // Hide action buttons
+    const addStaffBtn = document.querySelector(".add-staff-btn");
+    const sortBtn = document.querySelector(".sort-btn");
+
+    if (addStaffBtn) {
+      addStaffBtn.style.display = "none";
+    }
+    if (sortBtn) {
+      sortBtn.style.display = "none";
+    }
+
+    // Hide the entire actions container
+    const actionsContainer = document.querySelector(".actions");
+    if (actionsContainer) {
+      actionsContainer.style.display = "none";
+    }
+
+    // Hide filter group container
+    const filterGroup = document.querySelector(".filter-group-staff");
+    if (filterGroup) {
+      filterGroup.style.display = "none";
+    }
+  }
+
+  // Attendance tab
+  function showAttendanceTab() {
+    console.log("Showing Attendance tab");
+
+    // Hide staff table and related elements
+    const tableContainer = document.querySelector(".table-container");
+    if (tableContainer) {
+      tableContainer.style.display = "none";
+    }
+
+    // ✅ HIDE staff management filters and actions
+    hideStaffFiltersAndActions();
+
+    // Hide bulk actions
+    const bulkActions = document.querySelector(".bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = "none";
+    }
+
+    // Hide other tab containers first
+    hideTabContainers();
+
+    // Create or get attendance container
+    let attendanceContainer = document.querySelector(".attendance-container");
+
+    if (!attendanceContainer) {
+      attendanceContainer = document.createElement("div");
+      attendanceContainer.className = "attendance-container";
+
+      // Create attendance table structure
+      attendanceContainer.innerHTML = `
+        <div class="attendance-header">
+          <h2 class="attendance-count">Attendance Records (0)</h2>
+          <div class="attendance-actions">
+            <button class="refresh-btn">
+              <span class="material-icons">refresh</span>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="attendance-table-container">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th width="60">
+                  <div class="checkbox-container">
+                    <span class="custom-checkbox"></span>
+                  </div>
+                </th>
+                <th width="90">ID</th>
+                <th>Staff Name</th>
+                <th>Date</th>
+                <th>Time In</th>
+                <th>Time Out</th>
+                <th>Status</th>
+                <th width="180">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Attendance rows will be populated here -->
+            </tbody>
+          </table>
+          <div class="no-data-message">No attendance data available.</div>
+        </div>
+      `;
+
+      const container = document.querySelector(".container");
+      if (container) {
+        container.appendChild(attendanceContainer);
+      }
+
+      // Add event listeners to attendance actions
+      const refreshBtn = attendanceContainer.querySelector(".refresh-btn");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", fetchAttendanceData);
+      }
+    }
+
+    attendanceContainer.style.display = "block";
+
+    // Get attendance data from API
+    fetchAttendanceData();
+  }
+
+  // Payroll tab
+  function showPayrollTab() {
+    console.log("Showing Payroll tab");
+
+    // Hide staff table and related elements
+    const tableContainer = document.querySelector(".table-container");
+    if (tableContainer) {
+      tableContainer.style.display = "none";
+    }
+
+    // ✅ HIDE staff management filters and actions
+    hideStaffFiltersAndActions();
+
+    // Hide bulk actions
+    const bulkActions = document.querySelector(".bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = "none";
+    }
+
+    // Hide other tab containers first
+    hideTabContainers();
+
+    let payrollContainer = document.querySelector(".payroll-container");
+
+    if (!payrollContainer) {
+      payrollContainer = document.createElement("div");
+      payrollContainer.className = "payroll-container";
+      payrollContainer.innerHTML = `
+        <div class="payroll-header section-header">
+          <h2 class="payroll-count">Payroll Records (0)</h2>
+          <div class="section-actions">
+            <button class="btn secondary-btn refresh-payroll-btn">
+              <span class="material-icons">refresh</span>
+              <span>Refresh</span>
+            </button>
+            <button class="btn primary-btn add-payroll-btn">
+              <span class="material-icons">add_card</span> 
+              <span>Add Salary Record</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="payroll-table-container table-responsive-container">
+          <table class="data-table payroll-table">
+            <thead>
+              <tr>
+                <th width="50">ID</th>
+                <th>Staff ID</th>
+                <th>Staff Name</th>
+                <th>Salary Month</th>
+                <th>Amount (Rp)</th>
+                <th>Transfer Date</th>
+                <th>Notes</th>
+                <th width="120">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Payroll rows will be populated here -->
+            </tbody>
+          </table>
+          <div class="no-data-message payroll-no-data">No payroll data available.</div>
+        </div>
+      `;
+
+      const container = document.querySelector(".container");
+      if (container) {
+        container.appendChild(payrollContainer);
+      }
+
+      // Add event listeners for payroll actions
+      const refreshBtn = payrollContainer.querySelector(".refresh-payroll-btn");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", fetchPayrollData);
+      }
+
+      const addBtn = payrollContainer.querySelector(".add-payroll-btn");
+      if (addBtn) {
+        addBtn.addEventListener("click", showAddPayrollModal);
+      }
+    }
+
+    payrollContainer.style.display = "block";
+    fetchPayrollData(); // Fetch data when tab is shown
   }
 
   // Update bulk action buttons visibility
@@ -569,6 +838,26 @@ document.addEventListener("DOMContentLoaded", function () {
   // Show attendance tab
   // Replace the existing showAttendanceTab() function with this one
   function showAttendanceTab() {
+    console.log("Showing Attendance tab");
+
+    // Hide staff table and related elements
+    const tableContainer = document.querySelector(".table-container");
+    if (tableContainer) {
+      tableContainer.style.display = "none";
+    }
+
+    // ✅ HIDE staff management filters and actions
+    hideStaffFiltersAndActions();
+
+    // Hide bulk actions
+    const bulkActions = document.querySelector(".bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = "none";
+    }
+
+    // Hide other tab containers first
+    hideTabContainers();
+
     // Create or get attendance container
     let attendanceContainer = document.querySelector(".attendance-container");
 
@@ -665,7 +954,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to show the payroll tab
   function showPayrollTab() {
-    hideTabContainers(); // Hide other tab sections
+    console.log("Showing Payroll tab");
+
+    // Hide staff table and related elements
+    const tableContainer = document.querySelector(".table-container");
+    if (tableContainer) {
+      tableContainer.style.display = "none";
+    }
+
+    // ✅ HIDE staff management filters and actions
+    hideStaffFiltersAndActions();
+
+    // Hide bulk actions
+    const bulkActions = document.querySelector(".bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = "none";
+    }
+
+    // Hide other tab containers first
+    hideTabContainers();
 
     let payrollContainer = document.querySelector(".payroll-container");
 
@@ -1890,6 +2197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Collect form data
+
     const formData = new FormData(form);
     const staffData = {};
 

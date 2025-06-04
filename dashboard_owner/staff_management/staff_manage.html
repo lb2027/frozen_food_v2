@@ -147,19 +147,24 @@
           <div class="tab">Payroll</div>
         </div>
 
-        <!-- Update the subheader section with filter dropdowns -->
+        <!-- Update the subheader section -->
         <div class="subheader">
-          <div class="title-container">
+          <div class="title-container filter-group filter-group-staff">
             <h2 class="staff-count">Staff (0)</h2>
           </div>
-          <div class="filter-group">
+
+          <!-- ✅ FIX: Consistent naming untuk filter group -->
+          <div class="filter-group filter-group-staff">
             <select class="filter-select" title="Filter by status">
               <option value="">✓ All Status</option>
               <option value="Owner">Owner</option>
               <option value="Manager">Manager</option>
               <option value="Staff">Staff</option>
               <option value="Kasir">Kasir</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
+
             <select class="filter-select" title="Filter by date">
               <option value="">✓ All Time</option>
               <option value="today">Today</option>
@@ -168,6 +173,7 @@
               <option value="month">Last 30 Days</option>
             </select>
           </div>
+
           <div class="actions">
             <button class="sort-btn">
               <span class="material-icons">sort</span>

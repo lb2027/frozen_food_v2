@@ -81,6 +81,13 @@ class InvoiceManager {
     }
   }
 
+  closeInvoiceModal() {
+    if (this.invoiceModal) {
+      this.invoiceModal.style.display = "none";
+      this.invoiceContent.innerHTML = ""; // Clear content
+    }
+  }
+
   initializeElements() {
     // Filter elements
     this.startDateInput = document.getElementById("startDate");
@@ -117,13 +124,50 @@ class InvoiceManager {
     this.loader = document.getElementById("loader");
   }
 
+  // ✅ FIX: Improved date validation and formatting
+  validateDateRange(startDate, endDate) {
+    if (!startDate && !endDate) {
+      return { valid: true }; // No filter applied
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (start > end) {
+        return {
+          valid: false,
+          message: "Start date must be before or equal to end date",
+        };
+      }
+    }
+
+    return { valid: true };
+  }
+
+  // ✅ FIX: Format date for API (ensure YYYY-MM-DD format)
+  formatDateForAPI(dateString) {
+    if (!dateString) return null;
+
+    // Ensure format is YYYY-MM-DD
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return null;
+
+    return date.toISOString().split("T")[0];
+  }
+
   attachEventListeners() {
     // Filter listeners
     if (this.filterBtn) {
       this.filterBtn.addEventListener("click", () => this.applyFilters());
     }
+
     if (this.refreshBtn) {
-      this.refreshBtn.addEventListener("click", () => this.loadInvoices());
+      this.refreshBtn.addEventListener("click", () => {
+        // Clear filters and reload all data
+        this.clearFilters();
+        this.loadInvoices();
+      });
     }
 
     // Modal listeners
@@ -142,7 +186,7 @@ class InvoiceManager {
       });
     }
 
-    // Pagination listeners (if elements exist)
+    // Pagination listeners
     if (this.prevBtn) {
       this.prevBtn.addEventListener("click", () => this.goToPreviousPage());
     }
@@ -157,16 +201,32 @@ class InvoiceManager {
       }
     });
 
-    // Auto-filter on date/status change
+    // ✅ IMPROVED: Auto-filter with debouncing for better UX
     if (this.startDateInput) {
-      this.startDateInput.addEventListener("change", () => this.applyFilters());
+      this.startDateInput.addEventListener("change", () => {
+        this.debounceApplyFilters();
+      });
     }
+
     if (this.endDateInput) {
-      this.endDateInput.addEventListener("change", () => this.applyFilters());
+      this.endDateInput.addEventListener("change", () => {
+        this.debounceApplyFilters();
+      });
     }
+
     if (this.statusFilter) {
-      this.statusFilter.addEventListener("change", () => this.applyFilters());
+      this.statusFilter.addEventListener("change", () => {
+        this.debounceApplyFilters();
+      });
     }
+  }
+
+  // ✅ NEW: Debounced filter application for better performance
+  debounceApplyFilters() {
+    clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.applyFilters();
+    }, 500); // Wait 500ms after user stops typing/changing
   }
 
   // Navigation methods
@@ -244,23 +304,53 @@ class InvoiceManager {
 
       let url = `${this.apiBaseUrl}/invoices?page=${this.currentPage}&limit=${this.pageLimit}`;
 
-      // Add filters if applied
-      const startDate = this.startDateInput?.value;
-      const endDate = this.endDateInput?.value;
-      const status = this.statusFilter?.value;
+      // ✅ IMPROVED: Get filter values with validation
+      const startDateValue = this.startDateInput?.value;
+      const endDateValue = this.endDateInput?.value;
+      const statusValue = this.statusFilter?.value;
 
-      if (startDate) url += `&start_date=${startDate}`;
-      if (endDate) url += `&end_date=${endDate}`;
-      if (status) url += `&status=${status}`;
+      // ✅ VALIDATE: Date range validation
+      const dateValidation = this.validateDateRange(
+        startDateValue,
+        endDateValue
+      );
+      if (!dateValidation.valid) {
+        this.showError(dateValidation.message);
+        this.hideLoading();
+        return;
+      }
 
+      // ✅ FORMAT: Ensure proper date format for API
+      const startDate = this.formatDateForAPI(startDateValue);
+      const endDate = this.formatDateForAPI(endDateValue);
+
+      // ✅ BUILD: URL with properly formatted parameters
+      const params = new URLSearchParams();
+      params.append("page", this.currentPage);
+      params.append("limit", this.pageLimit);
+
+      if (startDate) {
+        params.append("start_date", startDate);
+        console.log("Adding start_date filter:", startDate);
+      }
+      if (endDate) {
+        params.append("end_date", endDate);
+        console.log("Adding end_date filter:", endDate);
+      }
+      if (statusValue && statusValue !== "") {
+        params.append("status", statusValue);
+        console.log("Adding status filter:", statusValue);
+      }
+
+      url = `${this.apiBaseUrl}/invoices?${params.toString()}`;
       console.log("Loading invoices from:", url);
 
-      // Include authentication token in headers
+      // ✅ API CALL: Include authentication token
       const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          token: this.token, // Match your system's token header
+          token: this.token,
         },
       });
 
@@ -271,11 +361,16 @@ class InvoiceManager {
       const data = await response.json();
       console.log("Invoice data received:", data);
 
+      // ✅ Store total count for stats
+      this.totalInvoicesCount = data.total_count || 0;
+
       this.displayInvoices(data.invoices || []);
       this.updateStats(data.invoices || []);
-      this.updatePagination(
-        data.total_count || data.total || data.invoices?.length || 0
-      );
+      this.updatePagination(data.total_count || 0);
+
+      // ✅ SHOW: Filter info to user
+      this.showFilterInfo(startDate, endDate, statusValue);
+
       this.hideLoading();
     } catch (error) {
       console.error("Error loading invoices:", error);
@@ -284,8 +379,79 @@ class InvoiceManager {
     }
   }
 
+  // ✅ NEW: Show filter information to user
+  showFilterInfo(startDate, endDate, status) {
+    let filterText = [];
+
+    if (startDate && endDate) {
+      if (startDate === endDate) {
+        filterText.push(`📅 ${this.formatDateString(startDate)}`);
+      } else {
+        filterText.push(
+          `📅 ${this.formatDateString(startDate)} to ${this.formatDateString(
+            endDate
+          )}`
+        );
+      }
+    } else if (startDate) {
+      filterText.push(`📅 From: ${this.formatDateString(startDate)}`);
+    } else if (endDate) {
+      filterText.push(`📅 Until: ${this.formatDateString(endDate)}`);
+    }
+
+    if (status) {
+      filterText.push(`📊 Status: ${status}`);
+    }
+
+    // ✅ ADD: Show filter indicator in UI
+    const existingIndicator = document.querySelector(".filter-indicator");
+    if (existingIndicator) {
+      existingIndicator.remove();
+    }
+
+    if (filterText.length > 0) {
+      const indicator = document.createElement("span");
+      indicator.className = "filter-indicator";
+      indicator.textContent = `🔍 Active: ${filterText.join(", ")}`;
+
+      const filtersContainer = document.querySelector(".quick-filters");
+      if (filtersContainer) {
+        filtersContainer.appendChild(indicator);
+      }
+
+      console.log("Applied filters:", filterText.join(", "));
+    }
+  }
+
+  // ✅ FIX: Improved applyFilters method
+  applyFilters() {
+    // Reset to first page when applying filters
+    this.currentPage = 1;
+
+    // ✅ VALIDATE: Inputs before applying
+    const startDate = this.startDateInput?.value;
+    const endDate = this.endDateInput?.value;
+
+    const validation = this.validateDateRange(startDate, endDate);
+    if (!validation.valid) {
+      this.showError(validation.message);
+      return;
+    }
+
+    // Show loading and apply filters
+    console.log("Applying filters...", {
+      startDate,
+      endDate,
+      status: this.statusFilter?.value,
+    });
+    this.loadInvoices();
+  }
+
+  // Stats elements (if they exist)
   updateStats(invoices) {
-    const totalInvoices = invoices.length;
+    const currentPageInvoices = invoices.length;
+
+    // For total stats, you should get this from the response
     const totalRevenue = invoices.reduce(
       (sum, invoice) => sum + (invoice.total_amount || 0),
       0
@@ -296,7 +462,11 @@ class InvoiceManager {
 
     // Only update if elements exist
     if (this.totalInvoicesEl) {
-      this.totalInvoicesEl.textContent = totalInvoices.toLocaleString();
+      // ✅ This should show total count from server, not current page
+      // You might want to store totalCount from the API response
+      this.totalInvoicesEl.textContent =
+        this.totalInvoicesCount?.toLocaleString() ||
+        currentPageInvoices.toLocaleString();
     }
     if (this.totalRevenueEl) {
       this.totalRevenueEl.textContent = this.formatCurrency(totalRevenue);
@@ -304,6 +474,51 @@ class InvoiceManager {
     if (this.paidInvoicesEl) {
       this.paidInvoicesEl.textContent = paidInvoices.toLocaleString();
     }
+  }
+
+  // ✅ FIX: Format tanggal tanpa timezone conversion
+  formatDate(dateString) {
+    if (!dateString) return "-";
+
+    // ✅ Method 1: Parse dengan explicit timezone
+    const date = new Date(dateString + "T00:00:00");
+
+    // ✅ Method 2: Manual parsing (lebih aman)
+    const [year, month, day] = dateString.split("-");
+    const dateObj = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+
+    return dateObj.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  // ✅ Alternative: String manipulation method
+  formatDateString(dateString) {
+    if (!dateString) return "-";
+
+    const [year, month, day] = dateString.split("-");
+    const months = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+
+    return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
   }
 
   displayInvoices(invoices) {
@@ -339,7 +554,7 @@ class InvoiceManager {
           <tr>
             <td>${invoice.invoice_id}</td>
             <td>${invoice.transaction_id}</td>
-            <td>${this.formatDate(invoice.invoice_date)}</td>
+            <td>${this.formatDateString(invoice.invoice_date)}</td>
             <td>${invoice.item_count}</td>
             <td>${this.formatCurrency(invoice.total_amount)}</td>
             <td>
@@ -743,22 +958,22 @@ class InvoiceManager {
     }
   }
 
-  applyFilters() {
-    this.currentPage = 1;
-    this.loadInvoices();
-  }
-
-  closeInvoiceModal() {
-    if (this.invoiceModal) {
-      this.invoiceModal.style.display = "none";
-    }
-  }
-
   // Utility functions
   formatDate(dateString) {
     if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("id-ID", {
+
+    // ✅ Method 1: Parse dengan explicit timezone
+    const date = new Date(dateString + "T00:00:00");
+
+    // ✅ Method 2: Manual parsing (lebih aman)
+    const [year, month, day] = dateString.split("-");
+    const dateObj = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+
+    return dateObj.toLocaleDateString("id-ID", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -831,7 +1046,105 @@ class InvoiceManager {
       }
     }, 4000);
   }
+
+  // ✅ ADD: Missing clearFilters method
+  clearFilters() {
+    if (this.startDateInput) this.startDateInput.value = "";
+    if (this.endDateInput) this.endDateInput.value = "";
+    if (this.statusFilter) this.statusFilter.value = "";
+
+    this.currentPage = 1;
+    console.log("Filters cleared");
+  }
+
+  // ✅ ADD: Missing setDateRange method
+  setDateRange(days) {
+    const today = new Date();
+    const startDate = new Date();
+    startDate.setDate(today.getDate() - days);
+
+    if (this.startDateInput) {
+      this.startDateInput.value = startDate.toISOString().split("T")[0];
+    }
+    if (this.endDateInput) {
+      this.endDateInput.value = today.toISOString().split("T")[0];
+    }
+
+    console.log(
+      `Setting date range: ${days} days (${
+        startDate.toISOString().split("T")[0]
+      } to ${today.toISOString().split("T")[0]})`
+    );
+    this.applyFilters();
+  }
+
+  // ✅ ADD: Quick filter methods for better UX
+  setToday() {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    if (this.startDateInput) this.startDateInput.value = todayStr;
+    if (this.endDateInput) this.endDateInput.value = todayStr;
+
+    console.log("Setting filter to today:", todayStr);
+    this.applyFilters();
+  }
+
+  setYesterday() {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+    if (this.startDateInput) this.startDateInput.value = yesterdayStr;
+    if (this.endDateInput) this.endDateInput.value = yesterdayStr;
+
+    console.log("Setting filter to yesterday:", yesterdayStr);
+    this.applyFilters();
+  }
+
+  setThisWeek() {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    const dayOfWeek = today.getDay();
+    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday as start of week
+
+    startOfWeek.setDate(today.getDate() - daysToSubtract);
+
+    if (this.startDateInput)
+      this.startDateInput.value = startOfWeek.toISOString().split("T")[0];
+    if (this.endDateInput)
+      this.endDateInput.value = today.toISOString().split("T")[0];
+
+    console.log("Setting filter to this week");
+    this.applyFilters();
+  }
+
+  setThisMonth() {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    if (this.startDateInput)
+      this.startDateInput.value = startOfMonth.toISOString().split("T")[0];
+    if (this.endDateInput)
+      this.endDateInput.value = today.toISOString().split("T")[0];
+
+    console.log("Setting filter to this month");
+    this.applyFilters();
+  }
 }
+
+// ✅ ADD: Global quick filter functions for HTML onclick
+window.invoiceQuickFilters = {
+  setDateRange: (days) => window.invoiceManager?.setDateRange(days),
+  setToday: () => window.invoiceManager?.setToday(),
+  setYesterday: () => window.invoiceManager?.setYesterday(),
+  setThisWeek: () => window.invoiceManager?.setThisWeek(),
+  setThisMonth: () => window.invoiceManager?.setThisMonth(),
+  clearAll: () => {
+    window.invoiceManager?.clearFilters();
+    window.invoiceManager?.loadInvoices();
+  },
+};
 
 // Integration with POS system for auto invoice generation
 window.generateInvoiceAfterSale = async function (saleData) {
