@@ -252,6 +252,18 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to fetch sales data
   async function fetchSalesData() {
     try {
+      // ✅ HIDE date range filter in sales tab
+      const filterBtn = document.querySelector(".date-range");
+      const filterGenerateBtn = document.querySelector(".generate-btn");
+
+      if (filterBtn) {
+        filterBtn.style.display = "none";
+      }
+
+      if (filterGenerateBtn) {
+        filterGenerateBtn.style.display = "none";
+      }
+
       // Fetch daily sales
       const today = new Date().toISOString().split("T")[0];
       const dailyResponse = await fetch(`${apiUrl}/dailysales?date=${today}`, {
@@ -430,6 +442,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
+      // ✅ FIX: Show date range filter ONLY in product performance tab
+      const filterBtn = document.querySelector(".date-range");
+      const filterGenerateBtn = document.querySelector(".generate-btn");
+      if (filterBtn) {
+        filterBtn.style.display = "block"; // Show it in product tab
+      }
+
+      if (filterGenerateBtn) {
+        filterGenerateBtn.style.display = "block";
+      }
+
       updateProductReport(filteredTransactions);
     } catch (error) {
       console.error("Error fetching product data:", error);
@@ -537,6 +560,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const endDate = document.getElementById("end-date").value;
 
     try {
+      // ✅ HIDE date range filter in transaction tab
+      const filterBtn = document.querySelector(".date-range");
+      if (filterBtn) {
+        filterBtn.style.display = "none";
+      }
+
       const response = await fetch(`${apiUrl}/transactionhistory`, {
         headers: {
           "Content-Type": "application/json",
