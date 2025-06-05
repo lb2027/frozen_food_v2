@@ -620,6 +620,7 @@ class InvoiceManager {
     }
   }
 
+  // ✅ ENHANCEMENT: Update displayInvoiceDetail method for dark theme
   displayInvoiceDetail(invoice) {
     if (!this.invoiceContent) {
       console.error("Invoice content element not found!");
@@ -627,156 +628,148 @@ class InvoiceManager {
     }
 
     const invoiceHTML = `
-      <div class="invoice-preview">
-        <div class="invoice-header">
-          <div class="business-info">
-            <h2>${
-              invoice.business_info?.name || "Bintang Jaya Frozen Food"
-            }</h2>
-            <p>${
-              invoice.business_info?.address ||
-              "Jl. Raya Frozen No. 123, Jakarta Selatan"
-            }</p>
-            <p>Phone: ${invoice.business_info?.phone || "+62 21 1234 5678"}</p>
-            <p>Email: ${
-              invoice.business_info?.email || "info@bintangjaya.com"
-            }</p>
-            <p>Tax ID: ${
-              invoice.business_info?.tax_id || "01.234.567.8-901.000"
-            }</p>
-          </div>
-          <div class="invoice-info">
-            <h1>INVOICE</h1>
-            <p><strong>Invoice ID:</strong> ${invoice.invoice_id}</p>
-            <p><strong>Transaction ID:</strong> ${invoice.transaction_id}</p>
-            <p><strong>Date:</strong> ${this.formatDate(
-              invoice.invoice_date
-            )}</p>
-            <p><strong>Due Date:</strong> ${this.formatDate(
-              invoice.due_date
-            )}</p>
-          </div>
+    <div class="invoice-preview">
+      <div class="invoice-header">
+        <div class="business-info">
+          <h2>${invoice.business_info?.name || "Bintang Jaya Frozen Food"}</h2>
+          <p>📍 ${
+            invoice.business_info?.address ||
+            "Jl. Raya Frozen No. 123, Jakarta Selatan"
+          }</p>
+          <p>📞 ${invoice.business_info?.phone || "+62 21 1234 5678"}</p>
+          <p>📧 ${invoice.business_info?.email || "info@bintangjaya.com"}</p>
+          <p>🏢 Tax ID: ${
+            invoice.business_info?.tax_id || "01.234.567.8-901.000"
+          }</p>
         </div>
-
-        <div class="customer-section">
-          <div class="customer-info">
-            <h4>Bill To:</h4>
-            <p><strong>${
-              invoice.customer_name || "Walk-in Customer"
-            }</strong></p>
-            ${
-              invoice.customer_phone
-                ? `<p>Phone: ${invoice.customer_phone}</p>`
-                : ""
-            }
-            <p>Payment: ${invoice.payment_method}</p>
-            <span class="status-badge status-${invoice.payment_status?.toLowerCase()}">
-              ${invoice.payment_status}
-            </span>
-          </div>
+        <div class="invoice-info">
+          <h1>INVOICE</h1>
+          <p><strong>Invoice ID:</strong> ${invoice.invoice_id}</p>
+          <p><strong>Transaction ID:</strong> ${invoice.transaction_id}</p>
+          <p><strong>Date:</strong> ${this.formatDate(invoice.invoice_date)}</p>
+          <p><strong>Due Date:</strong> ${this.formatDate(invoice.due_date)}</p>
         </div>
-
-        <div class="invoice-items">
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${
-                invoice.items
-                  ?.map(
-                    (item, index) => `
-                  <tr>
-                    <td>${index + 1}</td>
-                    <td>
-                      <div class="item-name">${item.product_name}</div>
-                      <div class="item-description">${
-                        item.description || ""
-                      }</div>
-                    </td>
-                    <td style="text-align: center;">${item.quantity}</td>
-                    <td style="text-align: right;">${this.formatCurrency(
-                      item.unit_price
-                    )}</td>
-                    <td style="text-align: right;">${this.formatCurrency(
-                      item.total_price
-                    )}</td>
-                  </tr>
-                `
-                  )
-                  .join("") || '<tr><td colspan="5">No items found</td></tr>'
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <div class="invoice-summary">
-          <div class="summary-table">
-            <div class="summary-row">
-              <span>Subtotal:</span>
-              <span>${this.formatCurrency(invoice.subtotal || 0)}</span>
-            </div>
-            <div class="summary-row">
-              <span>Tax (11%):</span>
-              <span>${this.formatCurrency(invoice.tax || 0)}</span>
-            </div>
-            ${
-              invoice.discount > 0
-                ? `
-                <div class="summary-row">
-                  <span>Discount:</span>
-                  <span>-${this.formatCurrency(invoice.discount)}</span>
-                </div>
-              `
-                : ""
-            }
-            <div class="summary-row total-row">
-              <span><strong>TOTAL:</strong></span>
-              <span><strong>${this.formatCurrency(
-                invoice.total || 0
-              )}</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="invoice-actions">
-          <button class="btn btn-primary" onclick="invoiceManager.printProfessionalInvoice('${
-            invoice.transaction_id
-          }')">
-            🖨️ Print Professional Invoice
-          </button>
-          <button class="btn btn-success" onclick="invoiceManager.downloadInvoiceHTML('${
-            invoice.transaction_id
-          }')">
-            📄 Download HTML
-          </button>
-          <button class="btn btn-warning" onclick="invoiceManager.previewInvoice('${
-            invoice.transaction_id
-          }')">
-            👁️ Preview Full Layout
-          </button>
-        </div>
-
-        ${
-          invoice.notes
-            ? `
-            <div class="notes-section">
-              <h4>Notes:</h4>
-              <p>${invoice.notes}</p>
-            </div>
-          `
-            : ""
-        }
       </div>
-    `;
+
+      <div class="customer-section">
+        <div class="customer-info">
+          <h4>💳 Bill To:</h4>
+          <p><strong>${invoice.customer_name || "Walk-in Customer"}</strong></p>
+          ${invoice.customer_phone ? `<p>📞 ${invoice.customer_phone}</p>` : ""}
+          <p>💰 Payment: ${invoice.payment_method}</p>
+          <span class="status-badge status-${invoice.payment_status?.toLowerCase()}">
+            ${invoice.payment_status}
+          </span>
+        </div>
+      </div>
+
+      <div class="invoice-items">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              invoice.items
+                ?.map(
+                  (item, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>
+                    <div class="item-name">${item.product_name}</div>
+                    <div class="item-description">${
+                      item.description || ""
+                    }</div>
+                  </td>
+                  <td style="text-align: center;">${item.quantity}</td>
+                  <td style="text-align: right;">${this.formatCurrency(
+                    item.unit_price
+                  )}</td>
+                  <td style="text-align: right;">${this.formatCurrency(
+                    item.total_price
+                  )}</td>
+                </tr>
+              `
+                )
+                .join("") ||
+              '<tr><td colspan="5" style="text-align: center; color: #666;">No items found</td></tr>'
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="invoice-summary">
+        <div class="summary-table">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>${this.formatCurrency(invoice.subtotal || 0)}</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax (11%):</span>
+            <span>${this.formatCurrency(invoice.tax || 0)}</span>
+          </div>
+          ${
+            invoice.discount > 0
+              ? `
+              <div class="summary-row">
+                <span>Discount:</span>
+                <span>-${this.formatCurrency(invoice.discount)}</span>
+              </div>
+            `
+              : ""
+          }
+          <div class="summary-row total-row">
+            <span><strong>🏆 TOTAL:</strong></span>
+            <span><strong>${this.formatCurrency(
+              invoice.total || 0
+            )}</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-actions">
+        <button class="btn btn-primary" onclick="invoiceManager.printProfessionalInvoice('${
+          invoice.transaction_id
+        }')">
+          🖨️ Print Professional
+        </button>
+        <button class="btn btn-success" onclick="invoiceManager.downloadInvoiceHTML('${
+          invoice.transaction_id
+        }')">
+          📄 Download HTML
+        </button>
+        <button class="btn btn-warning" onclick="invoiceManager.previewInvoice('${
+          invoice.transaction_id
+        }')">
+          👁️ Preview Layout
+        </button>
+      </div>
+
+      ${
+        invoice.notes
+          ? `
+          <div class="notes-section">
+            <h4>📝 Notes:</h4>
+            <p>${invoice.notes}</p>
+          </div>
+        `
+          : ""
+      }
+    </div>
+  `;
 
     this.invoiceContent.innerHTML = invoiceHTML;
+
+    // ✅ ADD: Dark theme class to modal
+    if (this.invoiceModal) {
+      this.invoiceModal.classList.add("dark-theme");
+    }
   }
 
   // Professional print using your HTML template
