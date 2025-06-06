@@ -405,14 +405,51 @@
     <div id="absensi-modal" class="modalabsensi">
       <div class="modal-contentabsensi">
         <span class="close-btnabsensi" id="close-absensi-modal">&times;</span>
-        <h1>Absensi </h1>
-        <p><strong>Lokasi Anda Sekarang:</strong></p>
-        <p>Latitude: <span id="latitude">-</span></p>
-        <p>Longitude: <span id="longitude">-</span></p>
-        <p id="status" class="info">Menunggu lokasi...</p>
-        <div id="absen-button-container" style="display: none;">
-          <button id="absen-btn" onclick="absen()">Absen</button>
-          <p id="absen-status" class="info"></p>
+        <h1>🕒 Absensi</h1>
+        
+        <!-- Enhanced attendance options -->
+        <div class="attendance-options">
+          <button id="manual-attendance-btn" class="attendance-option-btn active">
+            📍 Manual Attendance
+          </button>
+          <button id="face-attendance-btn" class="attendance-option-btn">
+            📷 Face Recognition
+          </button>
+        </div>
+
+        <!-- Manual attendance section -->
+        <div id="manual-attendance-section">
+          <p><strong>📍 Current Location:</strong></p>
+          <p>Latitude: <span id="latitude">-</span></p>
+          <p>Longitude: <span id="longitude">-</span></p>
+          <p id="status" class="status-message info">🔍 Checking location...</p>
+          <div id="absen-button-container" style="display: none;">
+            <button id="absen-btn" onclick="absen()">
+              ✅ Record Attendance
+            </button>
+            <p id="absen-status" class="status-message-absen info">Silahkan Absen</p>
+          </div>
+        </div>
+
+        <!-- Enhanced face attendance section -->
+        <div id="face-attendance-section" style="display: none;">
+          <div class="face-recognition-container">
+            <div class="video-container">
+              <video id="face-video" width="480" height="360" autoplay muted playsinline></video>
+              <canvas id="face-canvas" style="display: none;"></canvas>
+            </div>
+            <div class="face-controls">
+              <button id="capture-face-btn" class="btn btn-primary">
+                📷 Ambil untuk absen
+              </button>
+              <button id="register-face-btn" class="btn btn-secondary">
+                👤 Register wajah baru
+              </button>
+            </div>
+            <div id="face-status" class="status-message info">
+              📷 Click "Capture for Attendance" to start
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -633,5 +670,33 @@
     </button>
     <script src="/chatbot/chatbot.js"></script>
     <script src="../Js/staff.js"></script>
+    <script src="../Js/face-attendance.js"></script>
+
+    <!-- Face Recognition Modal -->
+<div id="face-modal" class="modal" style="display: none;">
+  <div class="modal-content face-modal-content">
+    <div class="modal-header">
+      <h2 id="face-modal-title">Absensi dengan Wajah</h2>
+      <span id="close-face-modal" class="close">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="face-recognition-container">
+        <div class="video-container">
+          <video id="face-video" autoplay muted playsinline></video>
+          <canvas id="face-canvas" style="display: none;"></canvas>
+        </div>
+        <div class="face-controls">
+          <button id="capture-face-btn" class="btn btn-primary">
+            Capture Face
+          </button>
+        </div>
+        <div id="face-status" class="status-message">
+          Initializing camera...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
   </body>
 </html>

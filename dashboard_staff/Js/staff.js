@@ -1,195 +1,15 @@
-//Bagian Login
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const token = localStorage.getItem("authToken");
-  
-//   function isTokenExpired(token) {
-//     try {
-//       const payloadBase64 = token.split(".")[1];
-//       const payload = JSON.parse(atob(payloadBase64));
-
-//       if (payload && payload.exp) {
-//         const expiryTime = payload.exp * 1000;
-//         const currentTime = Date.now();
-
-//         return currentTime > expiryTime;
-//       } else {
-//         return true;
-//       }
-//     } catch (error) {
-//       console.error("Error decoding token:", error);
-//       return true;
-//     }
-//   }
-
-//   if (!token || isTokenExpired(token)) {
-//     window.location.href = "/login/login.html";
-//     return;
-//   }
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
-      localStorage.removeItem("authToken");
-      window.location.href = "/login/login.html";
-    });
-  }
-
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
   logoutBtn.addEventListener("click", function () {
-    localStorage.removeItem("authToken"); // atau "token" sesuai nama yang kamu pakai
-    window.location.href = "/login/login.html"; // ganti path sesuai struktur kamu
+    localStorage.removeItem("authToken");
+    window.location.href = "/login/login.html";
   });
+}
 
-//   addProductForm.addEventListener("submit", async (event) => {
-//     event.preventDefault();
-
-//     const nama = document.getElementById("nama").value;
-//     const stok = document.getElementById("stok").value;
-//     const harga = document.getElementById("harga").value;
-//     const harga_beli = document.getElementById("harga_beli").value;
-//     const foto = document.getElementById("foto").value;
-//     const supplier = document.getElementById("supplier").value;
-
-//     if (!nama || !stok || !harga || !harga_beli || !foto || !supplier) {
-//       alert("Please fill in all fields.");
-//       return;
-//     }
-
-//     try {
-//       const response = await fetch(`${apiUrl}/addproduk`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           token: token,
-//         },
-//         body: JSON.stringify({
-//           nama: nama,
-//           stok: parseInt(stok),
-//           harga: parseFloat(harga),
-//           harga_beli: parseFloat(harga_beli),
-//           foto: foto,
-//           supplier: supplier,
-//         }),
-//       });
-
-//       if (response.ok) {
-//         modal.style.display = "none";
-
-//         fetchProduk();
-//       } else {
-//         const errorData = await response.json();
-//         alert(`Failed to add product: ${errorData.message || "Unknown error"}`);
-//       }
-//     } catch (error) {
-//       console.error("Error adding product:", error);
-//       alert("An error occurred while adding the product.");
-//     }
-//   });
-
-//   const closeButtonStock = document.getElementById("closeBtnStock");
-
-//   closeButtonStock.addEventListener("click", function () {
-//     addStockModal.style.display = "none";
-//   });
-
-//   function populateProductDropdown(products, dropdown) {
-//     if (!dropdown) {
-//       console.error("Product dropdown element not found!");
-//       return;
-//     }
-
-//     dropdown.innerHTML = "";
-
-//     products.forEach((produk) => {
-//       const option = document.createElement("option");
-//       option.value = produk.produk_id;
-//       option.text = produk.nama;
-//       dropdown.appendChild(option);
-//     });
-//   }
-
-//   async function deleteProduk(produkId) {
-//     try {
-//       const response = await fetch(`${apiUrl}/deleteproduk/${produkId}`, {
-//         method: "DELETE",
-//         headers: {
-//           "Content-Type": "application/json",
-//           token: token,
-//         },
-//       });
-
-//       if (response.ok) {
-//         fetchProduk();
-//       } else {
-//         console.error("Failed to delete product:", response.status);
-//       }
-//     } catch (error) {
-//       console.error("Error deleting product:", error);
-//     }
-//   }
-
-//   async function editProduk(produkId) {
-//     try {
-//       const response = await fetch(`${apiUrl}/editproduk/${produkId}`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//           token: token,
-//         },
-
-//         body: JSON.stringify({
-//           nama: "New Name",
-//           stok: 10,
-//           harga: 10000,
-//           harga_beli: 8000,
-//           foto: "new_image_url.jpg",
-//           supplier: "New Supplier",
-//         }),
-//       });
-
-//       if (response.ok) {
-//         fetchProduk();
-//       } else {
-//         console.error("Failed to edit product:", response.status);
-//       }
-//     } catch (error) {
-//       console.error("Error editing product:", error);
-//     }
-
-//     console.log("Edit product with ID:", produkId);
-//   }
-
-//   const searchInput = document.getElementById("search-input");
-
-//   searchInput.addEventListener("input", function () {
-//     const searchTerm = searchInput.value.toLowerCase();
-//     const filteredProducts = produkData.filter((produk) =>
-//       produk.nama.toLowerCase().includes(searchTerm)
-//     );
-//     renderProductList(filteredProducts);
-//   });
-
-//   initializeApiUrl().then(() => {
-//     fetchProduk();
-//   });
-// });
-
-// document.getElementById('open-customer-modal').addEventListener('click', function() {
-//     document.getElementById('customer-modal').style.display = 'block';
-//   });
-
-//   document.getElementById('close-customer-modal').addEventListener('click', function() {
-//     document.getElementById('customer-modal').style.display = 'none';
-//   });
-
-//   // Opsional: klik di luar modal untuk menutup
-//   window.addEventListener('click', function(event) {
-//     const modal = document.getElementById('customer-modal');
-//     if (event.target === modal) {
-//       modal.style.display = 'none';
-//     }
-//   });
-
+logoutBtn.addEventListener("click", function () {
+  localStorage.removeItem("authToken"); // atau "token" sesuai nama yang kamu pakai
+  window.location.href = "/login/login.html"; // ganti path sesuai struktur kamu
+});
 
 const openCustomerModal = document.getElementById("open-customer-modal");
 const customerModal = document.getElementById("customer-modal");
@@ -208,7 +28,6 @@ window.addEventListener("click", (e) => {
     customerModal.style.display = "none";
   }
 });
-
 
 //Bagian Absensi
 
@@ -315,7 +134,7 @@ function absen() {
       console.log("Sending data:", JSON.stringify(absensiData));
 
       // Use the dynamic apiUrl
-      fetch(`http://103.16.116.58:5050/addabsensi`, {
+      fetch(`${apiUrl}/addabsensi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -328,7 +147,7 @@ function absen() {
           if (data.success) {
             document.getElementById("absen-status").textContent =
               "✅ Absensi berhasil!";
-            document.getElementById("absen-status").className = "success";
+            document.getElementById("absen-status").className = "success-2";
           } else {
             document.getElementById("absen-status").textContent =
               "❌ Absensi gagal!";
@@ -370,7 +189,7 @@ document
       point_member: parseInt(document.getElementById("point_member").value),
     };
 
-    fetch("http://103.16.116.58:5050/addcustomer", {
+    fetch(`${apiUrl}/addcustomer`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -394,16 +213,12 @@ document
       });
   });
 
-  
-
-  
-// 
-
+//
 
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
 
-  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
 
   function renderProductList(products) {
     const productList = document.getElementById("product-list");
@@ -977,48 +792,48 @@ document.addEventListener("DOMContentLoaded", function () {
   <td><div class="product-image"><img src="${apiUrl}/images/${produk.foto}" 
       alt="${produk.nama}" width="50" 
       onerror="this.onerror=null; this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANtSURBVHic7ZpNaxNRFIafSdOvfKi1KoK14gcVRHRRNMY/UNCNWrcu3Lh0JbgQROjCnYuCv8ClaF2L4KIIIgqKH9UWamurbcHaJJqatzk3TszEmcmZO3NnmswDL4FC7nvPeTI595wzbkBRFEVRFEVRlHLDAxaAH0AcSCop/UjHvCiGkfXAO66MgwK4Dqz7k48CzfgTuQMcB/YCLqCWqAbm5diPwAXZ7iQ5AX4CJ2RbMXk6HiVn/vEiO1MqJoFfwJZiOVQsNgEpYLxYjhSRadQV/pu9wCbgfbGdKRIvkWV5R7EdKRaHEJN3QzrjTFyBmaCnwE7gGnCV/B9Qm4F+4CrQYNK/TuAtcAZYMumDrRwBPoWHwLgch334f0yzK0EkS2xF3qKZBHAHuIl/Sm4CTiXkB3AImDDpg63UIrfzCnAPf62xPLADJoC0PLPZ5MUztQ44iQz+ALDBhC+2IQvMH8A2i+6fKsCfALBz8JEQv82CRCLfIz0OHLVw/S0FuBMI1wgnLfgXaKpC6l8x4FYO8WXgWj5fWoHRDNcYLuB+gaEu/TFMKDiSZxvvA5vTnFsiYK3A08I9DAzVWdigI2OTicAQcAA4k+WakcAdh4YzriedaXDPqUGrgaeZBgdbkBp9qt59DpQAR0uDztwyBHSjD8JA0gFcRFaNqht8gNgA9CEf1i/lgEKmwTuRFHdrBvEtSFq8H1husy/lxDIkRvuQGmZQqEcSIheAd1nEn/PJDgLPbfClHPmMBI7DiMmMb0Q2MmKSKcpkvB2JwdvAByz4PIdMd14LjgWReqALGfdLDPuScZAqJmPA7mzDroaYaegDRgKDvfUZ/LUTS/4QcBO4jRWTW9K8+oKsLJ6kx4EUkk7HSj5sT9NqjGwC/C0tScV6JLANp72JHZNbVsR3yA0i6U6Uvmsc6EGSrUCRdQcojKQavcDD9IdZGeAQUnh4iDweO4A9SP0xFsQbBIaFuJVVQP8HBZDE6YeQVvJVkaSJo1oqgAoAKoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKACoAqACgAoAKABVQAFWtAOoG1lloh6cajJJmxXMgJq3kX1bIQhnJAVtLPXiABuSngMVu/pId8zRa9kdRFEVRFEVRHM9fBnWbxULiR8UAAAAASUVORK5CYII='"></div></td>
-        <td>${produk.stok}</td>
-        <td>Rp ${produk.harga.toFixed(2)}</td>
-        <td>${produk.supplier}</td>
-        <td>
-            <div class="action-btns">
-              <div class="edit-btn" data-produk-id="${produk.produk_id}">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  />
-                  <path
-                    d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
-                  />
-                </svg>
-                Edit
-              </div>
-              <div class="delete-btn" data-produk-id="${produk.produk_id}">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  stroke-width="2"
-                >
-                  <polyline points="3 6 5 6 21 6" />
-                  <path
-                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                  />
-                </svg>
-                Hapus
-              </div>
-            </div>
-          </td>
-      `;
+  <td>${produk.stok}</td>
+  <td>Rp ${produk.harga.toFixed(2)}</td>
+  <td>${produk.supplier}</td>
+  <td>
+      <div class="action-btns">
+        <div class="edit-btn" data-produk-id="${produk.produk_id}">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+          >
+            <path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            />
+            <path
+              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+            />
+          </svg>
+          Edit
+        </div>
+        <div class="delete-btn" data-produk-id="${produk.produk_id}">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path
+              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            />
+          </svg>
+          Hapus
+        </div>
+      </div>
+    </td>
+  `;
       productList.appendChild(row);
 
       // Add event listeners to the edit and delete buttons
@@ -1317,6 +1132,76 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Add these missing functions before the setInterval call
+
+  // Function to fetch daily sales data
+  async function fetchDailySales() {
+    try {
+      const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(`${apiUrl}/dailysales`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Daily sales data:", data);
+
+      // Update the daily sales chart or display
+      updateSalesChart(data);
+    } catch (error) {
+      console.error("Error fetching daily sales:", error);
+      // Use sample data if API call fails
+      const sampleData = generateSampleSalesData();
+      updateSalesChart(sampleData);
+    }
+  }
+
+  // Function to fetch weekly sales data
+  async function fetchWeeklySales() {
+    try {
+      const apiUrl =
+        localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+      const token = localStorage.getItem("authToken");
+
+      const response = await fetch(`${apiUrl}/weeklysales`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Weekly sales data:", data);
+
+      // Update weekly sales display if you have one
+      // updateWeeklySalesDisplay(data);
+    } catch (error) {
+      console.error("Error fetching weekly sales:", error);
+    }
+  }
+
+  // Helper function to format currency (if not already defined)
+  function formatCurrency(amount) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
+
   function showSuccessAlert(message) {
     showAlert(message, "success");
   }
@@ -1354,5 +1239,120 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }, 5000);
   }
-});
 
+  // Enhanced Face Attendance Integration
+  document.addEventListener("DOMContentLoaded", function () {
+    // Enhanced attendance option switching
+    const manualAttendanceBtn = document.getElementById(
+      "manual-attendance-btn"
+    );
+    const faceAttendanceBtn = document.getElementById("face-attendance-btn");
+    const manualAttendanceSection = document.getElementById(
+      "manual-attendance-section"
+    );
+    const faceAttendanceSection = document.getElementById(
+      "face-attendance-section"
+    );
+
+    // Initialize attendance system
+    let currentAttendanceMode = "manual";
+
+    if (manualAttendanceBtn && faceAttendanceBtn) {
+      manualAttendanceBtn.addEventListener("click", function () {
+        switchAttendanceMode("manual");
+      });
+
+      faceAttendanceBtn.addEventListener("click", function () {
+        switchAttendanceMode("face");
+      });
+    }
+
+    function switchAttendanceMode(mode) {
+      currentAttendanceMode = mode;
+
+      if (mode === "manual") {
+        manualAttendanceBtn.classList.add("active");
+        faceAttendanceBtn.classList.remove("active");
+
+        if (manualAttendanceSection)
+          manualAttendanceSection.style.display = "block";
+        if (faceAttendanceSection) faceAttendanceSection.style.display = "none";
+
+        // Stop camera if running
+        if (window.faceAttendanceSystem) {
+          window.faceAttendanceSystem.stopCamera();
+        }
+      } else if (mode === "face") {
+        faceAttendanceBtn.classList.add("active");
+        manualAttendanceBtn.classList.remove("active");
+
+        if (faceAttendanceSection)
+          faceAttendanceSection.style.display = "block";
+        if (manualAttendanceSection)
+          manualAttendanceSection.style.display = "none";
+
+        // Initialize face attendance if not already done
+        initializeFaceAttendance();
+      }
+    }
+
+    async function initializeFaceAttendance() {
+      try {
+        // Check if face attendance system is available
+        if (typeof FaceAttendanceSystem === "undefined") {
+          console.error("Face attendance system not loaded");
+          updateFaceStatus("Face attendance system not available", "danger");
+          return;
+        }
+
+        // Initialize or get existing instance
+        if (!window.faceAttendanceSystem) {
+          window.faceAttendanceSystem = new FaceAttendanceSystem();
+        }
+
+        // Initialize camera
+        const initialized =
+          await window.faceAttendanceSystem.initializeCamera();
+        if (!initialized) {
+          updateFaceStatus("Failed to initialize camera", "danger");
+        }
+      } catch (error) {
+        console.error("Error initializing face attendance:", error);
+        updateFaceStatus("Error initializing face attendance", "danger");
+      }
+    }
+
+    function updateFaceStatus(message, type = "info") {
+      const statusElement = document.getElementById("face-status");
+      if (statusElement) {
+        statusElement.textContent = message;
+        statusElement.className = `status-message ${type}`;
+      }
+    }
+
+    // Enhanced modal opening with proper initialization
+    document.getElementById("open-absensi-modal").onclick = function () {
+      const modal = document.getElementById("absensi-modal");
+      modal.style.display = "block";
+
+      // Reset to manual mode by default
+      switchAttendanceMode("manual");
+
+      // Check location for manual attendance
+      checkLocation();
+    };
+
+    // Enhanced modal closing with cleanup
+    document.getElementById("close-absensi-modal").onclick = function () {
+      const modal = document.getElementById("absensi-modal");
+      modal.style.display = "none";
+
+      // Cleanup face attendance system
+      if (window.faceAttendanceSystem) {
+        window.faceAttendanceSystem.stopCamera();
+      }
+    };
+
+    // ... rest of existing code ...
+  });
+});

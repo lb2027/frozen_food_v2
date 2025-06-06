@@ -1,0 +1,402 @@
+/* Face Attendance Modal Enhancements */
+.modalabsensi {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-contentabsensi {
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  margin: 5% auto;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 90%;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btnabsensi {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.close-btnabsensi:hover {
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.2);
+  transform: scale(1.1);
+}
+
+.modal-contentabsensi h1 {
+  font-size: 1.8em;
+  margin-bottom: 25px;
+  text-align: center;
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+}
+
+/* Enhanced Attendance Options */
+.attendance-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.attendance-option-btn {
+  padding: 15px 25px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.attendance-option-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #4caf50;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.attendance-option-btn.active {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border-color: #4caf50;
+  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* Manual Attendance Section */
+#manual-attendance-section {
+  text-align: center;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#manual-attendance-section p {
+  margin: 12px 0;
+  font-size: 16px;
+  color: #e0e0e0;
+}
+
+#manual-attendance-section strong {
+  color: #4caf50;
+}
+
+#absen-button-container {
+  margin-top: 25px;
+}
+
+#absen-btn {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+#absen-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+/* Face Attendance Section */
+#face-attendance-section {
+  text-align: center;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.face-recognition-container {
+  padding: 20px;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #4caf50;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: #000;
+}
+
+#face-video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+#face-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.face-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.face-controls .btn {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: white;
+  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #5a6268, #495057);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Enhanced Status Messages */
+.status-message {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-top: 15px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid transparent;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.status-message.info {
+  background: linear-gradient(
+    135deg,
+    rgba(13, 202, 240, 0.1),
+    rgba(13, 202, 240, 0.2)
+  );
+  color: #0dcaf0;
+  border-color: rgba(13, 202, 240, 0.3);
+}
+
+.status-message.success {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(76, 175, 80, 0.2)
+  );
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.status-message.danger {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.1),
+    rgba(220, 53, 69, 0.2)
+  );
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Location Display Enhancement */
+#latitude,
+#longitude {
+  font-weight: bold;
+  color: #4caf50;
+  font-family: "Courier New", monospace;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-contentabsensi {
+    margin: 10% auto;
+    padding: 20px;
+    max-width: 95%;
+  }
+
+  .attendance-options {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .attendance-option-btn {
+    width: 200px;
+    justify-content: center;
+  }
+
+  .face-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .face-controls .btn {
+    width: 200px;
+  }
+
+  #face-video {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .modal-contentabsensi h1 {
+    font-size: 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-contentabsensi {
+    margin: 5% auto;
+    padding: 15px;
+  }
+
+  .video-container {
+    margin-bottom: 15px;
+  }
+
+  .face-controls .btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Loading Animation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #4caf50;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Camera Permission Message */
+.camera-permission-message {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.1),
+    rgba(255, 193, 7, 0.2)
+  );
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  padding: 15px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: 500;
+}

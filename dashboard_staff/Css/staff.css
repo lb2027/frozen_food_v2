@@ -1,5 +1,4 @@
 @import "/chatbot/chatbot.css";
-
 /*Bagian Dashboard*/
 
 * {
@@ -379,8 +378,6 @@ header {
   transform: translateY(-2px);
 }
 
-
-
 .remove-item-btn {
   background-color: var(--danger);
   color: white;
@@ -396,7 +393,6 @@ header {
 .remove-item-btn:hover {
   background-color: var(--danger-hover);
 }
-
 
 .close-button {
   position: absolute;
@@ -473,6 +469,9 @@ button[type="submit"]:hover,
 
 .success {
   color: #4caf50;
+}
+.success-2 {
+  color: #28a745;
 }
 
 .danger {
@@ -640,49 +639,303 @@ button[type="submit"]:hover,
   background-color: #218838;
 }
 
-/* Status styles */
-.info {
-  color: #ddd;
-  font-size: 0.95em;
+/* Attendance modal styling */
+.modalabsensi {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.success {
-  color: #28d17e;
+.modal-contentabsensi {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
 }
 
-.danger {
-  color: #f44336;
+.close-btnabsensi {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 10px;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
+.close-btnabsensi:hover,
+.close-btnabsensi:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Attendance options styling */
+.attendance-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.attendance-option-btn {
+  padding: 10px 20px;
+  border: 2px solid #ddd;
+  background: #f8f9fa;
+  color: #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.attendance-option-btn:hover {
+  background: #e9ecef;
+  border-color: #28a745;
+}
+
+.attendance-option-btn.active {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+/* Manual attendance section */
+#manual-attendance-section {
+  text-align: center;
+  padding: 20px 0;
+}
+
+#manual-attendance-section p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+#absen-button-container {
+  margin-top: 20px;
+}
+
+#absen-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#absen-btn:hover {
+  background: #218838;
+}
+
+/* Face attendance section styling */
+#face-attendance-section {
+  text-align: center;
+}
+
+.face-recognition-container {
+  padding: 20px;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+#face-video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.face-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.face-controls .btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-primary {
+  background: #28a745;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #218838;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.status-message-absen.info {
+  background: linear-gradient(
+    135deg,
+    rgba(52, 152, 219, 0.1),
+    rgba(52, 152, 219, 0.15)
+  );
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0 !important;
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+  animation: fadeInPulse 0.5s ease-in-out;
+}
+
+.status-message-absen.info::before {
+  content: "ℹ️";
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+@keyframes fadeInPulse {
+  0% {
     opacity: 0;
+    transform: scale(0.95);
   }
-  to {
-    opacity: 1;
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
   }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
+  100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+.status-message.success,
+.success {
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  border-radius: 10px;
+  color: #155724;
+  padding: 1em;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+  animation: pulse 2s infinite;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-message.success,
+.success-2 {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(76, 175, 80, 0.15)
+  );
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0 !important;
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+  animation: fadeInPulse 0.5s ease-in-out;
+}
+
+.status-message.success::before,
+.success-2::before {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.status-message.danger,
+.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .modal-contentabsensi {
+    width: 95%;
+    margin: 10% auto;
+  }
+
+  .attendance-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .attendance-option-btn {
+    width: 200px;
+  }
+
+  .face-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .face-controls .btn {
+    width: 200px;
+  }
+
+  #face-video {
+    width: 100%;
+    max-width: 300px;
   }
 }
 
@@ -811,14 +1064,508 @@ button[type="submit"]:hover,
   }
 }
 
-
-
-
-
-
-
-
-
-
 /* Bagian Dwiki */
 
+/* Face Recognition Modal Styles */
+.face-modal-content {
+  max-width: 600px;
+  width: 90%;
+}
+
+.face-recognition-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+#face-video {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  display: block;
+}
+
+.face-controls {
+  margin: 20px 0;
+}
+
+.btn-face {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn-face:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
+.status-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.status-message.success {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(76, 175, 80, 0.2)
+  );
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.status-message.danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.face-attendance-section {
+  margin: 20px 0;
+  text-align: center;
+}
+
+/* Attendance options styling */
+.attendance-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.attendance-option-btn {
+  padding: 10px 20px;
+  border: 2px solid #ddd;
+  background: #f8f9fa;
+  color: #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.attendance-option-btn:hover {
+  background: #e9ecef;
+  border-color: #28a745;
+}
+
+.attendance-option-btn.active {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+/* Face Attendance Modal Enhancements */
+.modalabsensi {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-in-out;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+.modal-contentabsensi {
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 20px;
+  max-width: 700px;
+  width: calc(100% - 40px);
+  max-height: calc(100vh - 40px);
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  animation: slideInUp 0.3s ease-out;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btnabsensi {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.close-btnabsensi:hover {
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.2);
+  transform: scale(1.1);
+}
+
+.modal-contentabsensi h1 {
+  font-size: 1.8em;
+  margin-bottom: 25px;
+  text-align: center;
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+}
+
+/* Enhanced Attendance Options */
+.attendance-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.attendance-option-btn {
+  padding: 15px 25px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.attendance-option-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #4caf50;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.attendance-option-btn.active {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border-color: #4caf50;
+  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* Manual Attendance Section */
+#manual-attendance-section {
+  text-align: center;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#manual-attendance-section p {
+  margin: 12px 0;
+  font-size: 16px;
+  color: #e0e0e0;
+}
+
+#manual-attendance-section strong {
+  color: #4caf50;
+}
+
+#absen-button-container {
+  margin-top: 25px;
+}
+
+#absen-btn {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+#absen-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+/* Face Attendance Section */
+#face-attendance-section {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.face-recognition-container {
+  padding: 15px;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #4caf50;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: #000;
+  max-width: 100%;
+}
+
+#face-video {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 12px;
+}
+
+#face-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  max-width: 100%;
+  height: auto;
+}
+
+.face-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.face-controls .btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalabsensi {
+    padding: 10px 0;
+  }
+
+  .modal-contentabsensi {
+    margin: 10px auto;
+    padding: 15px;
+    width: calc(100% - 20px);
+    max-height: calc(100vh - 20px);
+  }
+
+  .attendance-options {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .attendance-option-btn {
+    width: 180px;
+    justify-content: center;
+    padding: 12px 20px;
+  }
+
+  .face-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .face-controls .btn {
+    width: 180px;
+    min-width: auto;
+    padding: 10px 15px;
+  }
+
+  #face-video {
+    max-width: 280px;
+  }
+
+  .modal-contentabsensi h1 {
+    font-size: 1.4em;
+    margin-bottom: 15px;
+  }
+
+  #manual-attendance-section,
+  #face-attendance-section {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalabsensi {
+    padding: 5px 0;
+  }
+
+  .modal-contentabsensi {
+    margin: 5px auto;
+    padding: 10px;
+    width: calc(100% - 10px);
+    max-height: calc(100vh - 10px);
+    border-radius: 15px;
+  }
+
+  .video-container {
+    margin-bottom: 10px;
+  }
+
+  .face-controls .btn {
+    padding: 10px 15px;
+    font-size: 13px;
+    width: 160px;
+  }
+
+  .attendance-option-btn {
+    width: 160px;
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+
+  #face-video {
+    max-width: 240px;
+  }
+
+  .modal-contentabsensi h1 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .modal-contentabsensi {
+    padding: 8px;
+  }
+
+  .face-controls .btn,
+  .attendance-option-btn {
+    width: 140px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  #face-video {
+    max-width: 200px;
+  }
+}
+
+/* Loading Animation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #4caf50;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Camera Permission Message */
+.camera-permission-message {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.1),
+    rgba(255, 193, 7, 0.2)
+  );
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  padding: 15px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: 500;
+}
