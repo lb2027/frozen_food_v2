@@ -450,6 +450,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Refresh the product list
         fetchProduk();
+        triggerSmartInventoryRefresh(); // ADD THIS LINE
       } else {
         // Display an error message
         const errorData = await response.json();
@@ -524,6 +525,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Function to handle stok sold form submission
+  // Function to handle stok sold form submission
   stokSoldForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -535,9 +537,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const produkId = item.querySelector(".produk").value;
       const stokTerjual = item.querySelector(".stok_terjual").value;
       const selectedOption = item.querySelector(".produk").selectedOptions[0];
-      const namaProduk = selectedOption.text; // Get the product name from the dropdown text
-      // You might need to fetch the price from the database or store it in the dropdown
-      // For simplicity, let's assume you have a way to get the price based on the product ID
+      const namaProduk = selectedOption.text;
+
       const product = produkData.find((p) => p.produk_id == produkId);
       if (!product) {
         alert(`Product with ID ${produkId} not found.`);
@@ -562,12 +563,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Retrieve the token from localStorage
     const token = localStorage.getItem("authToken");
-    console.log("Token:", token); // Add this line
+    console.log("Token:", token);
 
     try {
-      // Send a POST request to the sold items API
       const response = await fetch(`${apiUrl}/soldproduk`, {
         method: "POST",
         headers: {
@@ -578,31 +577,78 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (response.ok) {
-        // Close the modal
-        //showSuccessAlert("Stok berhasil terjual.");
+        console.log("Sold items submitted successfully");
 
+        // Close the modal first
         stokSoldModal.style.display = "none";
 
-        // Refresh the product list
-        fetchProduk();
-        // Refresh the sales data after adding sales
-        fetchDailySales();
-        fetchWeeklySales();
+        // Show success message
+
+        try {
+          // Refresh the product list
+          await fetchProduk();
+          console.log("Product list refreshed");
+        } catch (refreshError) {
+          console.error("Error refreshing product list:", refreshError);
+        }
+
+        try {
+          // Refresh sales data
+          await fetchDailySales();
+          await fetchWeeklySales();
+          console.log("Sales data refreshed");
+        } catch (salesError) {
+          console.error("Error refreshing sales data:", salesError);
+        }
+
+        try {
+          // Trigger Smart Inventory refresh
+          triggerSmartInventoryRefresh();
+          console.log("Smart Inventory refresh triggered");
+        } catch (smartError) {
+          console.error(
+            "Error triggering Smart Inventory refresh:",
+            smartError
+          );
+        }
+
+        // Clear the sold items list
+        soldItemsList.innerHTML = `
+        <div class="sold-item">
+          <div class="form-group">
+            <label for="produk">Pilih Produk:</label>
+            <select class="produk" name="produk" required>
+              <!-- Options will be dynamically added here -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stok_terjual">Stok Terjual:</label>
+            <input type="number" class="stok_terjual" name="stok_terjual" required />
+          </div>
+        </div>
+      `;
+
+        // Repopulate the dropdown in the cleared form
+        const newDropdown = soldItemsList.querySelector(".produk");
+        if (newDropdown && produkData) {
+          populateProductDropdown(produkData, newDropdown);
+        }
       } else {
-        // Display an error message
+        // Display an error message for failed API call
         const errorData = await response.json();
-        console.error("API Error:", errorData); // Add this line
+        console.error("API Error:", errorData);
         alert(
           `Failed to add sold items: ${errorData.message || "Unknown error"}`
         );
       }
     } catch (error) {
-      // Display an error message
-      console.error("Error adding sold items:", error);
-      alert("An error occurred while adding the sold items.");
+      // This catch block handles network errors or JSON parsing errors
+      console.error("Network/Parse error adding sold items:", error);
+      alert(
+        "A network error occurred while adding the sold items. Please check your connection and try again."
+      );
     }
   });
-
   // close button for stok sold modal
   const closeButtonStokSold = document.getElementById("closeBtnStokSold");
 
@@ -774,6 +820,11 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Product list element not found in catch block!");
       }
     }
+
+    // After successfully fetching products, trigger update
+    if (window.triggerStockChange) {
+      window.triggerStockChange("products_loaded");
+    }
   }
 
   function renderProductList(products) {
@@ -903,13 +954,21 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing options
     dropdown.innerHTML = "";
 
+    // Add default option FIRST
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "-- Pilih Produk --";
+    dropdown.appendChild(defaultOption);
+
     // Add options for each product
     products.forEach((produk) => {
       const option = document.createElement("option");
       option.value = produk.produk_id;
-      option.text = produk.nama;
+      option.textContent = `${produk.nama} (Stock: ${produk.stok})`;
       dropdown.appendChild(option);
     });
+
+    console.log("Dropdown populated with", products.length, "products");
   }
 
   async function deleteProduk(produkId) {
@@ -1023,6 +1082,9 @@ document.addEventListener("DOMContentLoaded", function () {
   async function initializeDashboard() {
     await initializeApiUrl();
     await fetchProduk();
+
+    // Initialize Smart Inventory integration after products are loaded
+    initializeSmartInventoryIntegration();
   }
 
   // Call initializeDashboard instead of just initializeApiUrl
@@ -1118,6 +1180,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Refresh the product list
         fetchProduk();
+        triggerSmartInventoryRefresh(); // ADD THIS LINE
       } else {
         // Display an error message
         const errorData = await response.json();
@@ -1353,6 +1416,34 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
 
-    // ... rest of existing code ...
+    // Add this function to ensure Smart Inventory works with staff dashboard
+    function initializeSmartInventoryIntegration() {
+      // Wait for Smart Inventory to be ready
+      setTimeout(() => {
+        if (window.smartInventorySystem) {
+          console.log("Smart Inventory System detected, integrating...");
+
+          // Make produkData available to Smart Inventory
+          if (produkData && produkData.length > 0) {
+            window.smartInventorySystem.products = produkData;
+            window.smartInventorySystem.updateDashboard();
+          }
+        } else {
+          console.log("Smart Inventory System not found, retrying...");
+          initializeSmartInventoryIntegration();
+        }
+      }, 1000);
+    }
   });
+
+  // Add this after your fetchProduk function
+  function triggerSmartInventoryRefresh() {
+    if (window.smartInventorySystem) {
+      setTimeout(async () => {
+        await window.smartInventorySystem.loadProducts();
+        window.smartInventorySystem.updateDashboard();
+        console.log("Smart Inventory refreshed after stock change");
+      }, 1000);
+    }
+  }
 });

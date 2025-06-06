@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
     <link rel="stylesheet" href="../Css/staff.css" />
+    <link rel="stylesheet" href="../Css/chatbot.css" />
+        <link rel="stylesheet" href="../Css/smart-inventory.css" />
+
+
   </head>
 
   <!--Bagian Sidebar-->
@@ -192,6 +196,8 @@
         </div>
       </div>
 
+
+
       <!--Bagian Action-->
 
         <div class="" id="open-add-modal">
@@ -343,7 +349,7 @@
           <div class="form-group">
             <label for="produk">Pilih Produk:</label>
             <select class="produk" id="produk" name="produk" required>
-              <!-- Options will be dynamically added here -->
+              <!-- Options will be populated here -->
             </select>
           </div>
           <div class="form-group">
@@ -351,9 +357,7 @@
             <input type="number" id="stok_masuk" name="stok_masuk" required />
           </div>
           <button type="submit" class="submit-btn">Simpan</button>
-          <button type="button" id="closeBtnStock" id="close-add-stock-modal">
-            Batal
-          </button>
+          <button type="button" id="closeBtnStock">Batal</button>
         </form>
       </div>
     </div>
@@ -668,35 +672,26 @@
         ></path>
       </svg>
     </button>
+
+    <!-- ADD this for better loading feedback (optional) -->
+<div id="smart-inventory-loading" class="loading-overlay" style="display: none;">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <p>🤖 AI is analyzing your inventory...</p>
+  </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="dashboard_staff/Js/profit-prediction-engine.js"></script>
+
+    <script src="/dashboard_staff/Js/staff.js"></script>
+    <script src="/dashboard_staff/Js/smart-inventory.js"></script>
     <script src="/chatbot/chatbot.js"></script>
-    <script src="../Js/staff.js"></script>
     <script src="../Js/face-attendance.js"></script>
 
     <!-- Face Recognition Modal -->
-<div id="face-modal" class="modal" style="display: none;">
-  <div class="modal-content face-modal-content">
-    <div class="modal-header">
-      <h2 id="face-modal-title">Absensi dengan Wajah</h2>
-      <span id="close-face-modal" class="close">&times;</span>
-    </div>
-    <div class="modal-body">
-      <div class="face-recognition-container">
-        <div class="video-container">
-          <video id="face-video" autoplay muted playsinline></video>
-          <canvas id="face-canvas" style="display: none;"></canvas>
-        </div>
-        <div class="face-controls">
-          <button id="capture-face-btn" class="btn btn-primary">
-            Capture Face
-          </button>
-        </div>
-        <div id="face-status" class="status-message">
-          Initializing camera...
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
   </body>
 </html>
