@@ -4154,6 +4154,33 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
       .join("");
   }
 
+  generateModelStatusHTML() {
+    const modelNames = {
+      neuralNet: "Neural Net",
+      linearRegression: "Linear Reg",
+      lstm: "LSTM",
+      cnn: "CNN",
+      randomForest: "Random Forest",
+      arima: "ARIMA",
+    };
+
+    return Object.keys(this.modelsLoaded)
+      .map((modelName) => {
+        const isLoaded = this.modelsLoaded[modelName];
+        const displayName = modelNames[modelName] || modelName;
+        const statusClass = isLoaded ? "loaded" : "pending";
+        const icon = isLoaded ? "✅" : "⏳";
+
+        return `
+      <div class="model-status ${statusClass}">
+        <span>${icon}</span>
+        <span>${displayName}</span>
+      </div>
+    `;
+      })
+      .join("");
+  }
+
   // ADD this method to generate progress details:
   generateProgressDetailsHTML() {
     const dataQuality = this.salesHistory.length;
@@ -4200,6 +4227,20 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
 
     // ... rest of your existing code ...
   }
+
+  // Add to OptimizedMultiEnsembleAISystem class
+  async initializeWithAnalytics() {
+    console.log("🚀 Initializing AI System with Real-Time Analytics...");
+
+    // Initialize AI system first
+    await this.initializeEnsemble();
+
+    // Initialize real-time analytics
+    window.realTimeAnalytics = new RealTimeAnalytics(this);
+    await window.realTimeAnalytics.initialize();
+
+    console.log("✅ AI System and Analytics initialized successfully");
+  }
 }
 
 // Enhanced initialization
@@ -4224,7 +4265,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function initializeAISystem() {
     if (!smartInventorySystem) {
-      // ✅ Use Optimized Multi-Ensemble instead
       smartInventorySystem = new OptimizedMultiEnsembleAISystem();
       window.smartInventorySystem = smartInventorySystem;
       console.log("🚀 Optimized Multi-Ensemble AI System created");
@@ -4233,11 +4273,11 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(async () => {
       try {
         await smartInventorySystem.initialize();
-        console.log("✅ Optimized AI System initialized successfully");
+        console.log("✅ Complete system initialized successfully");
       } catch (error) {
         console.error("❌ Initialization failed:", error);
       }
-    }, 100); // Reduced delay
+    }, 100);
   }
 
   // Cleanup on page unload
