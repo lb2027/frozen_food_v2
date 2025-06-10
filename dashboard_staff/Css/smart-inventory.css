@@ -609,3 +609,373 @@
     transform: scale(1);
   }
 }
+
+/* Add these styles to your smart-inventory.css file */
+.smart-inventory-container {
+  max-height: 300px; /* Initial collapsed height */
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  margin: 20px 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.smart-inventory-container.expanded {
+  max-height: none; /* Allow full expansion */
+  overflow: visible;
+}
+
+.smart-inventory-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  border-radius: 15px 15px 0 0;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.smart-inventory-title {
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.expand-indicator {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+  user-select: none;
+}
+
+.smart-inventory-container.expanded .expand-indicator {
+  transform: rotate(180deg);
+}
+
+.smart-inventory-content {
+  padding: 20px;
+  position: relative;
+}
+
+.smart-inventory-preview {
+  display: block;
+}
+
+.smart-inventory-container.expanded .smart-inventory-preview {
+  display: none;
+}
+
+.smart-inventory-full {
+  display: none;
+}
+
+.smart-inventory-container.expanded .smart-inventory-full {
+  display: block;
+}
+
+.expand-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(76, 175, 80, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.smart-inventory-container.expanded .expand-hint {
+  display: none;
+}
+
+.smart-inventory-container:hover .expand-hint {
+  opacity: 1;
+}
+
+/* Loading state for expanded content */
+.smart-inventory-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #ccc;
+}
+
+.smart-inventory-loading .loading-spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(76, 175, 80, 0.3);
+  border-radius: 50%;
+  border-top-color: #4caf50;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 15px;
+}
+
+/* Smooth transition for widgets */
+.smart-widget {
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.smart-inventory-container:not(.expanded) .smart-widget:nth-child(n + 4) {
+  display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .smart-inventory-container {
+    max-height: 250px;
+    margin: 15px 0;
+  }
+
+  .smart-inventory-header {
+    padding: 15px;
+  }
+
+  .smart-inventory-content {
+    padding: 15px;
+  }
+
+  .smart-inventory-title {
+    font-size: 16px;
+  }
+}
+
+/* Add these styles to the END of your existing smart-inventory.css file */
+
+/* Expandable Smart Inventory Styles */
+.smart-inventory-expandable-wrapper {
+  margin: 20px 0;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.smart-inventory-content-wrapper {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.smart-inventory-content-wrapper.collapsed {
+  max-height: 300px;
+  position: relative;
+}
+
+.smart-inventory-content-wrapper.expanded {
+  max-height: none;
+}
+
+/* Add fade-out gradient effect for collapsed state */
+.smart-inventory-content-wrapper.collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px; /* Height of fade effect */
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 26, 26, 0) 0%,
+    rgba(26, 26, 26, 0.3) 30%,
+    rgba(26, 26, 26, 0.7) 70%,
+    rgba(26, 26, 26, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 0 0 15px 15px;
+}
+
+/* Remove fade effect when expanded */
+.smart-inventory-content-wrapper.expanded::after {
+  display: none;
+}
+
+/* Enhance the preview widget to work better with fade effect */
+.smart-widget.preview-widget {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(69, 160, 73, 0.05)
+  );
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  margin-bottom: 20px; /* Add space for fade effect */
+  position: relative;
+  z-index: 1;
+}
+
+/* Adjust the expand hint positioning */
+.expand-hint {
+  position: absolute;
+  bottom: 15px; /* Moved up slightly to be visible above fade */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(76, 175, 80, 0.95);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 10; /* Above the fade effect */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.smart-inventory-content-wrapper.collapsed:hover .expand-hint {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.smart-inventory-content-wrapper.expanded .expand-hint {
+  display: none;
+}
+
+/* Enhanced header hover effect */
+.smart-inventory-expandable-header:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth content masking for collapsed state */
+.smart-inventory-content-wrapper.collapsed .smart-inventory-dashboard {
+  mask: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 70%,
+    rgba(0, 0, 0, 0.5) 85%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 70%,
+    rgba(0, 0, 0, 0.5) 85%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* Remove mask when expanded */
+.smart-inventory-content-wrapper.expanded .smart-inventory-dashboard {
+  mask: none;
+  -webkit-mask: none;
+}
+
+/* Enhanced preview action styling */
+.preview-action {
+  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px dashed rgba(76, 175, 80, 0.3);
+  margin-bottom: 10px; /* Space for fade effect */
+  position: relative;
+  z-index: 2;
+}
+
+/* Alternative fade effect using box-shadow for better browser support */
+.smart-inventory-content-wrapper.collapsed.alt-fade::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  box-shadow: 0 -20px 20px -10px rgba(26, 26, 26, 0.3),
+    0 -40px 40px -20px rgba(26, 26, 26, 0.5),
+    0 -60px 60px -30px rgba(26, 26, 26, 0.7),
+    0 -80px 80px -40px rgba(26, 26, 26, 0.9);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Responsive adjustments for fade effect */
+@media (max-width: 768px) {
+  .smart-inventory-content-wrapper.collapsed::after {
+    height: 60px; /* Smaller fade height on mobile */
+  }
+
+  .expand-hint {
+    bottom: 10px;
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .smart-inventory-content-wrapper.collapsed {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .smart-inventory-content-wrapper.collapsed::after {
+    height: 50px;
+  }
+
+  .expand-hint {
+    bottom: 8px;
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+}
+
+/* Enhanced animation for expansion */
+.smart-inventory-content-wrapper.expanding {
+  animation: expandContent 0.5s ease-out;
+}
+
+.smart-inventory-content-wrapper.collapsing {
+  animation: collapseContent 0.5s ease-in;
+}
+
+@keyframes expandContent {
+  from {
+    max-height: 300px;
+  }
+  to {
+    max-height: 1000px; /* Large enough value */
+  }
+}
+
+@keyframes collapseContent {
+  from {
+    max-height: 1000px;
+  }
+  to {
+    max-height: 300px;
+  }
+}
+
+/* Subtle pulse effect for the expand hint */
+@keyframes hintPulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.02);
+  }
+}
+
+.smart-inventory-content-wrapper.collapsed .expand-hint {
+  animation: hintPulse 3s infinite;
+}
+
+/* Stop animation on hover */
+.smart-inventory-content-wrapper.collapsed:hover .expand-hint {
+  animation: none;
+}

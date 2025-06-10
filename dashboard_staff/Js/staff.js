@@ -97,17 +97,40 @@ function checkLocation() {
   }
 }
 
+function isTokenExpired(token) {
+  try {
+    const payloadBase64 = token.split(".")[1];
+    const payload = JSON.parse(atob(payloadBase64));
+
+    // Check if the token has an expiration time
+    if (payload && payload.exp) {
+      const expiryTime = payload.exp * 1000; // Convert to milliseconds
+      const currentTime = Date.now();
+
+      // Check if the token is expired
+      return currentTime > expiryTime;
+    } else {
+      // If the token doesn't have an expiration time, consider it invalid
+      return true;
+    }
+  } catch (error) {
+    // If there's an error decoding the token, consider it invalid
+    console.error("Error decoding token:", error);
+    return true;
+  }
+}
+
 function absen() {
   const token = localStorage.getItem("authToken");
   const userid = localStorage.getItem("userid");
 
   // Get API URL from proper source
-  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
 
   // Use userid instead of undefined staffid variable
   console.log("Staff ID being used:", userid);
 
-  if (!token) {
+  if (!token || isTokenExpired(token)) {
     alert("Anda belum login!");
     window.location.href = "/login/login.html";
     return;
@@ -218,7 +241,12 @@ document
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
 
-  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+
+  if (!token || isTokenExpired(token)) {
+    window.location.href = "/login/login.html";
+    return;
+  }
 
   function renderProductList(products) {
     const productList = document.getElementById("product-list");
@@ -253,33 +281,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Function to check if the token is expired
-  function isTokenExpired(token) {
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const payload = JSON.parse(atob(payloadBase64));
-
-      // Check if the token has an expiration time
-      if (payload && payload.exp) {
-        const expiryTime = payload.exp * 1000; // Convert to milliseconds
-        const currentTime = Date.now();
-
-        // Check if the token is expired
-        return currentTime > expiryTime;
-      } else {
-        // If the token doesn't have an expiration time, consider it invalid
-        return true;
-      }
-    } catch (error) {
-      // If there's an error decoding the token, consider it invalid
-      console.error("Error decoding token:", error);
-      return true;
-    }
-  }
-
-  if (!token || isTokenExpired(token)) {
-    window.location.href = "/login/login.html";
-    return;
-  }
 
   // Get references to the modal and button elements
   const modal = document.getElementById("add-product-modal");
@@ -657,8 +658,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stokSoldModal.style.display = "none";
   });
 
-  let produkData = []; // Store the product data
-  let salesData = []; // Store the sales data
+  let produkData = [];
 
   // Function to read the JSON file
   async function readJsonFile(filePath) {
@@ -675,7 +675,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Read the JSON file and set the API URL
   async function initializeApiUrl() {
     const envData = await readJsonFile("/json/env.json");
     if (envData && envData.api_url) {
@@ -697,7 +696,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       data.push({
         date: date.toISOString().split("T")[0],
-        sales: Math.floor(Math.random() * 2000000) + 500000, // Random sales between 500k-2.5M
+        sales: Math.floor(Math.random() * 2000000) + 500000,
       });
     }
 
@@ -710,10 +709,8 @@ document.addEventListener("DOMContentLoaded", function () {
       ".stat-card:first-child .mini-chart"
     );
 
-    // Clear existing chart
     miniChart.innerHTML = "";
 
-    // Find the maximum sales value for scaling
     const maxSales = Math.max(...data.map((day) => day.sales));
 
     // Create bars for each day
@@ -1004,7 +1001,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Get the search input element
   const searchInput = document.getElementById("search-input");
 
   // Add an event listener to the search input
@@ -1079,12 +1075,71 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Initialize everything
-  async function initializeDashboard() {
-    await initializeApiUrl();
-    await fetchProduk();
+  // Add this to your existing staff.js file in the initializeDashboard function
 
-    // Initialize Smart Inventory integration after products are loaded
-    initializeSmartInventoryIntegration();
+  // Update your initializeDashboard function
+
+  async function initializeDashboard() {
+    console.log("🚀 Starting dashboard initialization...");
+
+    try {
+      await initializeApiUrl();
+      await fetchProduk();
+
+      // ✅ Initialize Smart Inventory FIRST
+      await initializeSmartInventoryIntegration();
+
+      // ✅ Wait for Smart Inventory to create its dashboard
+      await new Promise((resolve) => {
+        const checkDashboard = () => {
+          if (document.querySelector(".smart-inventory-dashboard")) {
+            resolve();
+          } else {
+            setTimeout(checkDashboard, 500);
+          }
+        };
+        checkDashboard();
+      });
+
+      // ✅ Then enhance with expandable functionality
+      if (!window.expandableSmartInventory) {
+        window.expandableSmartInventory = new ExpandableSmartInventory();
+        await window.expandableSmartInventory.initialize();
+
+        // Update preview with current data
+        if (produkData) {
+          window.expandableSmartInventory.updatePreviewStats(produkData);
+        }
+      }
+
+      console.log("✅ Dashboard initialization complete");
+    } catch (error) {
+      console.error("❌ Dashboard initialization failed:", error);
+    }
+  }
+
+  // Enhanced refresh function
+  function triggerSmartInventoryRefresh() {
+    console.log("🔄 Triggering Smart Inventory refresh...");
+
+    if (window.expandableSmartInventory) {
+      // Update preview stats
+      if (window.produkData) {
+        window.expandableSmartInventory.updatePreviewStats(window.produkData);
+      }
+    }
+
+    if (window.smartInventorySystem) {
+      setTimeout(async () => {
+        try {
+          window.smartInventorySystem.products = window.produkData;
+          await window.smartInventorySystem.updateDashboard();
+          console.log("✅ Smart Inventory refreshed after stock change");
+        } catch (error) {
+          console.error("❌ Error refreshing Smart Inventory:", error);
+        }
+      }, 1000);
+    }
   }
 
   // Call initializeDashboard instead of just initializeApiUrl
@@ -1200,7 +1255,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to fetch daily sales data
   async function fetchDailySales() {
     try {
-      const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+      const apiUrl =
+        localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
       const token = localStorage.getItem("authToken");
 
       const response = await fetch(`${apiUrl}/dailysales`, {
@@ -1303,8 +1359,93 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 5000);
   }
 
+  async function initializeSmartInventoryIntegration() {
+    console.log("🤖 Initializing Smart Inventory Integration...");
+
+    try {
+      // Wait for TensorFlow to be available
+      if (typeof tf === "undefined") {
+        console.log("⏳ Waiting for TensorFlow.js to load...");
+        await waitForTensorFlow();
+      }
+
+      // Check if Smart Inventory classes are available
+      if (typeof OptimizedMultiEnsembleAISystem === "undefined") {
+        console.error("❌ Smart Inventory classes not found!");
+        console.log("📝 Loading Smart Inventory script...");
+
+        // Dynamically load the smart inventory script if not loaded
+        await loadSmartInventoryScript();
+      }
+
+      // Initialize the AI system
+      console.log("🚀 Creating Smart Inventory System...");
+      window.smartInventorySystem = new OptimizedMultiEnsembleAISystem();
+
+      // Make products available to the system
+      if (produkData && produkData.length > 0) {
+        window.smartInventorySystem.products = produkData;
+        console.log(
+          `📦 Loaded ${produkData.length} products into Smart Inventory`
+        );
+      }
+
+      // Initialize the system
+      await window.smartInventorySystem.initialize();
+
+      console.log("✅ Smart Inventory System initialized successfully");
+    } catch (error) {
+      console.error("❌ Failed to initialize Smart Inventory:", error);
+      console.log("🔄 Retrying in 3 seconds...");
+      setTimeout(initializeSmartInventoryIntegration, 3000);
+    }
+  }
+
+  async function loadSmartInventoryScript() {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "/dashboard_staff/Js/smart-inventory.js";
+      script.onload = () => {
+        console.log("✅ Smart Inventory script loaded");
+        resolve();
+      };
+      script.onerror = () => {
+        console.error("❌ Failed to load Smart Inventory script");
+        reject(new Error("Failed to load smart-inventory.js"));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
   // Enhanced Face Attendance Integration
   document.addEventListener("DOMContentLoaded", function () {
+    function isTokenExpired(token) {
+      try {
+        const payloadBase64 = token.split(".")[1];
+        const payload = JSON.parse(atob(payloadBase64));
+
+        // Check if the token has an expiration time
+        if (payload && payload.exp) {
+          const expiryTime = payload.exp * 1000; // Convert to milliseconds
+          const currentTime = Date.now();
+
+          // Check if the token is expired
+          return currentTime > expiryTime;
+        } else {
+          // If the token doesn't have an expiration time, consider it invalid
+          return true;
+        }
+      } catch (error) {
+        // If there's an error decoding the token, consider it invalid
+        console.error("Error decoding token:", error);
+        return true;
+      }
+    }
+
+    if (!token || isTokenExpired(token)) {
+      window.location.href = "/login/login.html";
+      return;
+    }
     // Enhanced attendance option switching
     const manualAttendanceBtn = document.getElementById(
       "manual-attendance-btn"
@@ -1415,34 +1556,49 @@ document.addEventListener("DOMContentLoaded", function () {
         window.faceAttendanceSystem.stopCamera();
       }
     };
-
-    // Add this function to ensure Smart Inventory works with staff dashboard
-    function initializeSmartInventoryIntegration() {
-      // Wait for Smart Inventory to be ready
-      setTimeout(() => {
-        if (window.smartInventorySystem) {
-          console.log("Smart Inventory System detected, integrating...");
-
-          // Make produkData available to Smart Inventory
-          if (produkData && produkData.length > 0) {
-            window.smartInventorySystem.products = produkData;
-            window.smartInventorySystem.updateDashboard();
-          }
-        } else {
-          console.log("Smart Inventory System not found, retrying...");
-          initializeSmartInventoryIntegration();
-        }
-      }, 1000);
-    }
   });
 
+  function waitForTensorFlow() {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 50; // 25 seconds max wait
+
+      const checkTensorFlow = () => {
+        attempts++;
+        if (typeof tf !== "undefined") {
+          console.log("✅ TensorFlow.js loaded");
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          console.error("❌ TensorFlow.js failed to load after 25 seconds");
+          reject(new Error("TensorFlow.js not available"));
+        } else {
+          setTimeout(checkTensorFlow, 500);
+        }
+      };
+
+      checkTensorFlow();
+    });
+  }
   // Add this after your fetchProduk function
   function triggerSmartInventoryRefresh() {
+    console.log("🔄 Triggering Smart Inventory refresh...");
+
+    if (window.expandableSmartInventory) {
+      // Update preview stats
+      if (window.produkData) {
+        window.expandableSmartInventory.updatePreviewStats(window.produkData);
+      }
+    }
+
     if (window.smartInventorySystem) {
       setTimeout(async () => {
-        await window.smartInventorySystem.loadProducts();
-        window.smartInventorySystem.updateDashboard();
-        console.log("Smart Inventory refreshed after stock change");
+        try {
+          window.smartInventorySystem.products = window.produkData;
+          await window.smartInventorySystem.updateDashboard();
+          console.log("✅ Smart Inventory refreshed after stock change");
+        } catch (error) {
+          console.error("❌ Error refreshing Smart Inventory:", error);
+        }
       }, 1000);
     }
   }

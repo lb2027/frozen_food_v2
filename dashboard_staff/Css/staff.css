@@ -1427,6 +1427,21 @@ button[type="submit"]:hover,
   backdrop-filter: blur(10px);
 }
 
+.expand-toggle-btn {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+  backdrop-filter: blur(10px);
+  margin-top: 1em;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .modalabsensi {
@@ -1843,4 +1858,218 @@ button[type="submit"]:hover,
 
 .model-status.pending {
   color: #ccc;
+}
+
+/* Real-time confidence badge styles */
+.confidence-badge.realtime {
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.confidence-badge.confidence-updating {
+  animation: pulse 0.6s ease-in-out;
+  border-color: #ffd700;
+}
+
+.confidence-badge.confidence-increased {
+  background-color: rgba(0, 255, 0, 0.1);
+  border-color: #00ff00;
+  animation: glow-green 1s ease-out;
+}
+
+.confidence-badge.confidence-decreased {
+  background-color: rgba(255, 165, 0, 0.1);
+  border-color: #ffa500;
+  animation: glow-orange 1s ease-out;
+}
+
+/* Confidence level colors */
+.confidence-badge.confidence-high {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 0, 0.15),
+    rgba(0, 200, 0, 0.05)
+  );
+  color: #00ff00;
+  border-color: #00ff00;
+}
+
+.confidence-badge.confidence-medium {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 0, 0.15),
+    rgba(255, 200, 0, 0.05)
+  );
+  color: #ffff00;
+  border-color: #ffff00;
+}
+
+.confidence-badge.confidence-low {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 165, 0, 0.15),
+    rgba(255, 140, 0, 0.05)
+  );
+  color: #ffa500;
+  border-color: #ffa500;
+}
+
+.confidence-badge.confidence-critical {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.15),
+    rgba(200, 0, 0, 0.05)
+  );
+  color: #ff4444;
+  border-color: #ff4444;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow-green {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(0, 255, 0, 0);
+  }
+}
+
+@keyframes glow-orange {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 165, 0, 0);
+  }
+}
+
+/* Confidence value styling */
+.confidence-value {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Real-time indicator */
+.confidence-badge.realtime::after {
+  content: "●";
+  color: #00ff00;
+  font-size: 8px;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Add positioning styles for the dashboard */
+
+#smart-inventory-placeholder {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.smart-inventory-dashboard {
+  background: linear-gradient(
+    135deg,
+    rgba(33, 37, 41, 0.95),
+    rgba(52, 58, 64, 0.95)
+  );
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure dashboard appears right after header */
+.main-content header + .smart-inventory-dashboard,
+.main-content header + #smart-inventory-placeholder,
+.main-content header + .smart-inventory-expandable-wrapper {
+  margin-top: 20px;
+}
+
+/* Ensure proper spacing with search container */
+.smart-inventory-dashboard + .search-container,
+#smart-inventory-placeholder + .search-container,
+.smart-inventory-expandable-wrapper + .search-container {
+  margin-top: 20px;
+}
+
+/* Enhanced header styling for better integration */
+.main-content header {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 0; /* Remove margin so dashboard can be positioned directly after */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-title h2 {
+  color: #ffff;
+  margin: 0;
+  font-size: 1.5em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .smart-inventory-dashboard {
+    margin: 15px 0;
+    padding: 15px;
+  }
+
+  .main-content header {
+    padding: 15px;
+  }
+
+  .header-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.alert-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  border: none;
+  background-color: transparent;
+  z-index: 1;
 }

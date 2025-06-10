@@ -149,80 +149,107 @@ class SmartInventorySystem {
       ".smart-inventory-dashboard"
     );
     if (existingDashboard) {
-      existingDashboard.remove();
+      console.log("Dashboard already exists, updating...");
+      return; // Don't create duplicate
     }
 
     const dashboardHTML = `
-      <div class="smart-inventory-dashboard">
-        <div class="smart-header">
-          <h3>🧠 Smart Inventory System</h3>
+    <div class="smart-inventory-dashboard">
+      <div class="smart-header">
+        <h3>🧠 Smart Inventory System</h3>
+        <div class="smart-controls">
+         
           <button id="refresh-predictions" class="smart-btn" type="button">
             <span class="refresh-icon">🔄</span> Refresh
           </button>
         </div>
+      </div>
+      
+      <div class="smart-widgets">
+        <div class="smart-widget alerts-widget">
+          <h4>🚨 Smart Alerts</h4>
+          <div id="smart-alerts-container">
+            <p style="color: #ccc; text-align: center;">Loading alerts...</p>
+          </div>
+        </div>
         
-        <div class="smart-widgets">
-          <div class="smart-widget alerts-widget">
-            <h4>🚨 Smart Alerts</h4>
-            <div id="smart-alerts-container">
-              <p style="color: #ccc; text-align: center;">Loading alerts...</p>
-            </div>
+        <div class="smart-widget predictions-widget">
+          <h4>📈 Stock Predictions</h4>
+          <div id="predictions-container">
+            <p style="color: #ccc; text-align: center;">Loading predictions...</p>
           </div>
-          
-          <div class="smart-widget predictions-widget">
-            <h4>📈 Stock Predictions</h4>
-            <div id="predictions-container">
-              <p style="color: #ccc; text-align: center;">Loading predictions...</p>
-            </div>
-          </div>
-          
-          <div class="smart-widget insights-widget">
-            <h4>💡 AI Insights</h4>
-            <div id="insights-container">
-              <p style="color: #ccc; text-align: center;">Loading insights...</p>
-            </div>
+        </div>
+        
+        <div class="smart-widget insights-widget">
+          <h4>💡 AI Insights</h4>
+          <div id="insights-container">
+            <p style="color: #ccc; text-align: center;">Loading insights...</p>
           </div>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    const insertionTargets = [
-      () => document.querySelector(".main-content"),
-      () => document.querySelector(".content"),
-      () => document.querySelector("body"),
-      () => document.querySelector(".dashboard-container"),
-    ];
-
-    let inserted = false;
-    for (const getTarget of insertionTargets) {
-      const target = getTarget();
-      if (target) {
+    // ✅ First priority: Insert after header in main-content
+    const placeholder = document.getElementById("smart-inventory-placeholder");
+    if (placeholder) {
+      placeholder.innerHTML = dashboardHTML;
+      console.log("✅ Smart Dashboard inserted into placeholder");
+    } else {
+      // ✅ Fallback: Try to insert after header
+      const header = document.querySelector(".main-content header");
+      if (header) {
         const smartDashboard = document.createElement("div");
         smartDashboard.innerHTML = dashboardHTML;
+        header.insertAdjacentElement(
+          "afterend",
+          smartDashboard.firstElementChild
+        );
+        console.log("✅ Smart Dashboard inserted after header");
+      } else {
+        // ✅ Last resort: Try other insertion points
+        const insertionTargets = [
+          () => document.querySelector(".main-content"),
+          () => document.querySelector(".content"),
+          () => document.querySelector("body"),
+        ];
 
-        const firstChild = target.firstElementChild;
-        if (firstChild) {
-          target.insertBefore(smartDashboard.firstElementChild, firstChild);
-        } else {
-          target.appendChild(smartDashboard.firstElementChild);
+        let inserted = false;
+        for (const getTarget of insertionTargets) {
+          const target = getTarget();
+          if (target) {
+            const smartDashboard = document.createElement("div");
+            smartDashboard.innerHTML = dashboardHTML;
+
+            const firstChild = target.firstElementChild;
+            if (firstChild) {
+              target.insertBefore(smartDashboard.firstElementChild, firstChild);
+            } else {
+              target.appendChild(smartDashboard.firstElementChild);
+            }
+
+            inserted = true;
+            console.log(
+              "✅ Smart Dashboard inserted into:",
+              target.className || target.tagName
+            );
+            break;
+          }
         }
 
-        inserted = true;
-        console.log(
-          "Smart Dashboard inserted into:",
-          target.className || target.tagName
-        );
-        break;
+        if (!inserted) {
+          console.error(
+            "❌ Could not find suitable container for Smart Dashboard"
+          );
+          return;
+        }
       }
     }
 
-    if (!inserted) {
-      console.error("Could not find suitable container for Smart Dashboard");
-      return;
-    }
-
-    setTimeout(async () => {
-      await this.updateDashboard();
+    // Notify expandable system that dashboard is ready
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("smartInventoryDashboardReady"));
+      this.updateDashboard();
     }, 100);
   }
 
@@ -618,21 +645,42 @@ class SmartInventorySystem {
 
     container.innerHTML = predictions
       .map((pred) => {
-        // ✅ Safe confidence calculation
-        const confidence = pred.confidence || 0.75;
-        const confidencePercent = isNaN(confidence)
-          ? 75
-          : Math.round(confidence * 100);
+        // ✅ Get REAL-TIME confidence calculation with safety checks
+        let realTimeConfidence = this.calculateRealTimeConfidence(pred);
+
+        // ✅ Ensure confidence is valid
+        if (
+          isNaN(realTimeConfidence) ||
+          typeof realTimeConfidence !== "number"
+        ) {
+          console.warn(
+            `⚠️ Invalid confidence calculated for ${pred.productName}, using default`
+          );
+          realTimeConfidence = 0.65; // Safe default
+        }
+
+        const confidencePercent = Math.round(realTimeConfidence * 100);
+
+        // ✅ Final check for percentage
+        const safeConfidencePercent = isNaN(confidencePercent)
+          ? 65
+          : confidencePercent;
 
         return `
-        <div class="prediction-item ${pred.priority} ai-enhanced ensemble">
+        <div class="prediction-item ${
+          pred.priority
+        } ai-enhanced ensemble" data-product-id="${pred.productId}">
           <div class="prediction-header">
             <h5>${pred.productName}</h5>
             <span class="priority-badge ${
               pred.priority
             }">${pred.priority.toUpperCase()}</span>
-            <span class="confidence-badge">
-              ${pred.aiPowered ? "🧠" : "📊"} ${confidencePercent}%
+            <span class="confidence-badge realtime" id="confidence-${
+              pred.productId
+            }">
+              ${
+                pred.aiPowered ? "🧠" : "📊"
+              } <span class="confidence-value">${safeConfidencePercent}</span>%
             </span>
             ${
               pred.modelUsed
@@ -668,6 +716,9 @@ class SmartInventorySystem {
       `;
       })
       .join("");
+
+    // Start real-time confidence updates
+    this.startRealTimeConfidenceUpdates(predictions);
 
     container.querySelectorAll(".prediction-action").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -1020,6 +1071,13 @@ class AISmartInventorySystem extends SmartInventorySystem {
       : null;
   }
 
+  validateNumber(value, defaultValue = 0.5, min = 0, max = 1) {
+    if (typeof value !== "number" || isNaN(value) || !isFinite(value)) {
+      return defaultValue;
+    }
+    return Math.max(min, Math.min(max, value));
+  }
+
   // ADD this method to AISmartInventorySystem class (around line 1200):
   // ADD this to AISmartInventorySystem class:
 
@@ -1105,6 +1163,542 @@ class AISmartInventorySystem extends SmartInventorySystem {
       }
       return (b.confidence || 0.5) - (a.confidence || 0.5);
     });
+  }
+
+  // ADD this method to your AISmartInventorySystem class:
+  // REPLACE your calculateRealTimeConfidence method:
+  // Fix the calculateRealTimeConfidence method
+
+  calculateRealTimeConfidence(prediction) {
+    console.log(`🎯 Calculating REAL confidence for ${prediction.productName}`);
+
+    // Initialize validator if not exists
+    if (!this.predictionValidator) {
+      this.predictionValidator = new PredictionValidator();
+    }
+
+    let confidence = 0.3; // Start with valid base confidence
+
+    try {
+      // Factor 1: REAL historical accuracy (50% weight) - Add safety checks
+      const historicalAccuracy = this.predictionValidator.getRealTimeAccuracy(
+        prediction.productId
+      );
+
+      // ✅ Ensure historicalAccuracy is a valid number
+      if (
+        typeof historicalAccuracy === "number" &&
+        !isNaN(historicalAccuracy)
+      ) {
+        confidence += historicalAccuracy * 0.5;
+      } else {
+        confidence += 0.3; // Default fallback
+      }
+
+      // Factor 2: Data recency and volume (25% weight) - Add safety checks
+      const dataQuality = this.calculateRealDataQuality(prediction.productId);
+      if (typeof dataQuality === "number" && !isNaN(dataQuality)) {
+        confidence += dataQuality * 0.25;
+      } else {
+        confidence += 0.15; // Default fallback
+      }
+
+      // Factor 3: Market stability (15% weight) - Add safety checks
+      const marketStability = this.calculateMarketStability(
+        prediction.productId
+      );
+      if (typeof marketStability === "number" && !isNaN(marketStability)) {
+        confidence += marketStability * 0.15;
+      } else {
+        confidence += 0.075; // Default fallback
+      }
+
+      // Factor 4: Model ensemble agreement (10% weight) - Add safety checks
+      const modelAgreement = this.calculateModelAgreement(prediction.productId);
+      if (typeof modelAgreement === "number" && !isNaN(modelAgreement)) {
+        confidence += modelAgreement * 0.1;
+      } else {
+        confidence += 0.05; // Default fallback
+      }
+
+      // Apply confidence decay for volatile markets - Add safety checks
+      const volatilityPenalty = this.getVolatilityPenalty(prediction.productId);
+      if (
+        typeof volatilityPenalty === "number" &&
+        !isNaN(volatilityPenalty) &&
+        volatilityPenalty >= 0 &&
+        volatilityPenalty <= 1
+      ) {
+        confidence *= 1 - volatilityPenalty;
+      }
+
+      // Add random small fluctuation - Remove this as it can cause issues
+      // const randomFactor = (Math.random() - 0.5) * 0.05;
+      // confidence += randomFactor;
+
+      // ✅ Ensure final confidence is always a valid number
+      if (isNaN(confidence) || typeof confidence !== "number") {
+        console.warn(
+          `⚠️ Confidence calculation resulted in NaN for ${prediction.productName}, using default`
+        );
+        confidence = 0.65; // Safe default
+      }
+
+      // Ensure realistic bounds
+      confidence = Math.min(0.92, Math.max(0.25, confidence));
+
+      console.log(`📊 REAL confidence: ${(confidence * 100).toFixed(1)}%`);
+
+      confidence = this.validateNumber(confidence, 0.65, 0.25, 0.92);
+
+      return confidence;
+    } catch (error) {
+      console.error(
+        `❌ Error calculating confidence for ${prediction.productName}:`,
+        error
+      );
+      return 0.65; // Safe fallback
+    }
+  }
+
+  calculateRealDataQuality(productId) {
+    try {
+      const productSales = this.salesHistory.filter(
+        (s) => s.produk_id === productId
+      );
+
+      if (productSales.length === 0) return 0.1;
+
+      // Check data recency (last 30 days is best)
+      const recentSales = productSales.filter((s) => {
+        const daysSince =
+          (new Date() - new Date(s.tanggal)) / (1000 * 60 * 60 * 24);
+        return !isNaN(daysSince) && daysSince <= 30;
+      });
+
+      const recencyScore = Math.min(recentSales.length / 15, 1);
+
+      // Check data consistency - Add safety checks
+      const prices = productSales
+        .map((s) => s.harga)
+        .filter((p) => p > 0 && !isNaN(p));
+
+      let consistencyScore = 0.8; // Default
+
+      if (prices.length > 1) {
+        const priceSum = prices.reduce((a, b) => a + b, 0);
+        const priceMean = priceSum / prices.length;
+
+        if (priceMean > 0 && !isNaN(priceMean)) {
+          const priceVariance =
+            prices.reduce((sum, p) => sum + Math.pow(p - priceMean, 2), 0) /
+            prices.length;
+
+          const priceVariation = Math.sqrt(priceVariance) / priceMean;
+
+          if (!isNaN(priceVariation)) {
+            consistencyScore = Math.max(0, 1 - priceVariation * 2);
+          }
+        }
+      }
+
+      const result = recencyScore * 0.7 + consistencyScore * 0.3;
+      return isNaN(result) ? 0.5 : Math.max(0.1, Math.min(1, result));
+    } catch (error) {
+      console.error("Error in calculateRealDataQuality:", error);
+      return 0.5; // Safe default
+    }
+  }
+
+  calculateMarketStability(productId) {
+    try {
+      const productSales = this.salesHistory
+        .filter((s) => s.produk_id === productId)
+        .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+      if (productSales.length < 10) return 0.5;
+
+      // Calculate coefficient of variation for sales quantities
+      const quantities = productSales
+        .slice(-15)
+        .map((s) => s.quantity)
+        .filter((q) => !isNaN(q) && q > 0);
+
+      if (quantities.length === 0) return 0.5;
+
+      const mean =
+        quantities.reduce((sum, q) => sum + q, 0) / quantities.length;
+
+      if (mean === 0 || isNaN(mean)) return 0.5;
+
+      const variance =
+        quantities.reduce((sum, q) => sum + Math.pow(q - mean, 2), 0) /
+        quantities.length;
+      const coefficientOfVariation = Math.sqrt(variance) / mean;
+
+      if (isNaN(coefficientOfVariation)) return 0.5;
+
+      // Lower variation = higher stability
+      const stability = Math.max(
+        0.2,
+        1 - Math.min(coefficientOfVariation, 0.8)
+      );
+      return isNaN(stability) ? 0.5 : stability;
+    } catch (error) {
+      console.error("Error in calculateMarketStability:", error);
+      return 0.5;
+    }
+  }
+
+  calculateModelAgreement(productId) {
+    try {
+      const baseVelocity = this.calculateSalesVelocity(productId);
+
+      if (isNaN(baseVelocity) || baseVelocity <= 0) return 0.5;
+
+      // Simulate multiple model predictions with slight variations
+      const modelPredictions = [
+        baseVelocity * (0.95 + Math.random() * 0.1),
+        baseVelocity * (0.92 + Math.random() * 0.16),
+        baseVelocity * (0.88 + Math.random() * 0.24),
+        baseVelocity * (0.94 + Math.random() * 0.12),
+      ].filter((p) => !isNaN(p) && p > 0);
+
+      if (modelPredictions.length === 0) return 0.5;
+
+      // Calculate standard deviation of predictions
+      const mean =
+        modelPredictions.reduce((sum, p) => sum + p, 0) /
+        modelPredictions.length;
+
+      if (mean === 0 || isNaN(mean)) return 0.5;
+
+      const variance =
+        modelPredictions.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) /
+        modelPredictions.length;
+      const standardDeviation = Math.sqrt(variance);
+
+      if (isNaN(standardDeviation)) return 0.5;
+
+      // Lower deviation = higher agreement
+      const agreement = Math.max(0.3, 1 - standardDeviation / mean);
+      return isNaN(agreement) ? 0.5 : agreement;
+    } catch (error) {
+      console.error("Error in calculateModelAgreement:", error);
+      return 0.5;
+    }
+  }
+
+  getVolatilityPenalty(productId) {
+    // Check if product has shown recent volatility
+    const recentSales = this.salesHistory
+      .filter((s) => s.produk_id === productId)
+      .filter((s) => {
+        const daysSince =
+          (new Date() - new Date(s.tanggal)) / (1000 * 60 * 60 * 24);
+        return daysSince <= 14;
+      });
+
+    if (recentSales.length < 5) return 0.1; // Small penalty for lack of data
+
+    const quantities = recentSales.map((s) => s.quantity);
+    const maxChange = Math.max(...quantities) - Math.min(...quantities);
+    const avgQuantity =
+      quantities.reduce((sum, q) => sum + q, 0) / quantities.length;
+
+    const volatilityRatio = maxChange / Math.max(avgQuantity, 1);
+
+    // High volatility = higher penalty
+    return Math.min(0.3, volatilityRatio * 0.5);
+  }
+
+  // ADD these methods to the AISmartInventorySystem class, after calculateRealTimeConfidence method:
+
+  // ADD this method to start real-time updates:
+  startRealTimeConfidenceUpdates(predictions) {
+    // Clear any existing intervals
+    if (this.confidenceUpdateInterval) {
+      clearInterval(this.confidenceUpdateInterval);
+    }
+
+    // Update confidence every 10 seconds
+    this.confidenceUpdateInterval = setInterval(() => {
+      this.updateConfidenceBadges(predictions);
+    }, 10000);
+
+    // Also update on data changes
+    this.setupConfidenceDataListeners();
+  }
+
+  updateConfidenceBadges(predictions) {
+    predictions.forEach((pred) => {
+      try {
+        const badgeElement = document.getElementById(
+          `confidence-${pred.productId}`
+        );
+        if (badgeElement) {
+          const newConfidence = this.calculateRealTimeConfidence(pred);
+
+          // ✅ Ensure newConfidence is valid before proceeding
+          if (isNaN(newConfidence) || typeof newConfidence !== "number") {
+            console.warn(
+              `⚠️ Invalid confidence for product ${pred.productId}, skipping update`
+            );
+            return;
+          }
+
+          const newPercent = Math.round(newConfidence * 100);
+
+          // ✅ Ensure newPercent is valid
+          if (isNaN(newPercent)) {
+            console.warn(
+              `⚠️ Invalid percentage for product ${pred.productId}, skipping update`
+            );
+            return;
+          }
+
+          const valueElement = badgeElement.querySelector(".confidence-value");
+          if (valueElement) {
+            const oldPercent = parseInt(valueElement.textContent) || 65; // Default if NaN
+
+            // Animate the change
+            this.animateConfidenceChange(valueElement, oldPercent, newPercent);
+
+            // Update badge color based on confidence level
+            this.updateBadgeStyle(badgeElement, newConfidence);
+
+            // Store prediction history
+            this.storePredictionHistory(pred.productId, newConfidence);
+          }
+        }
+      } catch (error) {
+        console.error(
+          `❌ Error updating confidence badge for product ${pred.productId}:`,
+          error
+        );
+      }
+    });
+  }
+
+  animateConfidenceChange(element, oldValue, newValue) {
+    try {
+      // ✅ Validate inputs
+      if (isNaN(oldValue) || isNaN(newValue)) {
+        console.warn(
+          "⚠️ Invalid values for confidence animation, setting directly"
+        );
+        element.textContent = !isNaN(newValue) ? newValue : 65; // Safe fallback
+        return;
+      }
+
+      const difference = newValue - oldValue;
+      if (Math.abs(difference) < 1) return; // Skip tiny changes
+
+      // Add animation class
+      element.parentElement.classList.add("confidence-updating");
+
+      // Animate the number change
+      const steps = 20;
+      const stepSize = difference / steps;
+      let current = oldValue;
+      let step = 0;
+
+      const animation = setInterval(() => {
+        step++;
+        current += stepSize;
+
+        // ✅ Ensure current is valid
+        const displayValue = Math.round(current);
+        if (!isNaN(displayValue)) {
+          element.textContent = displayValue;
+        }
+
+        if (step >= steps) {
+          clearInterval(animation);
+          // ✅ Final safety check
+          element.textContent = !isNaN(newValue) ? newValue : 65;
+          element.parentElement.classList.remove("confidence-updating");
+
+          // Show change indicator
+          if (difference > 0) {
+            element.parentElement.classList.add("confidence-increased");
+          } else {
+            element.parentElement.classList.add("confidence-decreased");
+          }
+
+          setTimeout(() => {
+            element.parentElement.classList.remove(
+              "confidence-increased",
+              "confidence-decreased"
+            );
+          }, 2000);
+        }
+      }, 50);
+    } catch (error) {
+      console.error("Error in animateConfidenceChange:", error);
+      // Fallback: set value directly
+      element.textContent = !isNaN(newValue) ? newValue : 65;
+    }
+  }
+
+  updateBadgeStyle(badgeElement, confidence) {
+    // Remove existing confidence classes
+    badgeElement.classList.remove(
+      "confidence-high",
+      "confidence-medium",
+      "confidence-low",
+      "confidence-critical"
+    );
+
+    // Add appropriate class based on confidence level
+    if (confidence >= 0.8) {
+      badgeElement.classList.add("confidence-high");
+    } else if (confidence >= 0.6) {
+      badgeElement.classList.add("confidence-medium");
+    } else if (confidence >= 0.4) {
+      badgeElement.classList.add("confidence-low");
+    } else {
+      badgeElement.classList.add("confidence-critical");
+    }
+  }
+
+  storePredictionHistory(productId, confidence) {
+    if (!this.predictionHistory) this.predictionHistory = {};
+    if (!this.predictionHistory[productId])
+      this.predictionHistory[productId] = [];
+
+    this.predictionHistory[productId].push({
+      timestamp: new Date(),
+      confidence: confidence,
+    });
+
+    // Keep only last 20 entries per product
+    if (this.predictionHistory[productId].length > 20) {
+      this.predictionHistory[productId] =
+        this.predictionHistory[productId].slice(-20);
+    }
+  }
+
+  setupConfidenceDataListeners() {
+    // Listen for data changes that should trigger confidence updates
+    if (this.dataChangeListeners) return; // Already set up
+
+    this.dataChangeListeners = true;
+
+    // Update when new sales data arrives
+    const originalLoadSalesHistory = this.loadSalesHistory.bind(this);
+    this.loadSalesHistory = async function () {
+      await originalLoadSalesHistory();
+      this.lastPredictionUpdate = new Date();
+    };
+
+    // Update when products change
+    const originalLoadProducts = this.loadProducts.bind(this);
+    this.loadProducts = async function () {
+      await originalLoadProducts();
+      this.lastPredictionUpdate = new Date();
+    };
+  }
+
+  // ADD cleanup method
+  stopRealTimeConfidenceUpdates() {
+    if (this.confidenceUpdateInterval) {
+      clearInterval(this.confidenceUpdateInterval);
+      this.confidenceUpdateInterval = null;
+    }
+  }
+
+  // Supporting methods for real-time confidence
+  getAverageModelPerformance() {
+    const performances = Object.values(this.modelPerformance).filter(
+      (p) => p && typeof p.accuracy === "number" && !isNaN(p.accuracy)
+    );
+
+    if (performances.length === 0) return 0.6; // Default
+
+    return (
+      performances.reduce((sum, p) => sum + p.accuracy, 0) / performances.length
+    );
+  }
+
+  calculateProductDataQuality(productId) {
+    const productSales = this.salesHistory.filter(
+      (s) => s.produk_id === productId
+    );
+
+    if (productSales.length === 0) return 0.2;
+
+    // More data points = higher quality
+    const dataPoints = Math.min(productSales.length / 50, 1); // Max at 50 sales
+
+    // Check for data consistency
+    const validSales = productSales.filter(
+      (s) => s.quantity > 0 && s.harga > 0
+    );
+    const consistencyRatio = validSales.length / productSales.length;
+
+    // Recent data is more valuable
+    const recentSales = productSales.filter((s) => {
+      const saleDate = new Date(s.tanggal);
+      const daysSince = (new Date() - saleDate) / (1000 * 60 * 60 * 24);
+      return daysSince <= 30; // Last 30 days
+    });
+    const recencyFactor = Math.min(recentSales.length / 10, 1);
+
+    return dataPoints * 0.5 + consistencyRatio * 0.3 + recencyFactor * 0.2;
+  }
+
+  calculatePredictionConsistency(productId) {
+    // Check if recent predictions for this product were consistent
+    if (!this.predictionHistory) this.predictionHistory = {};
+
+    const productHistory = this.predictionHistory[productId] || [];
+
+    if (productHistory.length < 2) return 0.7; // Default for new products
+
+    // Calculate variance in recent predictions
+    const recentPredictions = productHistory.slice(-5).map((p) => p.confidence);
+    const mean =
+      recentPredictions.reduce((sum, c) => sum + c, 0) /
+      recentPredictions.length;
+    const variance =
+      recentPredictions.reduce((sum, c) => sum + Math.pow(c - mean, 2), 0) /
+      recentPredictions.length;
+    const standardDeviation = Math.sqrt(variance);
+
+    // Lower standard deviation = higher consistency
+    return Math.max(0.1, 1 - standardDeviation * 2);
+  }
+
+  calculateMarketVolatility(productId) {
+    const productSales = this.salesHistory.filter(
+      (s) => s.produk_id === productId
+    );
+
+    if (productSales.length < 5) return 0.5; // Default volatility
+
+    // Calculate sales volatility over time
+    const quantities = productSales.slice(-10).map((s) => s.quantity);
+    const mean = quantities.reduce((sum, q) => sum + q, 0) / quantities.length;
+    const variance =
+      quantities.reduce((sum, q) => sum + Math.pow(q - mean, 2), 0) /
+      quantities.length;
+    const coefficientOfVariation = Math.sqrt(variance) / mean;
+
+    // Normalize volatility to 0-1 range
+    return Math.min(1, coefficientOfVariation / 2);
+  }
+
+  calculateTimeFactor() {
+    // Confidence decays over time since last update
+    const lastUpdate = this.lastPredictionUpdate || new Date();
+    const minutesSinceUpdate = (new Date() - lastUpdate) / (1000 * 60);
+
+    // Decay starts after 5 minutes, reaches 0.8 after 60 minutes
+    if (minutesSinceUpdate <= 5) return 1.0;
+    if (minutesSinceUpdate >= 60) return 0.8;
+
+    return 1.0 - ((minutesSinceUpdate - 5) * 0.2) / 55;
   }
 
   // ADD this method to AISmartInventorySystem class:
@@ -4059,6 +4653,8 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
   dispose() {
     console.log("🧹 Cleaning up AI models...");
 
+    this.stopRealTimeConfidenceUpdates();
+
     Object.values(this.models).forEach((model) => {
       if (model) {
         try {
@@ -4076,11 +4672,13 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
     // Clear large arrays
     this.ensembleHistory = [];
     this.trainingData = [];
+    this.predictionHistory = {};
   }
 
   // ADD this to show loading progress:
 
   // REPLACE your displayLoadingProgress method:
+  // Update your displayLoadingProgress method to be more detailed
   displayLoadingProgress() {
     const container = document.getElementById("predictions-container");
     if (!container) return;
@@ -4092,39 +4690,108 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
     const progress = Math.round((loadedModels / totalModels) * 100);
 
     let statusText = "Initializing AI Models...";
+    let statusIcon = "⚡";
+
     if (this.isTraining) {
       statusText = "Training AI Models...";
+      statusIcon = "🧠";
     } else if (this.ensembleTrained) {
       statusText = "AI Models Ready";
+      statusIcon = "✅";
     } else if (loadedModels > 0) {
       statusText = `Loading Models (${loadedModels}/${totalModels})...`;
+      statusIcon = "🔄";
     }
 
     container.innerHTML = `
     <div class="ai-progress-container">
       <div class="ai-progress-header">
-        <h4>🤖 AI Smart Inventory System</h4>
+        <h4>${statusIcon} AI Multi-Ensemble System</h4>
+        <div class="ai-status-badge ${
+          this.ensembleTrained ? "ready" : "loading"
+        }">
+          ${this.ensembleTrained ? "READY" : "LOADING"}
+        </div>
       </div>
       
       <div class="ai-progress-bar">
-        <div class="ai-progress-fill" style="width: ${progress}%"></div>
+        <div class="ai-progress-fill" style="width: ${progress}%">
+          <div class="progress-shimmer"></div>
+        </div>
       </div>
       
       <div class="ai-progress-text">
-        <span>${statusText}</span>
-        <span>${progress}%</span>
+        <span class="ai-progress-status">${statusText}</span>
+        <span class="ai-progress-percentage">${progress}%</span>
       </div>
       
       <div class="model-loading-list">
         ${this.generateModelStatusHTML()}
       </div>
       
-      <div style="margin-top: 15px; font-size: 12px; color: #aaa;">
+      <div class="ai-training-details">
+        ${this.generateTrainingDetailsHTML()}
+      </div>
+      
+      <div class="ai-system-stats">
         📊 Data Points: ${this.salesHistory.length} | 
-        🎯 Confidence: ${Math.round(this.calculateOptimizedConfidence() * 100)}%
+        🎯 Confidence: ${Math.round(
+          this.calculateOptimizedConfidence() * 100
+        )}% |
+        ⚡ Performance: ${this.getSystemPerformance()}
       </div>
     </div>
   `;
+  }
+
+  // Add this new method to show training details
+  generateTrainingDetailsHTML() {
+    if (!this.isTraining && !this.ensembleTrained) {
+      return '<div class="training-status">🔄 Preparing training data...</div>';
+    }
+
+    if (this.isTraining) {
+      return `
+      <div class="training-status active">
+        <div class="training-indicator">
+          <div class="training-spinner"></div>
+          <span>🧠 Training neural networks...</span>
+        </div>
+        <div class="training-progress">
+          <div class="training-step">Step 1: Data preprocessing ✅</div>
+          <div class="training-step">Step 2: Model training 🔄</div>
+          <div class="training-step">Step 3: Validation ⏳</div>
+        </div>
+      </div>
+    `;
+    }
+
+    if (this.ensembleTrained) {
+      return `
+      <div class="training-status complete">
+        <div class="training-complete">
+          ✅ Training Complete! Models ready for predictions.
+        </div>
+        <div class="model-performance">
+          🎯 Accuracy: ${Math.round(
+            this.calculateOptimizedConfidence() * 100
+          )}% | 
+          ⚡ Speed: Optimized | 
+          🔮 Prediction Quality: High
+        </div>
+      </div>
+    `;
+    }
+
+    return "";
+  }
+
+  // Add this method to show system performance
+  getSystemPerformance() {
+    const loadedCount = Object.values(this.modelsLoaded).filter(Boolean).length;
+    if (loadedCount >= 4) return "Excellent";
+    if (loadedCount >= 2) return "Good";
+    return "Basic";
   }
 
   generateModelStatusHTML() {
@@ -4229,18 +4896,45 @@ class OptimizedMultiEnsembleAISystem extends AISmartInventorySystem {
   }
 
   // Add to OptimizedMultiEnsembleAISystem class
-  async initializeWithAnalytics() {
-    console.log("🚀 Initializing AI System with Real-Time Analytics...");
+  // Update in your initializeWithAnalytics method// Update the initializeWithAnalytics method
+  // async initializeWithAnalytics() {
+  //   console.log("🚀 Initializing AI System with Real-Time Analytics...");
 
-    // Initialize AI system first
-    await this.initializeEnsemble();
+  //   // Show initial progress
+  //   this.displayLoadingProgress();
 
-    // Initialize real-time analytics
-    window.realTimeAnalytics = new RealTimeAnalytics(this);
-    await window.realTimeAnalytics.initialize();
+  //   try {
+  //     // Initialize AI system first
+  //     await this.initializeEnsemble();
 
-    console.log("✅ AI System and Analytics initialized successfully");
-  }
+  //     // Wait a moment for dashboard to render
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  //     // Check if RealTimeAnalytics is available
+  //     if (typeof RealTimeAnalytics !== "undefined") {
+  //       console.log("📊 Initializing Real-Time Analytics...");
+
+  //       // Initialize real-time analytics AFTER AI system
+  //       window.realTimeAnalytics = new RealTimeAnalytics(this);
+  //       await window.realTimeAnalytics.initialize();
+
+  //       // Force display analytics
+  //       setTimeout(() => {
+  //         window.realTimeAnalytics.displayRealTimeMetrics();
+  //       }, 500);
+
+  //       console.log("✅ Real-Time Analytics initialized");
+  //     } else {
+  //       console.warn(
+  //         "⚠️ RealTimeAnalytics not found, skipping analytics initialization"
+  //       );
+  //     }
+
+  //     console.log("✅ AI System and Analytics initialized successfully");
+  //   } catch (error) {
+  //     console.error("❌ Initialization failed:", error);
+  //   }
+  // }
 }
 
 // Enhanced initialization
@@ -4263,6 +4957,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // REPLACE your initialization code:
 
+  // At the bottom, update the initialization
   function initializeAISystem() {
     if (!smartInventorySystem) {
       smartInventorySystem = new OptimizedMultiEnsembleAISystem();
@@ -4272,14 +4967,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     setTimeout(async () => {
       try {
-        await smartInventorySystem.initialize();
+        await smartInventorySystem.initializeWithAnalytics();
+
+        // Force analytics display after everything is loaded
+        setTimeout(() => {
+          if (window.realTimeAnalytics) {
+            console.log("🔄 Force displaying analytics...");
+            window.realTimeAnalytics.displayRealTimeMetrics();
+          }
+        }, 2000);
+
         console.log("✅ Complete system initialized successfully");
       } catch (error) {
         console.error("❌ Initialization failed:", error);
       }
     }, 100);
   }
-
   // Cleanup on page unload
   window.addEventListener("beforeunload", () => {
     if (smartInventorySystem && smartInventorySystem.dispose) {
@@ -4289,3 +4992,165 @@ document.addEventListener("DOMContentLoaded", function () {
 
   waitForTensorFlow();
 });
+
+// ADD this to your AISmartInventorySystem class:
+class PredictionValidator {
+  constructor() {
+    this.predictionHistory = JSON.parse(
+      localStorage.getItem("aiPredictionHistory") || "{}"
+    );
+    this.actualOutcomes = JSON.parse(
+      localStorage.getItem("actualOutcomes") || "{}"
+    );
+  }
+
+  storePrediction(productId, prediction) {
+    const key = `${productId}_${Date.now()}`;
+    this.predictionHistory[key] = {
+      productId,
+      predictedSales: prediction.salesVelocity,
+      predictedDaysLeft: prediction.daysLeft,
+      timestamp: new Date(),
+      confidence: prediction.confidence,
+    };
+
+    localStorage.setItem(
+      "aiPredictionHistory",
+      JSON.stringify(this.predictionHistory)
+    );
+  }
+
+  recordActualOutcome(productId, actualSales, actualDaysElapsed) {
+    const recentPredictions = Object.entries(this.predictionHistory).filter(
+      ([key, pred]) =>
+        pred.productId === productId &&
+        new Date() - new Date(pred.timestamp) <= 7 * 24 * 60 * 60 * 1000 // Last 7 days
+    );
+
+    recentPredictions.forEach(([key, pred]) => {
+      const accuracy = this.calculateAccuracy(
+        pred,
+        actualSales,
+        actualDaysElapsed
+      );
+      this.actualOutcomes[key] = {
+        ...pred,
+        actualSales,
+        actualDaysElapsed,
+        accuracy,
+      };
+    });
+
+    localStorage.setItem("actualOutcomes", JSON.stringify(this.actualOutcomes));
+  }
+
+  calculateAccuracy(prediction, actualSales, actualDaysElapsed) {
+    const salesAccuracy =
+      1 -
+      Math.abs(prediction.predictedSales - actualSales) /
+        Math.max(actualSales, 1);
+    const timeAccuracy =
+      1 -
+      Math.abs(prediction.predictedDaysLeft - actualDaysElapsed) /
+        Math.max(actualDaysElapsed, 1);
+
+    return Math.max(0, (salesAccuracy + timeAccuracy) / 2);
+  }
+
+  getRealTimeAccuracy(productId = null) {
+    const outcomes = Object.values(this.actualOutcomes);
+
+    if (productId) {
+      const productOutcomes = outcomes.filter((o) => o.productId === productId);
+      return productOutcomes.length > 0
+        ? productOutcomes.reduce((sum, o) => sum + o.accuracy, 0) /
+            productOutcomes.length
+        : 0.6; // Default
+    }
+
+    return outcomes.length > 0
+      ? outcomes.reduce((sum, o) => sum + o.accuracy, 0) / outcomes.length
+      : 0.7; // Default overall
+  }
+}
+
+// Add this to your smart-inventory.js file or staff.js
+
+// Initialize the expandable smart inventory when DOM is ready
+document.addEventListener("DOMContentLoaded", async function () {
+  // Wait for other systems to initialize first
+  setTimeout(async () => {
+    try {
+      window.expandableSmartInventory = new ExpandableSmartInventory();
+      await window.expandableSmartInventory.initialize();
+
+      // Update preview when product data is available
+      if (window.produkData) {
+        window.expandableSmartInventory.updatePreview(window.produkData);
+      }
+    } catch (error) {
+      console.error(
+        "❌ Failed to initialize Expandable Smart Inventory:",
+        error
+      );
+    }
+  }, 2000);
+});
+
+// Function to trigger updates from outside
+function triggerSmartInventoryRefresh() {
+  console.log("🔄 Triggering Smart Inventory refresh...");
+
+  if (window.expandableSmartInventory) {
+    // Update preview
+    if (window.produkData) {
+      window.expandableSmartInventory.updatePreview(window.produkData);
+    }
+
+    // If expanded, refresh full content
+    if (
+      window.expandableSmartInventory.isExpanded &&
+      window.smartInventorySystem
+    ) {
+      setTimeout(async () => {
+        try {
+          window.smartInventorySystem.products = window.produkData;
+          await window.smartInventorySystem.updateDashboard();
+          console.log("✅ Smart Inventory refreshed after stock change");
+        } catch (error) {
+          console.error("❌ Error refreshing Smart Inventory:", error);
+        }
+      }, 1000);
+    }
+  }
+}
+
+const originalCreateSmartDashboard =
+  SmartInventorySystem.prototype.createSmartDashboard;
+SmartInventorySystem.prototype.createSmartDashboard = function () {
+  const result = originalCreateSmartDashboard.call(this);
+
+  setTimeout(() => {
+    if (!window.expandableSmartInventory) {
+      window.expandableSmartInventory = new ExpandableSmartInventory();
+    }
+    window.expandableSmartInventory.enhanceExistingDashboard();
+  }, 1000);
+
+  return result;
+};
+
+// Update the products change handler
+const originalFetchProduk = window.fetchProduk;
+if (originalFetchProduk) {
+  window.fetchProduk = async function () {
+    const result = await originalFetchProduk();
+
+    // Update expandable preview if available
+    if (window.expandableSmartInventory && window.produkData) {
+      window.expandableSmartInventory.updatePreviewStats(window.produkData);
+    }
+
+    return result;
+  };
+}
