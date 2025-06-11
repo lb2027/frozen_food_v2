@@ -257,7 +257,7 @@ function checkLocation() {
         const distance = getDistance(userLat, userLon, officeLat, officeLon);
 
         const statusEl = document.getElementById("status");
-        if (distance <= 100000000000000000000000000000) {
+        if (distance <= 100000000000000000000000000000000) {
           statusEl.textContent = "✅ Anda berada di dalam area absensi.";
           statusEl.className = "success";
           document.getElementById("absen-button-container").style.display =
@@ -283,7 +283,7 @@ function absen() {
   const userid = localStorage.getItem("userid");
 
   // Get API URL from proper source
-  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
 
   // Use userid instead of undefined staffid variable
   console.log("Staff ID being used:", userid);
