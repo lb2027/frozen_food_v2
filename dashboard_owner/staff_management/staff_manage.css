@@ -1,8 +1,10 @@
 @import "/dashboard_owner/foundation.css";
 @import "/chatbot/chatbot.css";
+@import "/dashboard_owner/mobile-style.css";
 
 /* Modern Dark Theme for Staff Management */
 
+/* Add these variables to match owner.css exactly */
 :root {
   --primary-color: #32d583;
   --primary-hover: #2bb974;
@@ -51,30 +53,57 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #2d2d3f;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
 }
 
 .back-button {
   display: flex;
   align-items: center;
+  gap: 15px;
+  width: 100%;
+  justify-content: space-between;
   cursor: pointer;
   font-size: 18px;
   font-weight: 500;
   color: var(--text-color);
 }
 
-.back-button .material-icons {
-  margin-right: 5px;
+/* Mobile Header - Hidden by default, shown on mobile via @media */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #191919;
+  z-index: 1003;
+  padding: 0 15px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.user-info {
+.mobile-header .mobile-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  flex: 1;
+  text-align: center;
+  margin: 0;
+}
+
+.mobile-header .mobile-user-info {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
-.notification {
+.mobile-header .notification {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -82,28 +111,69 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  color: white;
 }
 
-.notification:hover {
+.mobile-header .notification:hover {
   background-color: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
-  border-radius: 50%;
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
-.user-avatar img {
+.hamburger-menu:hover {
+  background-color: var(--primary-color);
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(1) {
+  transform: rotate(-45deg) translate(-8px, 6px);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(3) {
+  transform: rotate(45deg) translate(-8px, -6px);
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1005;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
 }
 
 /* Tabs styles */
@@ -1054,19 +1124,59 @@ tbody tr:hover::after {
   color: var(--text-secondary);
 }
 
+/* Quick fix - add at the top of staff_manage.css */
+.sidebar-item span {
+  display: block !important;
+  margin-top: 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #aaa !important;
+}
+
+.sidebar-item:hover span {
+  color: #fff !important;
+}
+
+.sidebar-item.active span {
+  color: white !important;
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .subheader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .filter-group-staff {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 1024px) {
   :root {
     --sidebar-width: 80px;
   }
 
-  .sidebar span {
+  .logo {
+    font-size: 1rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar-item span {
     display: none;
   }
 
   .sidebar-item {
     justify-content: center;
-    padding: 15px 0;
+    padding: 0.75rem;
+    margin: 0.5rem;
   }
 
   .icon-circle {
@@ -1076,202 +1186,447 @@ tbody tr:hover::after {
   .main-content {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
+    padding: 15px;
   }
 
-  .logo {
-    font-size: 18px;
-    text-align: center;
-    padding: 10px 0;
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 800px;
   }
 }
 
 @media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
-    gap: 0;
+  body {
+    position: relative;
   }
 
+  /* Show mobile header */
+  .mobile-header {
+    display: flex !important;
+  }
+
+  /* Create mobile header dynamically via CSS content */
+  .main-content::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #191919;
+    z-index: 1001;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Add hamburger menu via CSS */
+
+  /* Adjust main content for mobile header */
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 80px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* Sidebar mobile behavior */
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    z-index: 1006;
+    transition: left 0.3s ease;
+    background-color: #0e0e0e;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* Restore sidebar items text on mobile when sidebar is open */
+  .sidebar-item span {
+    display: inline !important;
+  }
+
+  .icon-circle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo {
+    font-size: 18px !important;
+    padding: 25px 0 !important;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Header Mobile */
   .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
   }
 
-  .user-info {
-    align-self: flex-end;
+  .back-button {
+    font-size: 16px;
   }
 
+  /* Tabs Mobile */
   .tabs-container {
+    margin-bottom: 15px;
     overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
+  .tabs-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    min-width: 120px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Subheader Mobile */
   .subheader {
     flex-direction: column;
-    align-items: flex-start;
     gap: 15px;
+    align-items: stretch;
+    margin-bottom: 20px;
   }
 
-  .actions {
-    width: 100%;
-    justify-content: space-between;
+  .title-container {
+    justify-content: center;
+  }
+
+  .staff-count {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .filter-group-staff {
     flex-direction: column;
     gap: 10px;
   }
 
-  .staff-details-grid {
-    grid-template-columns: 1fr;
+  .filter-select {
+    width: 100%;
+    min-width: auto;
   }
 
+  .actions {
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .sort-btn,
+  .add-staff-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  /* Table Mobile */
+  .table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+  table {
+    min-width: 700px;
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    padding: 8px 4px;
+    white-space: nowrap;
+  }
+
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: var(--card-bg);
+    z-index: 1;
+  }
+
+  .staff-details {
+    min-width: 150px;
+  }
+
+  .staff-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .staff-name {
+    font-size: 12px;
+  }
+
+  .staff-role {
+    font-size: 10px;
+  }
+
+  .action-icons {
+    gap: 4px;
+  }
+
+  .action-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .action-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* No Data Message */
+  .no-data-message {
+    padding: 20px;
+    font-size: 14px;
+  }
+
+  /* Bulk Actions Mobile */
   .bulk-actions {
     bottom: 20px;
     right: 20px;
-    flex-direction: column;
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .bulk-action-btn {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .main-content {
-    padding: 15px;
+    padding-top: 70px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
-  .actions {
-    flex-direction: column;
-    gap: 8px;
+  .header {
+    margin-bottom: 15px;
+  }
+
+  .back-button {
+    font-size: 14px;
+  }
+
+  .staff-count {
+    font-size: 16px;
+  }
+
+  .tab {
+    font-size: 12px;
+    padding: 8px 12px;
+    min-width: 100px;
   }
 
   .sort-btn,
   .add-staff-btn {
-    width: 100%;
-    justify-content: center;
+    padding: 10px 12px;
+    font-size: 12px;
   }
 
+  .sort-btn .material-icons,
+  .add-staff-btn .material-icons {
+    font-size: 16px;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 11px;
+  }
+
+  th,
+  td {
+    padding: 6px 2px;
+  }
+
+  .staff-details {
+    min-width: 120px;
+  }
+
+  .staff-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .staff-name {
+    font-size: 11px;
+  }
+
+  .staff-role {
+    font-size: 9px;
+  }
+
+  .action-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .action-btn svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Enhanced Mobile Modal */
+@media (max-width: 768px) {
   .modal {
-    width: 95%;
+    padding: 0;
+    align-items: flex-start;
+    padding-top: 10px;
   }
 
-  .alert {
-    width: 90%;
-    right: 5%;
-  }
-}
-
-/* Fixed helper function */
-.chart-placeholder {
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  color: var(--light-text);
-  font-size: 14px;
-  margin-top: 15px;
-  border: 1px solid #2d2d3f;
-}
-
-.refresh-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid #2d2d3f;
-  color: var(--text-color);
-  padding: 0.5em;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  align-items: center;
-}
-
-/* Two-column layout styling for modal forms */
-.modal .form-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -10px; /* Negative margin to offset padding */
-}
-
-.modal .form-group {
-  margin-bottom: 1.5rem;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-/* Column sizing */
-.modal .col-full {
-  width: 100%;
-}
-
-.modal .col-half {
-  width: 50%;
-}
-
-@media (max-width: 768px) {
-  /* On smaller screens, make all columns full width */
-  .modal .col-half {
+  .modal-content {
     width: 100%;
+    height: calc(100vh - 20px);
+    max-height: none;
+    margin: 0;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    flex-shrink: 0;
+    border-bottom: 1px solid #2d2d3f;
+    padding: 15px;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+  }
+
+  .modal-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #2d2d3f;
+    padding: 15px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .modal-footer .btn:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .staff-profile {
+    margin-bottom: 15px;
+  }
+
+  .staff-avatar-large {
+    width: 60px;
+    height: 60px;
+  }
+
+  .staff-details-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .detail-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .detail-label {
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  .detail-value {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .chatbot-toggle {
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 6px 20px rgba(50, 213, 131, 0.4);
   }
 }
 
-.modal .form-control {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #2d2d3f;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-color);
-  box-sizing: border-box;
+/* Touch Interactions */
+@media (hover: none) and (pointer: coarse) {
+  .tab:hover,
+  .sort-btn:hover,
+  .add-staff-btn:hover,
+  .action-btn:hover,
+  tbody tr:hover {
+    transform: none;
+    background-color: initial;
+  }
+
+  .notification:hover {
+    transform: none;
+  }
 }
 
-.modal .form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(50, 213, 131, 0.1);
+/* Landscape Mobile Adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-content {
+    padding-top: 70px;
+  }
+
+  .subheader {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-group-staff {
+    flex-direction: row;
+    flex: 1;
+  }
+
+  .actions {
+    flex-shrink: 0;
+  }
 }
 
-.modal .error-message {
-  color: #ff6b6b;
-  font-size: 0.9rem;
-  margin-top: 5px;
-  display: none;
-}
+/* Fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .main-content {
+    min-height: calc(100vh - 60px);
+  }
 
-/* ✅ Ensure proper hiding/showing of elements */
-.filter-group {
-    transition: all 0.3s ease;
-}
-
-/* ✅ Tab-specific visibility */
-.tab-content {
-    transition: opacity 0.3s ease;
-}
-
-.attendance-container,
-.payroll-container {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-
-.attendance-container.active,
-.payroll-container.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ✅ Responsive tab controls */
-@media (max-width: 768px) {
-    .filter-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .actions {
-        flex-direction: column;
-        gap: 10px;
-    }
+  .modal-content {
+    height: calc(100vh - env(safe-area-inset-top) - 20px);
+  }
 }

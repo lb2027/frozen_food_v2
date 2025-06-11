@@ -1162,7 +1162,168 @@ window.generateInvoiceAfterSale = async function (saleData) {
   }
 };
 
+function initializeMobileNavigation() {
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const sidebar = document.querySelector(".sidebar");
+  const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+  if (hamburgerMenu && sidebar && sidebarOverlay) {
+    // Toggle sidebar on hamburger click
+    hamburgerMenu.addEventListener("click", function () {
+      hamburgerMenu.classList.toggle("active");
+      sidebar.classList.toggle("active");
+      sidebarOverlay.classList.toggle("active");
+
+      // Prevent body scroll when sidebar is open
+      if (sidebar.classList.contains("active")) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "auto";
+      }
+    });
+
+    // Close sidebar when overlay is clicked
+    sidebarOverlay.addEventListener("click", function () {
+      closeMobileSidebar();
+    });
+
+    // Close sidebar when sidebar item is clicked (for navigation)
+    const sidebarItems = document.querySelectorAll(".sidebar-item");
+    sidebarItems.forEach((item) => {
+      item.addEventListener("click", function () {
+        if (window.innerWidth <= 768) {
+          closeMobileSidebar();
+        }
+      });
+    });
+  }
+}
+
+function closeMobileSidebar() {
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const sidebar = document.querySelector(".sidebar");
+  const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+  if (hamburgerMenu) hamburgerMenu.classList.remove("active");
+  if (sidebar) sidebar.classList.remove("active");
+  if (sidebarOverlay) sidebarOverlay.classList.remove("active");
+  document.body.style.overflow = "auto";
+}
+
+// Mobile Touch Gestures - Match history.js
+function initializeTouchGestures() {
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let currentY = 0;
+
+  const sidebar = document.querySelector(".sidebar");
+
+  // Touch start
+  document.addEventListener(
+    "touchstart",
+    function (e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    },
+    { passive: true }
+  );
+
+  // Touch move
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      if (!startX || !startY) return;
+
+      currentX = e.touches[0].clientX;
+      currentY = e.touches[0].clientY;
+
+      const diffX = startX - currentX;
+      const diffY = startY - currentY;
+
+      // Horizontal swipe detection
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        // Swipe right to open sidebar (only from left edge)
+        if (diffX < -50 && startX < 50 && window.innerWidth <= 768) {
+          e.preventDefault();
+          openMobileSidebar();
+        }
+        // Swipe left to close sidebar
+        else if (
+          diffX > 50 &&
+          sidebar &&
+          sidebar.classList.contains("active")
+        ) {
+          e.preventDefault();
+          closeMobileSidebar();
+        }
+      }
+    },
+    { passive: false }
+  );
+
+  // Touch end
+  document.addEventListener(
+    "touchend",
+    function () {
+      startX = 0;
+      startY = 0;
+      currentX = 0;
+      currentY = 0;
+    },
+    { passive: true }
+  );
+}
+
+function openMobileSidebar() {
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const sidebar = document.querySelector(".sidebar");
+  const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+  if (hamburgerMenu) hamburgerMenu.classList.add("active");
+  if (sidebar) sidebar.classList.add("active");
+  if (sidebarOverlay) sidebarOverlay.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+// Mobile Performance Optimizations
+function optimizeForMobile() {
+  if (window.innerWidth <= 768) {
+    // Reduce animations on mobile for better performance
+    document.documentElement.style.setProperty("--transition-speed", "0.2s");
+
+    // Add touch-friendly classes
+    document.body.classList.add("touch-device");
+
+    // Optimize scroll performance
+    const scrollElements = document.querySelectorAll(
+      ".table-container, .main-content"
+    );
+    scrollElements.forEach((element) => {
+      element.style.webkitOverflowScrolling = "touch";
+    });
+  }
+}
+
+// Initialize all mobile features
+function initializeMobileFeatures() {
+  initializeMobileNavigation();
+  initializeTouchGestures();
+  optimizeForMobile();
+
+  // Handle window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768) {
+      closeMobileSidebar();
+      document.body.style.overflow = "auto";
+    }
+  });
+}
+
+// Initialize mobile features
+
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
+  initializeMobileFeatures();
   window.invoiceManager = new InvoiceManager();
 });

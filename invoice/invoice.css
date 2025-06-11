@@ -1,4 +1,5 @@
 @import "../chatbot/chatbot.css";
+@import "../mobile-styles.css";
 
 /* Use foundation variables and extend */
 .main-content {
@@ -1470,4 +1471,909 @@
   font-size: 18px;
   font-weight: 600;
   z-index: 11;
+}
+
+/* Add to all CSS files */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+}
+
+/* Add to each page's CSS file for specific mobile enhancements */
+
+/* Reports Page Mobile Specific */
+@media (max-width: 768px) {
+  .report-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tab-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
+
+/* History Page Mobile Specific */
+@media (max-width: 768px) {
+  .transaction-table {
+    font-size: 14px;
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: 8px 4px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .page-btn {
+    min-width: 35px;
+    height: 35px;
+  }
+}
+
+/* Staff Management Mobile Specific */
+@media (max-width: 768px) {
+  .tabs-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .staff-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bulk-actions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Invoice Page Mobile Specific */
+@media (max-width: 768px) {
+  .invoice-preview {
+    padding: 15px;
+  }
+
+  .invoice-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .invoice-table {
+    font-size: 12px;
+  }
+
+  .print-btn,
+  .download-btn {
+    width: 100%;
+  }
+}
+
+.mobile-header {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #191919;
+  z-index: 1001;
+}
+
+.mobile-header .dashboard-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  flex: 1;
+  text-align: center;
+  margin: 0;
+}
+
+.mobile-header .user-profile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mobile-header .notification-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  font-size: 18px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-header .notification-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover {
+  background-color: var(--primary);
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(1) {
+  transform: rotate(-45deg) translate(-8px, 6px);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(3) {
+  transform: rotate(45deg) translate(-8px, -6px);
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 1200px) {
+  .stats-cards {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-row {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .quick-filters,
+  .status-quick-filters {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .invoice-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 80px;
+  }
+
+  .logo {
+    font-size: 1rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar-item span {
+    display: none;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+    padding: 0.75rem;
+    margin: 0.5rem;
+  }
+
+  .icon-circle {
+    margin-right: 0;
+  }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    padding: 15px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  #invoiceTable {
+    min-width: 800px;
+  }
+
+  .invoice-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+
+  body {
+    position: relative;
+  }
+
+  /* Show mobile header */
+  .mobile-header {
+    display: flex !important;
+  }
+
+  /* Adjust main content for mobile header */
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 80px; /* Account for mobile header */
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* Sidebar mobile behavior - exactly like history.css */
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    background-color: #0e0e0e;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* Restore sidebar items text on mobile when sidebar is open */
+  .sidebar-item span {
+    display: inline !important;
+  }
+
+  .icon-circle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo {
+    font-size: 18px !important;
+    padding: 25px 0 !important;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Header Mobile */
+  .header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+
+  .back-button {
+    font-size: 16px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .user-info {
+    gap: 10px;
+  }
+
+  .notification {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  /* Filter Section Mobile */
+  .filter-section {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-row input,
+  .filter-row select {
+    min-width: auto;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  /* Quick Filters Mobile */
+  .quick-filters,
+  .status-quick-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .quick-filter-label {
+    margin-bottom: 8px;
+    margin-right: 0;
+    text-align: center;
+  }
+
+  .quick-filters .btn,
+  .status-quick-filters .btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+
+  /* Stats Cards Mobile */
+  .stats-cards {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    padding: 20px;
+    min-height: 120px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .stat-date {
+    font-size: 12px;
+  }
+
+  .mini-chart {
+    height: 40px;
+  }
+
+  /* Invoice List Mobile */
+  .invoice-list {
+    padding: 15px;
+  }
+
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  /* Table Mobile */
+  .table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+  #invoiceTable {
+    min-width: 600px;
+    font-size: 12px;
+  }
+
+  #invoiceTable th,
+  #invoiceTable td {
+    padding: 10px 6px;
+    white-space: nowrap;
+  }
+
+  #invoiceTable th:first-child,
+  #invoiceTable td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #1d1d1d;
+    z-index: 1;
+  }
+
+  /* Status badges mobile */
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  /* Action buttons mobile */
+  .action-buttons {
+    gap: 4px;
+  }
+
+  .action-buttons .btn {
+    width: auto;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  /* No Data Message Mobile */
+  .no-data-message {
+    padding: 30px 15px;
+    font-size: 14px;
+  }
+
+  .no-data-icon {
+    font-size: 36px;
+  }
+
+  /* Pagination Mobile */
+  .pagination-container {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 15px;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .page-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  /* Invoice Modal Mobile */
+  .invoice-modal .modal-content {
+    width: 100%;
+    height: calc(100vh - 20px);
+    max-height: none;
+    margin: 10px auto;
+    border-radius: 12px 12px 0 0;
+    overflow-y: auto;
+  }
+
+  /* Invoice Preview Mobile */
+  .invoice-preview {
+    padding: 15px !important;
+    margin: 5px !important;
+  }
+
+  .invoice-header {
+    flex-direction: column !important;
+    gap: 15px;
+    padding: 15px !important;
+  }
+
+  .invoice-info {
+    text-align: left !important;
+  }
+
+  .invoice-info h1 {
+    font-size: 24px !important;
+    text-align: left !important;
+  }
+
+  .business-info h2 {
+    font-size: 18px !important;
+  }
+
+  .business-info p,
+  .invoice-info p {
+    font-size: 12px !important;
+  }
+
+  /* Customer Section Mobile */
+  .customer-section {
+    padding: 15px !important;
+    margin-bottom: 20px;
+  }
+
+  .customer-info h4 {
+    font-size: 14px !important;
+  }
+
+  .customer-info p {
+    font-size: 12px !important;
+  }
+
+  /* Items Table Mobile */
+  .items-table {
+    font-size: 11px !important;
+    overflow-x: auto;
+  }
+
+  .items-table th,
+  .items-table td {
+    padding: 6px 4px !important;
+    white-space: nowrap;
+  }
+
+  .item-name {
+    font-size: 11px !important;
+  }
+
+  .item-description {
+    font-size: 10px !important;
+  }
+
+  /* Invoice Summary Mobile */
+  .invoice-summary {
+    padding: 15px !important;
+    margin-bottom: 20px;
+  }
+
+  .summary-table {
+    max-width: 100% !important;
+    font-size: 12px;
+  }
+
+  .summary-row {
+    padding: 6px 0;
+  }
+
+  .total-row {
+    padding: 10px 15px !important;
+    font-size: 14px !important;
+  }
+
+  /* Invoice Actions Mobile */
+  .invoice-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 15px 0;
+  }
+
+  .invoice-actions .btn {
+    min-width: auto !important;
+    width: 100% !important;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Notes Section Mobile */
+  .notes-section {
+    padding: 15px !important;
+  }
+
+  .notes-section h4 {
+    font-size: 14px !important;
+  }
+
+  .notes-section p {
+    font-size: 12px !important;
+  }
+
+  /* Chatbot Mobile */
+  .chatbot-container {
+    width: 100%;
+    height: 70vh;
+    bottom: 0;
+    right: 0;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .chatbot-toggle {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .chatbot-input-area {
+    padding: 10px;
+  }
+
+  .chatbot-input-area input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .voice-controls {
+    gap: 8px;
+  }
+
+  .voice-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .chatbot-suggestions {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .suggestion-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 70px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .header {
+    margin-bottom: 15px;
+  }
+
+  .back-button {
+    font-size: 14px;
+  }
+
+  .filter-section {
+    padding: 12px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .stats-cards {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 15px;
+    min-height: 100px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  #invoiceTable {
+    min-width: 500px;
+    font-size: 11px;
+  }
+
+  #invoiceTable th,
+  #invoiceTable td {
+    padding: 8px 4px;
+  }
+
+  .status-badge {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .action-buttons .btn {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+
+  .page-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .invoice-preview {
+    padding: 10px !important;
+  }
+
+  .invoice-info h1 {
+    font-size: 20px !important;
+  }
+
+  .business-info h2 {
+    font-size: 16px !important;
+  }
+
+  .items-table {
+    font-size: 10px !important;
+  }
+
+  .items-table th,
+  .items-table td {
+    padding: 4px 2px !important;
+  }
+
+  .summary-table {
+    font-size: 11px;
+  }
+
+  .total-row {
+    font-size: 12px !important;
+  }
+
+  .invoice-actions .btn {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .chatbot-container {
+    height: 60vh;
+  }
+
+  .chatbot-toggle {
+    width: 45px;
+    height: 45px;
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+/* Touch Interactions */
+@media (hover: none) and (pointer: coarse) {
+  .btn:hover,
+  .stat-card:hover,
+  .page-btn:hover,
+  #invoiceTable tbody tr:hover {
+    transform: none;
+    background-color: initial;
+  }
+
+  .notification:hover {
+    transform: none;
+  }
+
+  .suggestion-btn:hover {
+    transform: none;
+  }
+}
+
+/* Landscape Mobile Adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-content {
+    padding-top: 70px;
+  }
+
+  .stats-cards {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .filter-row input,
+  .filter-row select {
+    width: auto;
+    flex: 1;
+  }
+
+  .quick-filters,
+  .status-quick-filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .quick-filters .btn,
+  .status-quick-filters .btn {
+    width: auto;
+    flex: 1;
+  }
+}
+
+/* Fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .main-content {
+    min-height: calc(100vh - 60px);
+  }
+
+  .chatbot-container {
+    height: calc(70vh - env(safe-area-inset-bottom));
+  }
+
+  .invoice-modal .modal-content {
+    height: calc(100vh - env(safe-area-inset-top) - 20px);
+  }
+}
+
+/* Print Styles for Mobile */
+@media print {
+  .sidebar,
+  .mobile-header,
+  .chatbot-container,
+  .chatbot-toggle,
+  .filter-section,
+  .stats-cards,
+  .list-header,
+  .pagination-container {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .invoice-preview {
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .invoice-actions {
+    display: none !important;
+  }
 }

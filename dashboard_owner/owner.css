@@ -903,3 +903,493 @@ button[type="submit"]:hover,
   cursor: pointer;
   color: var(--light-text);
 }
+/* Add to all CSS files */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+}
+
+/* Add to dashboard_owner/owner.css */
+
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 1200px) {
+  :root {
+    --sidebar-width: 80px;
+  }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+
+  body {
+    position: relative;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    background-color: #0e0e0e;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 15px;
+  }
+
+  /* Mobile Header */
+  .mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .hamburger-menu {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger-menu:hover {
+    background-color: var(--primary);
+  }
+
+  .hamburger-line {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 3px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+  }
+
+  .hamburger-menu.active .hamburger-line:nth-child(1) {
+    transform: rotate(-45deg) translate(-8px, 6px);
+  }
+
+  .hamburger-menu.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-menu.active .hamburger-line:nth-child(3) {
+    transform: rotate(45deg) translate(-8px, -6px);
+  }
+
+  /* Stats Cards Mobile */
+  .stats-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-value {
+    font-size: 1.8rem !important;
+  }
+
+  .stat-label {
+    font-size: 0.9rem !important;
+  }
+
+  /* Action Buttons Mobile */
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .action-btn {
+    padding: 16px 20px;
+    font-size: 16px;
+    justify-content: center;
+  }
+
+  /* Search Mobile */
+  .search-container {
+    margin-bottom: 20px;
+  }
+
+  .search-input {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+
+  /* Product Table Mobile */
+  .products-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .products-table {
+    min-width: 700px;
+  }
+
+  .products-table th,
+  .products-table td {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+
+  .action-btns {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  /* Modal Mobile */
+  .modal-content {
+    width: 95%;
+    max-width: 500px;
+    margin: 5% auto;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 16px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  /* Button Mobile */
+  button[type="submit"],
+  .submit-btn {
+    padding: 16px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-group button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem !important;
+  }
+
+  .modal-content {
+    width: 98%;
+    margin: 2% auto;
+    padding: 15px;
+  }
+
+  .action-btn {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+/* Add to all CSS files */
+
+/* Mobile Form Improvements */
+@media (max-width: 768px) {
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(50, 213, 131, 0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Button Groups */
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn-group.horizontal {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .btn-group.horizontal button {
+    flex: 1;
+  }
+
+  /* File Input Styling */
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .file-input-wrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .file-input-label {
+    display: block;
+    padding: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-input-label:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary);
+  }
+}
+
+/* Add to owner.css - Mobile Stats Cards Fix */
+
+@media (max-width: 768px) {
+  /* Stats Cards Mobile Layout */
+  .stats-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .stat-card {
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .stat-card .card-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #aaabb8;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.8rem !important;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+  }
+
+  .stat-card .stat-date {
+    font-size: 12px;
+    color: #aaabb8;
+    margin-bottom: 15px;
+  }
+
+  .stat-card-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  /* Mini Chart Mobile */
+  .mini-chart {
+    height: 40px;
+    gap: 2px;
+    margin-top: 10px;
+  }
+
+  .chart-bar {
+    min-width: 3px;
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* Ensure text doesn't overflow on small screens */
+  .stat-value {
+    word-break: break-word;
+    line-height: 1.2;
+  }
+
+  /* Loading state for mobile */
+  .stat-card.loading .stat-value {
+    background: linear-gradient(90deg, #333 25%, #555 50%, #333 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    height: 30px;
+    width: 80%;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 15px;
+    min-height: 100px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.5rem !important;
+    min-height: 35px;
+  }
+
+  .stat-card .card-title {
+    font-size: 13px;
+  }
+
+  .stat-card .stat-date {
+    font-size: 11px;
+  }
+
+  .stat-card-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .mini-chart {
+    height: 30px;
+  }
+}
+
+/* Fix for very small screens */
+@media (max-width: 320px) {
+  .stat-card .stat-value {
+    font-size: 1.3rem !important;
+  }
+}

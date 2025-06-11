@@ -1016,7 +1016,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       `;
 
-      const container = document.querySelector(".container"); // Main content container
+      const container = document.querySelector(".container");
       if (container) {
         container.appendChild(payrollContainer);
       }
@@ -2845,5 +2845,138 @@ document.addEventListener("DOMContentLoaded", function () {
         alertElement.remove();
       }
     }, 5000);
+  }
+
+  // Mobile Navigation Handler
+  // Update the initializeMobileNavigation function in staff_manage.js
+
+  function initializeMobileNavigation() {
+    // Create mobile header if it doesn't exist - EXACTLY like owner.js
+    const mainContent = document.querySelector(".main-content");
+    if (!document.querySelector(".mobile-header")) {
+      const mobileHeader = document.createElement("div");
+      mobileHeader.className = "mobile-header";
+      mobileHeader.style.display = "none";
+
+      mobileHeader.innerHTML = `
+      <div class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </div>
+      <h1 class="mobile-title">BINTANG JAYA</h1>
+      <div class="mobile-user-info">
+        <div class="notification">🔔</div>
+      </div>
+    `;
+
+      mainContent.insertBefore(mobileHeader, mainContent.firstChild);
+    }
+
+    // Create sidebar overlay - EXACTLY like owner.js
+    if (!document.querySelector(".sidebar-overlay")) {
+      const overlay = document.createElement("div");
+      overlay.className = "sidebar-overlay";
+      overlay.id = "sidebar-overlay";
+      document.body.appendChild(overlay);
+    }
+
+    // Mobile menu functionality - EXACTLY like owner.js
+    const hamburgerMenu = document.getElementById("hamburger-menu");
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+    const mobileHeader = document.querySelector(".mobile-header");
+
+    function toggleMobileMenu() {
+      hamburgerMenu.classList.toggle("active");
+      sidebar.classList.toggle("active");
+      overlay.classList.toggle("active");
+    }
+
+    function closeMobileMenu() {
+      hamburgerMenu.classList.remove("active");
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    }
+
+    hamburgerMenu.addEventListener("click", toggleMobileMenu);
+    overlay.addEventListener("click", closeMobileMenu);
+
+    // Show/hide mobile header based on screen size - EXACTLY like owner.js
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        mobileHeader.style.display = "flex";
+      } else {
+        mobileHeader.style.display = "none";
+        closeMobileMenu();
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial check
+
+    // Close mobile menu when clicking sidebar items - EXACTLY like owner.js
+    const sidebarItems = document.querySelectorAll(".sidebar-item");
+    sidebarItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        if (window.innerWidth <= 768) {
+          closeMobileMenu();
+        }
+      });
+    });
+  }
+  // Touch Gestures for Mobile
+  function initializeTouchGestures() {
+    let startX = 0;
+    let startY = 0;
+
+    document.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+
+    document.addEventListener("touchend", (e) => {
+      if (!startX || !startY) return;
+
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const diffX = startX - endX;
+      const diffY = startY - endY;
+
+      // Swipe right to open sidebar
+      if (window.innerWidth <= 768 && diffX < -100 && Math.abs(diffY) < 100) {
+        const sidebar = document.querySelector(".sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const hamburger = document.getElementById("hamburger-menu");
+
+        if (!sidebar.classList.contains("active")) {
+          hamburger.classList.add("active");
+          sidebar.classList.add("active");
+          overlay.classList.add("active");
+        }
+      }
+
+      // Swipe left to close sidebar
+      if (window.innerWidth <= 768 && diffX > 100 && Math.abs(diffY) < 100) {
+        const sidebar = document.querySelector(".sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const hamburger = document.getElementById("hamburger-menu");
+
+        if (sidebar.classList.contains("active")) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      }
+
+      startX = 0;
+      startY = 0;
+    });
+  }
+
+  // Initialize all mobile features
+  if (window.innerWidth <= 768) {
+    initializeMobileNavigation();
+    initializeTouchGestures();
   }
 });
