@@ -125,7 +125,7 @@ function absen() {
   const userid = localStorage.getItem("userid");
 
   // Get API URL from proper source
-  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
 
   // Use userid instead of undefined staffid variable
   console.log("Staff ID being used:", userid);
@@ -241,7 +241,7 @@ document
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("authToken");
 
-  const apiUrl = localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+  const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
 
   if (!token || isTokenExpired(token)) {
     window.location.href = "/login/login.html";
@@ -1255,8 +1255,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to fetch daily sales data
   async function fetchDailySales() {
     try {
-      const apiUrl =
-        localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+      const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
       const token = localStorage.getItem("authToken");
 
       const response = await fetch(`${apiUrl}/dailysales`, {
@@ -1286,8 +1285,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to fetch weekly sales data
   async function fetchWeeklySales() {
     try {
-      const apiUrl =
-        localStorage.getItem("apiUrl") || "http://103.16.116.58:5050";
+      const apiUrl = localStorage.getItem("apiUrl") || "http://localhost:5050";
       const token = localStorage.getItem("authToken");
 
       const response = await fetch(`${apiUrl}/weeklysales`, {

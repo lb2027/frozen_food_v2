@@ -1,13 +1,26 @@
 {
-  "name": "dashboard_owner",
+  "name": "frozen_food_v2",
   "version": "1.0.0",
+  "description": "Frozen Food POS System with comprehensive test coverage",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:real-coverage": "jest --coverage --testPathPattern=real-coverage",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:all": "jest --coverage --verbose",
+    "test:staff-management": "jest __tests__/real-coverage-staff-management.test.js --coverage",
+    "test:analytics": "jest __tests__/real-coverage-analytics.test.js --coverage",
+    "test:all-real": "jest __tests__/real-coverage-*.test.js --coverage --verbose"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "nyc": "^17.1.0"
+    "jest-environment-jsdom": "^30.0.0",
+    "jsdom": "^24.0.0",
+    "nyc": "^17.1.0",
+    "@testing-library/jest-dom": "^6.1.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.0.0"
   }
 }
